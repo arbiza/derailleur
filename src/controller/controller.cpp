@@ -2,7 +2,7 @@
 
 #include "controller.h"
 
-namespace controller {
+namespace derailleur {
     
     void Controller::teste()
     { 
