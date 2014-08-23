@@ -20,7 +20,7 @@
 int main(int argc, char *argv[])
 {
     
-    controller::Controller c;
+    controller::Controller c("0.0.0.0", 6653, 2);
     c.teste();
     
     
