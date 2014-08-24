@@ -1,4 +1,5 @@
-#ifndef __CONTROLLER_HH__ define __CONTROLLER_HH__
+#ifndef __CONTROLLER_HH__ 
+#define __CONTROLLER_HH__
 
 #include <fluid/OFServer.hh>
 
