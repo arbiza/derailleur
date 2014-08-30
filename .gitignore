@@ -1,7 +1,16 @@
-# Emacs backup files
+## Emacs backup files
 *~
 \#*
 
 
-# build directories
+## Other backups
+*.backup
+*.bak
+
+
+## Build directories
 */build/*
+
+
+## Lib directories
+*/lib/*
