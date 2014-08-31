@@ -5,14 +5,24 @@
  *  Copyright (c) 2014 Lucas Arbiza <lucas.arbiza@gmail.com>
  * 
  *  This file is an implementation of the class(es) defined in
- *  controller.h header file.
+ *  controller.hpp header file.
  *
  *  See the header file for documentation and license information.
  *
  **/
 
 
-#include "controller.h"
+#include "controller.hpp"
+
+
+
+void derailleur::Controller::connection_callback(
+    fluid_base::OFConnection *ofconn, 
+    fluid_base::OFConnection::Event type)
+{
+    // what?
+}
+
 
 
 
@@ -23,14 +33,6 @@ void derailleur::Controller::message_callback(
      std::cout << "message" << std::endl;
 }
 
-
-
-void derailleur::Controller::connection_callback(
-    fluid_base::OFConnection *ofconn, 
-    fluid_base::OFConnection::Event type)
-{
-    // what?
-}
 
 
 
