@@ -60,15 +60,20 @@ public:
        fluid_base::OFHandler which is inherited by fluid_base::OFServer.
     */
 
-    
-    virtual void connection_callback(fluid_base::OFConnection* ofconn,
-				     fluid_base::OFConnection::Event type);
 
-    
     // Method called when a new message arrives
     // @param
     virtual void message_callback(fluid_base::OFConnection* ofconn,
 				  uint8_t type, void* data, size_t len);
+
+    
+
+    // This method manages switches connections. It is called when a switch
+    // connection state changes.
+    // @param ofcon switch connection pointer
+    // @param type connection type identifier
+    virtual void connection_callback(fluid_base::OFConnection* ofconn,
+				     fluid_base::OFConnection::Event type);
 
                                                                       
 

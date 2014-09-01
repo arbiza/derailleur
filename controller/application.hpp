@@ -15,7 +15,8 @@
 #ifndef _APPLICATION_HPP_
 #define _APPLICATION_HPP_
 
-//#include <system_includes>
+#include <memory>
+#include <fluid/OFServer.hh>
 
 //#include "project_includes"
 
@@ -26,15 +27,16 @@ class Application
 {
     
 public:
-    // Default constructor
     Application();
 
-    virtual void on_switch_up() override;
+    // TODO: Check if it is correct
+    virtual void on_switch_up (
+	std::shared_ptr<fluid_base::OFConnection> ofconn) override;
     virtual void on_switch_down() override;
     virtual void on_packet_in() override;
     
 private:
-    
+    std::shared_ptr<fluid_base::OFConnection> ofconn_;
     
 };
 
