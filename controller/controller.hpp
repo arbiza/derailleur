@@ -27,6 +27,7 @@
 #include <iostream>
 
 #include <fluid/OFServer.hh>
+#include <fluid/of13msg.hh>
 
 #include "application.hpp"
 
@@ -38,6 +39,7 @@ class Controller : public fluid_base::OFServer {
     
 public:
 
+    // TODO: remove if not used!
     // Controller(const char* address = "0.0.0.0", const int port = 6653,
     // 	       const int n_workers = 4, bool secure = false)
     // 	: fluid_base::OFServer(address, port, n_workers, secure,
@@ -47,12 +49,10 @@ public:
     // 	this->running_ = true;
     // }
 
-    Controller(&Application Application)
+    //Controller(&Application Application)
+    Controller()
 	: fluid_base::OFServer("0.0.0.0", 6653, 4, false,
-	    fluid_base::OFServerSettings().supported_version(1).supported_version(4).keep_data_ownership(false))
-    {
-	this->running_ = true;
-    }
+			       fluid_base::OFServerSettings().supported_version(1).supported_version(4).keep_data_ownership(false)) {};
 
 
     /* The following two methods override methods defined in

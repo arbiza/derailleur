@@ -31,9 +31,9 @@ public:
 
     // TODO: Check if it is correct
     virtual void on_switch_up (
-	std::shared_ptr<fluid_base::OFConnection> ofconn) override;
-    virtual void on_switch_down() override;
-    virtual void on_packet_in() override;
+	std::shared_ptr<fluid_base::OFConnection> ofconn);
+    virtual void on_switch_down();
+    virtual void on_packet_in();
     
 private:
     std::shared_ptr<fluid_base::OFConnection> ofconn_;
