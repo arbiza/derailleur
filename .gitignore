@@ -9,8 +9,8 @@
 
 
 ## Build directories
-*/build/*
+build/
 
 
 ## Lib directories
-*/lib/*
+lib/
