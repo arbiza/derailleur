@@ -13,15 +13,15 @@
 // ___________________________________________________________________
 
 
-#include "controller/controller.h"
+#include "../../derailleur.hpp"
 
 #include <iostream>
 
 int main(int argc, char *argv[])
 {
     
-    controller::Controller c("0.0.0.0", 6653, 2);
-    c.teste();
+    derailleur::Controller controller;
+    controller.teste();
     
     
     return 0;
