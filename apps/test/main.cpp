@@ -21,8 +21,9 @@ int main(int argc, char *argv[])
 {
     
     derailleur::Controller controller;
-    controller.teste();
-    
+
+    controller.start();
+    while(1);
     
     return 0;
 }
