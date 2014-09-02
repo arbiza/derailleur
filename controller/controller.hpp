@@ -27,7 +27,6 @@
 #include <iostream>
 
 #include <fluid/OFServer.hh>
-#include <fluid/of13msg.hh>
 
 #include "application.hpp"
 

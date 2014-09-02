@@ -11,6 +11,7 @@
  *
  **/
 
+#include <iostream>
 
 #include "controller.hpp"
 #include "base_flows.hpp"
@@ -23,24 +24,17 @@ void derailleur::Controller::message_callback(
     switch (type){
 
     case 10: // packet_in
-	derailleur::flows::normal(ofconn);
+	
 	break;
 
     case 6: // ofpt_features_reply
-	
+	std::cout << "switch up" << std::endl;
+	derailleur::flows::normal(ofconn);
 	break;
 
     default:
 	break;
     }
-
-    // Packet_in
-    // if (type == 10) {
-    // 	dispatch_event(new PacketInEvent(ofconn, this, data, len));
-    // }
-    // else if (type == 6) { // OFPT_FEATURES_REPLY
-    // 	dispatch_event(new SwitchUpEvent(ofconn, this, data, len));
-    // }
 }
 
 
