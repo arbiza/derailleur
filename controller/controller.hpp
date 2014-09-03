@@ -25,11 +25,23 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include <fluid/OFServer.hh>
 
 
-namespace derailleur {
+
+// It is used when controller is started (by OFServer). The controller
+// will run on only 1 thread, because it will run each switch connection
+// in a separated thread.
+const int server_n_threads_ = 1;
+
+
+
+class thread; // forward declaration
+
+
+namespace derailleur {    
 
 // This class inherits from fluid_base::OFServer ans implements Derailleur
 // controller functionalities.  Usage: ...
@@ -38,29 +50,23 @@ class Controller : public fluid_base::OFServer {
 public:
 
     // Constructor with parameters
-    Controller(const char* address, const int port, const int n_workers,
-	       bool secure)
-    	: fluid_base::OFServer(address, port, n_workers, secure,
+    Controller(const char* address, const int port, bool secure)
+    	: fluid_base::OFServer(address, port, server_n_threads_, secure,
     			       fluid_base::OFServerSettings().supported_version(1).
-    			       supported_version(4).keep_data_ownership(false))
+    			       supported_version(4).keep_data_ownership(false)) {};
 
 	  
     
     Controller()
-	: fluid_base::OFServer("0.0.0.0", 6653, 4, false,
+	: fluid_base::OFServer("0.0.0.0", 6653, server_n_threads_, false,
 			       fluid_base::OFServerSettings().supported_version(1).supported_version(4).keep_data_ownership(false)) {};
 
-
-    /* The following two methods override methods defined in
-       fluid_base::OFServer class. They were defined in
-       fluid_base::OFHandler which is inherited by fluid_base::OFServer.
-    */
 
 
     // Method called when a new message arrives
     // @param
-    virtual void message_callback(fluid_base::OFConnection* ofconn,
-				  uint8_t type, void* data, size_t len);
+    void message_callback(fluid_base::OFConnection* ofconn,
+			  uint8_t type, void* data, size_t len) override;
 
     
 
@@ -68,14 +74,26 @@ public:
     // connection state changes.
     // @param ofcon switch connection pointer
     // @param type connection type identifier
-    virtual void connection_callback(fluid_base::OFConnection* ofconn,
-				     fluid_base::OFConnection::Event type);
+    void connection_callback(fluid_base::OFConnection* ofconn,
+			     fluid_base::OFConnection::Event type) override;
 
-    
+private:
+
+    // This vector stores the threads over witch the Switches objects are
+    // running.
+    // TODO: maybe a map is batter than vector (I'll need to release)
+    std::vector<std::thread> switches_;
+    void new_switch(fluid_base::OFConnection* ofconn,
+		    fluid_base::OFHandler* handler);
 };
     
 } // namespace derailleur
 
 
 #endif // _CONTROLLER_HPP_
+
+
+
+
+
 

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 project(Derailleur)
 
 # Compiler flags
-add_definitions(-Wall -std=c++11)
+add_definitions(-Wall -std=c++11 -lpthread)
 
 set(CMAKE_BUILD_TYPE Release)
 

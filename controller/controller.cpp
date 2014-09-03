@@ -12,29 +12,40 @@
  **/
 
 #include <iostream>
+#include <thread>
 
 #include "controller.hpp"
-#include "base_flows.hpp"
+#include "switch.hpp"
 
 
 
 void derailleur::Controller::message_callback(
     fluid_base::OFConnection *ofconn, uint8_t type, void *data, size_t len)
 {
-    switch (type){
-
-    case 10: // packet_in
-	
-	break;
-
-    case 6: // ofpt_features_reply
+    if(type == 6) {
+	this->switches_.push_back(std::thread(
+				      &derailleur::Controller::new_switch,
+				      ofconn,
+				      this));
 	std::cout << "switch up" << std::endl;
-	derailleur::flows::normal(ofconn);
-	break;
-
-    default:
-	break;
     }
+    else {
+	std::cout << "lost message arrived." << std::endl;
+    }
+    // switch (type){
+
+    // case 10: // packet_in
+	
+    // 	break;
+
+    // case 6: // ofpt_features_reply
+    // 	std::cout << "switch up" << std::endl;
+	
+    // 	break;
+
+    // default:
+    // 	break;
+    // }
 }
 
 
@@ -65,3 +76,22 @@ void derailleur::Controller::connection_callback( fluid_base::OFConnection
 	// dispatch_event(new SwitchDownEvent(ofconn));
     }
 }
+
+
+
+void derailleur::Controller::new_switch(fluid_base::OFConnection *ofconn,
+					fluid_base::OFHandler *handler) {
+    //derailleur::Switch switch(ofconn, handler);
+    std::cout << "ok" << std::endl;
+}
+
+
+
+
+
+
+
+
+
+
+

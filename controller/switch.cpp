@@ -91,23 +91,3 @@ void derailleur::Switch::add_flow_default() {
     connection_->send(buffer, fm.length());
     fluid_msg::OFMsg::free_buffer(buffer);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

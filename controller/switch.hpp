@@ -21,6 +21,7 @@
 
 namespace derailleur {
 
+    
 // Class comment: describe what it is for and how it should be used.
 class Switch : public fluid_base::OFHandler {
 
@@ -30,6 +31,10 @@ public:
 	this->connection_ = connection;
 	this->handler_ = handler;
 	add_flow_default();
+    }
+
+    ~Switch() {
+	std::cout << "Switch died." << std::endl;
     }
 
     
@@ -56,9 +61,7 @@ private:
     void add_flow_default();
 
     fluid_base::OFConnection* connection_;
-    fluid_base::OFHandler* handler_;
-
-    
+    fluid_base::OFHandler* handler_;    
 };
 
 } // namespace derailleur
