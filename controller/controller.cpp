@@ -65,11 +65,3 @@ void derailleur::Controller::connection_callback( fluid_base::OFConnection
 	// dispatch_event(new SwitchDownEvent(ofconn));
     }
 }
-
-
-
-// TODO: remove it!    
-void derailleur::Controller::teste()
-{ 
-    std::cout << "OK!" << std::endl; 
-}

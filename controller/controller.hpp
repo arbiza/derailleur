@@ -28,7 +28,6 @@
 
 #include <fluid/OFServer.hh>
 
-#include "application.hpp"
 
 namespace derailleur {
 
@@ -38,17 +37,15 @@ class Controller : public fluid_base::OFServer {
     
 public:
 
-    // TODO: remove if not used!
-    // Controller(const char* address = "0.0.0.0", const int port = 6653,
-    // 	       const int n_workers = 4, bool secure = false)
-    // 	: fluid_base::OFServer(address, port, n_workers, secure,
-    // 			       fluid_base::OFServerSettings().supported_version(1).
-    // 			       supported_version(4).keep_data_ownership(false))
-    // {
-    // 	this->running_ = true;
-    // }
+    // Constructor with parameters
+    Controller(const char* address, const int port, const int n_workers,
+	       bool secure)
+    	: fluid_base::OFServer(address, port, n_workers, secure,
+    			       fluid_base::OFServerSettings().supported_version(1).
+    			       supported_version(4).keep_data_ownership(false))
 
-    //Controller(&Application Application)
+	  
+    
     Controller()
 	: fluid_base::OFServer("0.0.0.0", 6653, 4, false,
 			       fluid_base::OFServerSettings().supported_version(1).supported_version(4).keep_data_ownership(false)) {};
@@ -74,11 +71,6 @@ public:
     virtual void connection_callback(fluid_base::OFConnection* ofconn,
 				     fluid_base::OFConnection::Event type);
 
-                                                                      
-
-    void teste();
-
-private: bool running_;
     
 };
     
