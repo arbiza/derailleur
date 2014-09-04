@@ -15,6 +15,8 @@
 #ifndef _SWITCH_HPP_
 #define _SWITCH_HPP_
 
+// TODO: remove iostream
+#include <iostream>
 
 #include <fluid/OFServer.hh>
 
@@ -30,11 +32,12 @@ public:
 	   fluid_base::OFHandler* handler) {
 	this->connection_ = connection;
 	this->handler_ = handler;
-	add_flow_default();
+	//add_flow_default();
     }
 
+
     ~Switch() {
-	std::cout << "Switch died." << std::endl;
+    	std::cout << "Switch died." << std::endl;
     }
 
     
@@ -42,8 +45,9 @@ public:
     // Method called when a new message arrives.
     // Overrides OFHandler connection_callback.
     // @param
-    void message_callback(fluid_base::OFConnection* ofconn,
-				  uint8_t type, void* data, size_t len) override;
+    void message_callback(
+	fluid_base::OFConnection* ofconn, uint8_t type,	void* data,
+	size_t len) override;
 
     
 
@@ -52,8 +56,12 @@ public:
     // Overrides OFHandler connection_callback.
     // @param ofcon switch connection pointer
     // @param type connection type identifier
-    void connection_callback(fluid_base::OFConnection* ofconn,
-				     fluid_base::OFConnection::Event type) override;
+    void connection_callback(
+	fluid_base::OFConnection* ofconn, fluid_base::OFConnection::Event type)
+	override;
+
+
+    void free_data (void* data) override;
 
     void add_flow_normal();
     

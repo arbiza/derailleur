@@ -69,6 +69,12 @@ void derailleur::Switch::connection_callback(
 
 
 
+void derailleur::Switch::free_data (void* data) {
+    //TODO: remove it and correct this method
+    std::cout << "test free data" << std::endl;
+}
+
+
 
 void derailleur::Switch::add_flow_normal() {
 

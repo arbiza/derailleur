@@ -36,4 +36,4 @@ add_executable(${EXECUTABLE} ${SOURCES})
 
 
 # Link libraries
-target_link_libraries(${EXECUTABLE} fluid_base fluid_msg libderailleur)
+target_link_libraries(${EXECUTABLE} fluid_base fluid_msg pthread libderailleur)

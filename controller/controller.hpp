@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <vector>
-
+#include <thread>
 #include <fluid/OFServer.hh>
 
 
@@ -83,6 +83,8 @@ private:
     // running.
     // TODO: maybe a map is batter than vector (I'll need to release)
     std::vector<std::thread> switches_;
+
+
     void new_switch(fluid_base::OFConnection* ofconn,
 		    fluid_base::OFHandler* handler);
 };
