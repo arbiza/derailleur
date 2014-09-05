@@ -25,20 +25,8 @@
 
 
 #include <iostream>
-#include <vector>
-#include <thread>
+
 #include <fluid/OFServer.hh>
-
-
-
-// It is used when controller is started (by OFServer). The controller
-// will run on only 1 thread, because it will run each switch connection
-// in a separated thread.
-const int server_n_threads_ = 1;
-
-
-
-class thread; // forward declaration
 
 
 namespace derailleur {    
@@ -49,24 +37,20 @@ class Controller : public fluid_base::OFServer {
     
 public:
 
-    // Constructor with parameters
-    Controller(const char* address, const int port, bool secure)
-    	: fluid_base::OFServer(address, port, server_n_threads_, secure,
-    			       fluid_base::OFServerSettings().supported_version(1).
-    			       supported_version(4).keep_data_ownership(false)) {};
+    // Constructor
+    Controller(const char* address,
+	       const int port,
+	       const int n_workers,
+	       const bool secure);
 
-	  
+
     
-    Controller()
-	: fluid_base::OFServer("0.0.0.0", 6653, server_n_threads_, false,
-			       fluid_base::OFServerSettings().supported_version(1).supported_version(4).keep_data_ownership(false)) {};
-
-
-
     // Method called when a new message arrives
     // @param
     void message_callback(fluid_base::OFConnection* ofconn,
-			  uint8_t type, void* data, size_t len) override;
+			  uint8_t type,
+			  void* data,
+			  size_t len) override;
 
     
 
@@ -77,25 +61,19 @@ public:
     void connection_callback(fluid_base::OFConnection* ofconn,
 			     fluid_base::OFConnection::Event type) override;
 
+
+    // Return a shared pointer to the switches stack.
+    auto get_rack_pointer() { return this->switch_stack_; }
+    
+
 private:
 
-    // This vector stores the threads over witch the Switches objects are
-    // running.
-    // TODO: maybe a map is batter than vector (I'll need to release)
-    std::vector<std::thread> switches_;
+    // It is a pointer shared with application class.
+    auto switch_stack_;
 
-
-    void new_switch(fluid_base::OFConnection* ofconn,
-		    fluid_base::OFHandler* handler);
 };
     
 } // namespace derailleur
 
 
 #endif // _CONTROLLER_HPP_
-
-
-
-
-
-

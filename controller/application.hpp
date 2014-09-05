@@ -15,10 +15,9 @@
 #ifndef _APPLICATION_HPP_
 #define _APPLICATION_HPP_
 
-#include <memory>
 #include <fluid/OFServer.hh>
 
-//#include "project_includes"
+#include "controller.hpp"
 
 namespace derailleur {
 
@@ -30,13 +29,15 @@ public:
     Application();
 
     // TODO: Check if it is correct
-    virtual void on_switch_up (
-	std::shared_ptr<fluid_base::OFConnection> ofconn);
-    virtual void on_switch_down();
-    virtual void on_packet_in();
+    void on_switch_up ();
+    void on_switch_down();
+    virtual void handler();
     
 private:
-    std::shared_ptr<fluid_base::OFConnection> ofconn_;
+    auto switches_rack_;
+    //std::shared_ptr<std::map<int, derailleur::Switch>> switches_rack_;
+
+    derailleur::Controller controller;
     
 };
 

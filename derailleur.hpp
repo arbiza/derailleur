@@ -18,7 +18,9 @@
 // This file is the only one anyone which will use derailleur controller
 // should include. It includes the header files needed for applications.
 
+// TODO: remover, pois application vai conter o controller
 #include "controller/controller.hpp"
+
 #include "controller/application.hpp"
 #include "controller/table.hpp"
 

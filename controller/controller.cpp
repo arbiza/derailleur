@@ -11,41 +11,41 @@
  *
  **/
 
+// TODO: remove when log class in use
 #include <iostream>
+
+
+#include <memory>
+#include <map>
 
 #include "controller.hpp"
 #include "switch.hpp"
 
 
-void echo(const char* text) {
-    std::cout << text << std::endl;
+
+derailleur::Controller::Controller(const char* address,
+				   const int port,
+				   const int n_workers,
+				   const bool secure)
+    : fluid_base::OFServer(address,
+			   port,
+			   n_workers,
+			   secure,
+			   fluid_base::OFServerSettings().
+			   supported_version(1).
+			   supported_version(4).
+			   keep_data_ownership(false)) {
+    
+    switch_stack_ = std::make_shared< std::map<int, derailleur::Switch> >;
 }
 
-
-void teste(fluid_base::OFConnection* ofconn,
-    fluid_base::OFHandler* handler) {
-    derailleur::Switch s(ofconn, handler);
-    // std::cout << "ok" << std::endl;
-}
 
 
 void derailleur::Controller::message_callback(
     fluid_base::OFConnection *ofconn, uint8_t type, void *data, size_t len)
 {
     if(type == 6) {
-	// this->switches_.push_back(std::thread(
-	// 			      &derailleur::Controller::new_switch,
-	// 			      ofconn,
-	//  			      this));
-	// this->switches_.push_back(std::thread(
-	// 			      &derailleur::Controller::new_switch,
-	// 			      this));
-	//derailleur::Switch s(ofconn, this);
-	//std::thread t(std::move(s));
-
-	//this->switches_.push_back(std::thread(teste,ofconn, this));
-	
-	std::cout << "id na criacao: " << ofconn->get_id() << std::endl;
+	derailleur::Switch s(ofconn);
     }
     else {
 	std::cout << "lost message arrived." << std::endl;
@@ -96,30 +96,3 @@ void derailleur::Controller::connection_callback( fluid_base::OFConnection
 	// dispatch_event(new SwitchDownEvent(ofconn));
     }
 }
-
-
-
-void derailleur::Controller::new_switch(fluid_base::OFConnection* ofconn,
-    fluid_base::OFHandler* handler) {
-//    derailleur::Switch s(ofconn, handler);
-    // std::cout << "ok" << std::endl;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
