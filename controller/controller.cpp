@@ -12,7 +12,6 @@
  **/
 
 #include <iostream>
-#include <utility>
 
 #include "controller.hpp"
 #include "switch.hpp"
@@ -44,8 +43,9 @@ void derailleur::Controller::message_callback(
 	//derailleur::Switch s(ofconn, this);
 	//std::thread t(std::move(s));
 
-	this->switches_.push_back(std::thread(teste,ofconn, this));
-
+	//this->switches_.push_back(std::thread(teste,ofconn, this));
+	
+	std::cout << "id na criacao: " << ofconn->get_id() << std::endl;
     }
     else {
 	std::cout << "lost message arrived." << std::endl;
@@ -85,11 +85,13 @@ void derailleur::Controller::connection_callback( fluid_base::OFConnection
     }
     else if (type == fluid_base::OFConnection::EVENT_CLOSED)
     {
+	std::cout << "id: " << ofconn->get_id() << std::endl;
 	// printf("Connection id=%d closed by the user\n", ofconn->get_id());
 	// dispatch_event(new SwitchDownEvent(ofconn));
     }
     else if (type == fluid_base::OFConnection::EVENT_DEAD)
     {
+	std::cout << "id: " << ofconn->get_id() << std::endl;
 	// printf("Connection id=%d closed due to inactivity\n", ofconn->get_id());
 	// dispatch_event(new SwitchDownEvent(ofconn));
     }
