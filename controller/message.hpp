@@ -1,6 +1,6 @@
 
 /**
- *  File: switch.hpp
+ *  File: message.hpp
  *
  *  Copyright (c) 2014 Lucas Arbiza <lucas.arbiza@gmail.com>
  * 
@@ -12,50 +12,38 @@
 
 
 
-#ifndef _SWITCH_HPP_
-#define _SWITCH_HPP_
+#ifndef _MESSAGE_HPP_
+#define _MESSAGE_HPP_
 
-
-#include "message.hpp"
-
-
-// Forward declaration
 namespace fluid_base {
-    class OFConnection;
+    // Forward declaration
+    class OFHandler; 
 }
 
 
 namespace derailleur {
 
-    
 // Class comment: describe what it is for and how it should be used.
-class Switch {
-
-public:
+class Message
+{
     
-    Switch(fluid_base::OFConnection* connection);
+public:
+    Message(fluid_base::OFHandler* ofhandler,
+	    int type,
+	    void* data,
+	    size_t len);
 
-    void message_handler (derailleur::Message* message);
+    virtual ~Message();
 
-
-    void add_flow_normal();
+    int get_type();
     
 private:
-    void add_flow_default();
-
-    fluid_base::OFConnection* connection_;
+    fluid_base::OFHandler* handler_;
+    int type_;
+    uint8_t* data_;
+    size_t len_;
 };
 
 } // namespace derailleur
 
-#endif // _SWITCH_HPP_
-
-
-
-
-
-
-
-
-
-
+#endif // _MESSAGE_HPP_

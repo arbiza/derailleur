@@ -17,10 +17,10 @@
 
 #include <memory>
 #include <map>
+#include <utility>
 
 #include "controller.hpp"
-#include "switch.hpp"
-
+#include "message.hpp"
 
 
 derailleur::Controller::Controller(const char* address,
@@ -34,36 +34,27 @@ derailleur::Controller::Controller(const char* address,
 			   fluid_base::OFServerSettings().
 			   supported_version(1).
 			   supported_version(4).
-			   keep_data_ownership(false)) {
-    
-    switch_stack_ = std::make_shared< std::map<int, derailleur::Switch> >;
-}
+			   keep_data_ownership(false)) {}
 
 
 
-void derailleur::Controller::message_callback(
-    fluid_base::OFConnection *ofconn, uint8_t type, void *data, size_t len)
+void derailleur::Controller::message_callback(fluid_base::OFConnection *ofconn,
+					      uint8_t type,
+					      void *data,
+					      size_t len)
 {
     if(type == 6) {
-	derailleur::Switch s(ofconn);
+
+	//TODO: lock here
+	switches_rack_.emplace(std::make_pair(
+				   int (ofconn->get_id()),
+				   derailleur::Switch(ofconn)));
+	//TODO: unlock here	
     }
     else {
-	std::cout << "lost message arrived." << std::endl;
+        switches_rack_.at(ofconn->get_id()).message_handler(
+	    new Message(this, type, data, len));
     }
-    // switch (type){
-
-    // case 10: // packet_in
-	
-    // 	break;
-
-    // case 6: // ofpt_features_reply
-    // 	std::cout << "switch up" << std::endl;
-	
-    // 	break;
-
-    // default:
-    // 	break;
-    // }
 }
 
 
@@ -85,14 +76,12 @@ void derailleur::Controller::connection_callback( fluid_base::OFConnection
     }
     else if (type == fluid_base::OFConnection::EVENT_CLOSED)
     {
-	std::cout << "id: " << ofconn->get_id() << std::endl;
-	// printf("Connection id=%d closed by the user\n", ofconn->get_id());
-	// dispatch_event(new SwitchDownEvent(ofconn));
+	std::cout << "closed id: " << ofconn->get_id() << std::endl;
+        // TODO: Delete switch from rack
     }
     else if (type == fluid_base::OFConnection::EVENT_DEAD)
     {
-	std::cout << "id: " << ofconn->get_id() << std::endl;
-	// printf("Connection id=%d closed due to inactivity\n", ofconn->get_id());
-	// dispatch_event(new SwitchDownEvent(ofconn));
+	std::cout << "closed id: " << ofconn->get_id() << std::endl;
+        // TODO: Delete switch from rack
     }
 }

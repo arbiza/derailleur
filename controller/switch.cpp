@@ -11,17 +11,34 @@
  *
  **/
 
+
+//TODO: remove!
+#include <iostream>
+
+
+
 #include <fluid/OFServer.hh>
 #include <fluid/of13msg.hh>
 
 #include "switch.hpp"
 
 
-derailleur::Switch::Switch(fluid_base::OFConnection* const connection)
+derailleur::Switch::Switch(fluid_base::OFConnection* connection)
     : connection_(connection) {
     add_flow_default();
+
+    std::cout << "Conexão: " << this->connection_->get_id() << std::endl;
 }
 
+
+void derailleur::Switch::message_handler(derailleur::Message* message) {
+    std::cout << "chegou mensagem no switch "
+	      << this->connection_->get_id()
+	      // << "\n Mensagem: "
+	      // << (uint8_t*) data
+	      << "_______________________________"
+	      << std::endl;
+}
 
 
 void derailleur::Switch::add_flow_normal() {

@@ -21,8 +21,8 @@
 // TODO: remover, pois application vai conter o controller
 #include "controller/controller.hpp"
 
-#include "controller/application.hpp"
-#include "controller/table.hpp"
+//#include "controller/application.hpp"
+//#include "controller/table.hpp"
 
 
 #endif // _DERAILLEUR_HPP_

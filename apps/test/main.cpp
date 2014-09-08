@@ -20,7 +20,7 @@
 int main(int argc, char *argv[])
 {
     
-    derailleur::Controller controller;
+    derailleur::Controller controller("0.0.0.0", 6653, 4, false);
 
     controller.start();
     while(1);

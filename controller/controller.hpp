@@ -28,8 +28,9 @@
 
 #include <fluid/OFServer.hh>
 
+#include "switch.hpp"
 
-namespace derailleur {    
+namespace derailleur {
 
 // This class inherits from fluid_base::OFServer ans implements Derailleur
 // controller functionalities.  Usage: ...
@@ -63,17 +64,30 @@ public:
 
 
     // Return a shared pointer to the switches stack.
-    auto get_rack_pointer() { return this->switch_stack_; }
+    //auto get_rack_pointer() { return this->switch_stack_; }
     
 
 private:
 
+    // TODO: move to application class
     // It is a pointer shared with application class.
-    auto switch_stack_;
-
+    //static auto switches_rack_;
+    //std::shared_ptr< std::map<int, derailleur::Switch> > switches_rack_;
+    std::map<int, derailleur::Switch> switches_rack_;
+    //std::map<int, std::string> teste;
 };
     
 } // namespace derailleur
 
 
 #endif // _CONTROLLER_HPP_
+
+
+
+
+
+
+
+
+
+

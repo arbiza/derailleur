@@ -34,7 +34,7 @@ public:
     virtual void handler();
     
 private:
-    auto switches_rack_;
+    //auto switches_rack_;
     //std::shared_ptr<std::map<int, derailleur::Switch>> switches_rack_;
 
     derailleur::Controller controller;
