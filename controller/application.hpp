@@ -26,21 +26,36 @@ class Application
 {
     
 public:
-    Application();
+    Application(const char* address,
+		const int port,
+		const int n_workers,
+		const bool secure);
+    
+    ~Application();
 
     // TODO: Check if it is correct
-    void on_switch_up ();
-    void on_switch_down();
+    virtual void on_switch_up ();
+    virtual void on_switch_down();
     virtual void handler();
     
 private:
-    //auto switches_rack_;
-    //std::shared_ptr<std::map<int, derailleur::Switch>> switches_rack_;
 
-    derailleur::Controller controller;
+    void set_rack_pointer();
     
+    //derailleur::Controller* controller_;
+    //auto switches_rack_;
 };
 
 } // namespace derailleur
 
 #endif // _APPLICATION_HPP_
+
+
+
+
+
+
+
+
+
+

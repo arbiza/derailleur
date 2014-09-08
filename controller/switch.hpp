@@ -35,9 +35,6 @@ public:
     
     Switch(fluid_base::OFConnection* connection);
 
-    void message_handler (derailleur::Message* message);
-
-
     void add_flow_normal();
     
 private:

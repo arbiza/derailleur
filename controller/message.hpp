@@ -31,7 +31,7 @@ public:
     Message(fluid_base::OFHandler* ofhandler,
 	    int type,
 	    void* data,
-	    size_t len);
+	    size_t length);
 
     virtual ~Message();
 
@@ -41,7 +41,7 @@ private:
     fluid_base::OFHandler* handler_;
     int type_;
     uint8_t* data_;
-    size_t len_;
+    size_t length_;
 };
 
 } // namespace derailleur

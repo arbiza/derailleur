@@ -30,7 +30,7 @@ set(
 
 
 #add_library(derailleur SHARED controller.cpp switch.cpp)
-add_library(derailleur SHARED controller.cpp switch.cpp message.cpp)
+add_library(derailleur SHARED controller.cpp switch.cpp message.cpp application.cpp)
 
 #install(TARGETS derailleur RUNTIME_OUTPUT_DIRECTORY ${DERAILLEUR_BINARY_DIR}/bin)
 

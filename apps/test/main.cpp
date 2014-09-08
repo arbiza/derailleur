@@ -17,12 +17,23 @@
 
 #include <iostream>
 
+
+class MyApp : public derailleur::Application {
+    
+}
+
+
 int main(int argc, char *argv[])
 {
     
-    derailleur::Controller controller("0.0.0.0", 6653, 4, false);
+    // derailleur::Controller controller("0.0.0.0", 6653, 4, false);
 
-    controller.start();
+    // controller.start();
+    // while(1);
+
+    MyApp myapp;
+
+
     while(1);
     
     return 0;

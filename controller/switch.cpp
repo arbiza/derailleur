@@ -31,15 +31,6 @@ derailleur::Switch::Switch(fluid_base::OFConnection* connection)
 }
 
 
-void derailleur::Switch::message_handler(derailleur::Message* message) {
-    std::cout << "chegou mensagem no switch "
-	      << this->connection_->get_id()
-	      // << "\n Mensagem: "
-	      // << (uint8_t*) data
-	      << "_______________________________"
-	      << std::endl;
-}
-
 
 void derailleur::Switch::add_flow_normal() {
 

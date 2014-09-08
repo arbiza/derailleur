@@ -19,11 +19,11 @@
 derailleur::Message::Message(fluid_base::OFHandler* ofhandler,
 			     int type,
 			     void* data,
-			     size_t len) {
+			     size_t length) {
     this->handler_ = ofhandler;
     this->type_ = type;
     this->data_ = (uint8_t*) data;
-    this->len_ = len;
+    this->length_ = length;
 }
 
 

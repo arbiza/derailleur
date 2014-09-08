@@ -15,7 +15,6 @@
 #include <iostream>
 
 
-#include <memory>
 #include <map>
 #include <utility>
 
@@ -23,10 +22,14 @@
 #include "message.hpp"
 
 
-derailleur::Controller::Controller(const char* address,
-				   const int port,
-				   const int n_workers,
-				   const bool secure)
+
+
+derailleur::Controller::Controller(
+    const char* address,
+    const int port,
+    const int n_workers,
+    const bool secure,
+    std::unique_ptr<derailleur::Application> application) 
     : fluid_base::OFServer(address,
 			   port,
 			   n_workers,
@@ -52,8 +55,8 @@ void derailleur::Controller::message_callback(fluid_base::OFConnection *ofconn,
 	//TODO: unlock here	
     }
     else {
-        switches_rack_.at(ofconn->get_id()).message_handler(
-	    new Message(this, type, data, len));
+        // switches_rack_.at(ofconn->get_id()).message_handler(
+	//     new Message(this, type, data, len));
     }
 }
 
@@ -64,15 +67,15 @@ void derailleur::Controller::connection_callback( fluid_base::OFConnection
 {
     if (type == fluid_base::OFConnection::EVENT_STARTED)
     {
-	
+	// TODO: log
     }
     else if (type == fluid_base::OFConnection::EVENT_ESTABLISHED)
     {
-        
+        // TODO: log
     }
     else if (type == fluid_base::OFConnection::EVENT_FAILED_NEGOTIATION)
     {
-	
+	// TODO: log
     }
     else if (type == fluid_base::OFConnection::EVENT_CLOSED)
     {

@@ -25,10 +25,12 @@
 
 
 #include <iostream>
+#include <memory>
 
 #include <fluid/OFServer.hh>
 
 #include "switch.hpp"
+#include "application.hpp"
 
 namespace derailleur {
 
@@ -38,11 +40,12 @@ class Controller : public fluid_base::OFServer {
     
 public:
 
-    // Constructor
+    // Contructor
     Controller(const char* address,
-	       const int port,
-	       const int n_workers,
-	       const bool secure);
+    	       const int port,
+    	       const int n_workers,
+    	       const bool secure,
+	       std::unique_ptr<derailleur::Application> application);
 
 
     
@@ -68,13 +71,8 @@ public:
     
 
 private:
-
-    // TODO: move to application class
-    // It is a pointer shared with application class.
-    //static auto switches_rack_;
-    //std::shared_ptr< std::map<int, derailleur::Switch> > switches_rack_;
+    std::unique_ptr<derailleur::Application> application_;
     std::map<int, derailleur::Switch> switches_rack_;
-    //std::map<int, std::string> teste;
 };
     
 } // namespace derailleur
