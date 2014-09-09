@@ -24,23 +24,22 @@
 
 
 
-derailleur::Controller::Controller(
-    const char* address,
-    const int port,
-    const int n_workers,
-    const bool secure,
-    std::unique_ptr<derailleur::Application> application) 
+derailleur::Controller::Controller(const char* address,
+                                   const int port,
+                                   const int n_workers,
+                                   const bool secure,
+                                   derailleur::Application* application)
     : fluid_base::OFServer(address,
-			   port,
-			   n_workers,
-			   secure,
-			   fluid_base::OFServerSettings().
-			   supported_version(1).
-			   supported_version(4).
-			   keep_data_ownership(false)) {
+                           port,
+                           n_workers,
+                           secure,
+                           fluid_base::OFServerSettings().
+                           supported_version(1).
+                           supported_version(4).
+                           keep_data_ownership(false)) {
 
-    this->application_ = std::move(application);
-    this->application_->set_rack_pointer();
+    this->application_ = application;
+    this->application_->set_rack_pointer(this->switches_rack_);
 }
 
 

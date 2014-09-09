@@ -11,7 +11,7 @@
  *
  **/
 
-#include <memory>
+#include <utility>
 
 #include "controller.hpp"
 #include "application.hpp"
@@ -19,27 +19,17 @@
 
 
 derailleur::Application::Application(const char* address,
-				     const int port,
-				     const int n_workers,
-				     const bool secure) {
-    this->controller_ =
-    	new derailleur::Controller(
-	    address,
-	    port,
-	    n_workers,
-	    secure,
-	    std::unique_ptr<derailleur::Application>(this));
-
+                                     const int port,
+                                     const int n_workers,
+                                     const bool secure) {
+    this->controller_ =	new derailleur::Controller(address,
+                                                   port,
+                                                   n_workers,
+                                                   secure,
+                                                   &this);
+//    derailleur::Controller controller(address, port, n_workers, secure, &this);
+//    this->controller_ = std::move(controller);
 }
-
-
-
-derailleur::Application::~Application() {
-    //delete this->controller_;
-}
-
-
-
 
 
 

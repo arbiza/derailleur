@@ -15,11 +15,16 @@
 #ifndef _APPLICATION_HPP_
 #define _APPLICATION_HPP_
 
+#include <map>
+
 #include <fluid/OFServer.hh>
+
+#include "switch.hpp"
 
 
 namespace derailleur {
 
+// Forward declarations
 class Controller;
 class Message;
 
@@ -34,19 +39,23 @@ public:
                 const int n_workers,
                 const bool secure);
     
-    ~Application();
 
     // TODO: Check if it is correct
-    virtual void on_switch_up () {}
-    virtual void on_switch_down() {}
-    virtual void handler(derailleur::Message* message) {}
+    virtual void on_switch_up (int switch_id) {}
 
-    void set_rack_pointer();
+    virtual void on_switch_down(int switch_id) {}
+
+    virtual void handler(int switch_id, derailleur::Message* message) {}
+
+
+    void set_rack_pointer(std::map<int, derailleur::Switch>& switches_rack_ptr){
+        this->switches_rack_ptr_ = &switches_rack_ptr;
+    }
     
 private:
     
     Controller* controller_;
-    //auto switches_rack_;
+    std::map<int, derailleur::Switch>* switches_rack_ptr_;
 };
 
 } // namespace derailleur

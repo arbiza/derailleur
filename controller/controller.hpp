@@ -45,7 +45,7 @@ public:
                const int port,
                const int n_workers,
                const bool secure,
-               std::unique_ptr<derailleur::Application> application);
+               derailleur::Application* application);
 
 
     
@@ -67,7 +67,8 @@ public:
     
 
 private:
-    std::unique_ptr<derailleur::Application> application_;
+    //std::unique_ptr<derailleur::Application> application_;
+    derailleur::Application* application_;
     std::map<int, derailleur::Switch> switches_rack_;
 };
 

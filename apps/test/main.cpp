@@ -27,15 +27,15 @@ public:
           const bool secure)
         : derailleur::Application(address, port, n_workers, secure) {}
 
-    void on_switch_up () override {
+    void on_switch_up (int switch_id) override {
 
     }
 
-    void on_switch_down() override {
+    void on_switch_down(int switch_id) override {
 
     }
 
-    void handler(derailleur::Message* message) override {
+    void handler(int switch_id, derailleur::Message* message) override {
 
     }
 };
