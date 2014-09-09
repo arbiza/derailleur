@@ -19,6 +19,7 @@
 // should include. It includes the header files needed for applications.
 
 #include "controller/application.hpp"
+//#include "controller/message.hpp"
 //#include "controller/table.hpp"
 
 

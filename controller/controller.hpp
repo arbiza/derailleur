@@ -2,7 +2,7 @@
 /** * File: controller.hpp
  *
  *  Copyright (c) 2014 Lucas Arbiza <lucas.arbiza@gmail.com>
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU Lesser General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or (at
@@ -42,19 +42,19 @@ public:
 
     // Contructor
     Controller(const char* address,
-    	       const int port,
-    	       const int n_workers,
-    	       const bool secure,
-	       std::unique_ptr<derailleur::Application> application);
+               const int port,
+               const int n_workers,
+               const bool secure,
+               std::unique_ptr<derailleur::Application> application);
 
 
     
     // Method called when a new message arrives
     // @param
     void message_callback(fluid_base::OFConnection* ofconn,
-			  uint8_t type,
-			  void* data,
-			  size_t len) override;
+                          uint8_t type,
+                          void* data,
+                          size_t len) override;
 
     
 
@@ -63,29 +63,16 @@ public:
     // @param ofcon switch connection pointer
     // @param type connection type identifier
     void connection_callback(fluid_base::OFConnection* ofconn,
-			     fluid_base::OFConnection::Event type) override;
-
-
-    // Return a shared pointer to the switches stack.
-    //auto get_rack_pointer() { return this->switch_stack_; }
+                             fluid_base::OFConnection::Event type) override;
     
 
 private:
     std::unique_ptr<derailleur::Application> application_;
     std::map<int, derailleur::Switch> switches_rack_;
 };
-    
+
 } // namespace derailleur
 
 
+
 #endif // _CONTROLLER_HPP_
-
-
-
-
-
-
-
-
-
-

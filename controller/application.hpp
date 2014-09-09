@@ -20,7 +20,8 @@
 
 namespace derailleur {
 
-    class Controller;
+class Controller;
+class Message;
 
 
 // It's an interface class 
@@ -29,20 +30,20 @@ class Application
     
 public:
     Application(const char* address,
-		const int port,
-		const int n_workers,
-		const bool secure);
+                const int port,
+                const int n_workers,
+                const bool secure);
     
     ~Application();
 
     // TODO: Check if it is correct
-    virtual void on_switch_up ();
-    virtual void on_switch_down();
-    virtual void handler();
-    
-private:
+    virtual void on_switch_up () {}
+    virtual void on_switch_down() {}
+    virtual void handler(derailleur::Message* message) {}
 
     void set_rack_pointer();
+    
+private:
     
     Controller* controller_;
     //auto switches_rack_;

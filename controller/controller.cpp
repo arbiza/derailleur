@@ -38,7 +38,9 @@ derailleur::Controller::Controller(
 			   supported_version(1).
 			   supported_version(4).
 			   keep_data_ownership(false)) {
+
     this->application_ = std::move(application);
+    this->application_->set_rack_pointer();
 }
 
 
@@ -51,9 +53,8 @@ void derailleur::Controller::message_callback(fluid_base::OFConnection *ofconn,
     if(type == 6) {
 
 	//TODO: lock here
-	switches_rack_.emplace(std::make_pair(
-				   int (ofconn->get_id()),
-				   derailleur::Switch(ofconn)));
+    switches_rack_.emplace(std::make_pair(int (ofconn->get_id()),
+                                          derailleur::Switch(ofconn)));
 	//TODO: unlock here	
     }
     else {

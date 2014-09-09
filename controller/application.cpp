@@ -30,12 +30,6 @@ derailleur::Application::Application(const char* address,
 	    secure,
 	    std::unique_ptr<derailleur::Application>(this));
 
-    // derailleur::Controller controller_(
-    // 	address,
-    // 	port,
-    // 	n_workers,
-    // 	secure,
-    // 	std::make_unique<derailleur::Application>(this) );
 }
 
 

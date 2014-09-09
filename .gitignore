@@ -2,7 +2,7 @@
 *~
 \#*
 *.user
-
+*.autosave
 
 ## Other backups
 *.backup
