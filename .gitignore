@@ -3,6 +3,7 @@
 \#*
 *.user
 *.autosave
+*.kdev4*
 
 ## Other backups
 *.backup
