@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 # Project name
-project(Derailleur)
+project(derailleur)
 
 # Compiler flags
 add_definitions(-Wall -std=c++11)
@@ -28,9 +28,9 @@ set(
     ${CMAKE_BINARY_DIR}/lib
     )
 
-
-#add_library(derailleur SHARED controller.cpp switch.cpp)
-add_library(derailleur SHARED controller.cpp switch.cpp message.cpp application.cpp)
+#add_library(derailleur SHARED controller.cpp switch.cpp message.cpp application.cpp)
+aux_source_directory(. SRC_LIST)
+add_library(${PROJECT_NAME} SHARED  ${SRC_LIST})
 
 #install(TARGETS derailleur RUNTIME_OUTPUT_DIRECTORY ${DERAILLEUR_BINARY_DIR}/bin)
 

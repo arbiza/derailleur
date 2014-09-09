@@ -17,9 +17,11 @@
 
 #include <fluid/OFServer.hh>
 
-#include "controller.hpp"
 
 namespace derailleur {
+
+    class Controller;
+
 
 // It's an interface class 
 class Application 
@@ -42,7 +44,7 @@ private:
 
     void set_rack_pointer();
     
-    //derailleur::Controller* controller_;
+    Controller* controller_;
     //auto switches_rack_;
 };
 

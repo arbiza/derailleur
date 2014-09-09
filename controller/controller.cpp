@@ -37,7 +37,9 @@ derailleur::Controller::Controller(
 			   fluid_base::OFServerSettings().
 			   supported_version(1).
 			   supported_version(4).
-			   keep_data_ownership(false)) {}
+			   keep_data_ownership(false)) {
+    this->application_ = std::move(application);
+}
 
 
 
