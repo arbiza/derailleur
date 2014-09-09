@@ -56,9 +56,11 @@ public:
 
     std::string get_name() const { return this->name_; }
     
+protected:
+	std::map<int, derailleur::Switch>* switches_rack_ptr_;
+    
 private:
     std::string name_;
-    std::map<int, derailleur::Switch>* switches_rack_ptr_;
 };
 
 } // namespace derailleur

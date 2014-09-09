@@ -24,9 +24,6 @@
 #define _CONTROLLER_HPP_
 
 
-#include <iostream>
-#include <memory>
-
 #include <fluid/OFServer.hh>
 
 #include "switch.hpp"
@@ -37,39 +34,38 @@ namespace derailleur {
 // This class inherits from fluid_base::OFServer ans implements Derailleur
 // controller functionalities.  Usage: ...
 class Controller : public fluid_base::OFServer {
-    
+
 public:
 
-    // Contructor
-    Controller(const char* address,
-               const int port,
-               const int n_workers,
-               const bool secure,
-               derailleur::Application* application);
+     // Contructor
+     Controller ( const char* address,
+                  const int port,
+                  const int n_workers,
+                  const bool secure,
+                  derailleur::Application* application );
 
 
-    
-    // Method called when a new message arrives
-    // @param
-    void message_callback(fluid_base::OFConnection* ofconn,
-                          uint8_t type,
-                          void* data,
-                          size_t len) override;
 
-    
+     // Method called when a new message arrives
+     // @param
+     void message_callback ( fluid_base::OFConnection* ofconn,
+                             uint8_t type,
+                             void* data,
+                             size_t len ) override;
 
-    // This method manages switches connections. It is called when a switch
-    // connection state changes.
-    // @param ofcon switch connection pointer
-    // @param type connection type identifier
-    void connection_callback(fluid_base::OFConnection* ofconn,
-                             fluid_base::OFConnection::Event type) override;
-    
+
+
+     // This method manages switches connections. It is called when a switch
+     // connection state changes.
+     // @param ofcon switch connection pointer
+     // @param type connection type identifier
+     void connection_callback ( fluid_base::OFConnection* ofconn,
+                                fluid_base::OFConnection::Event type ) override;
+
 
 private:
-    //std::unique_ptr<derailleur::Application> application_;
-    derailleur::Application* application_;
-    std::map<int, derailleur::Switch> switches_rack_;
+     derailleur::Application* application_;
+     std::map<int, derailleur::Switch> switches_rack_;
 };
 
 } // namespace derailleur

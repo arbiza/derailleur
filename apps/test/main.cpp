@@ -20,40 +20,40 @@
 
 
 class MyApp : public derailleur::Application {
-    
+
 public:
-    MyApp(std::string app_name)
-        : derailleur::Application(app_name) {}
+     MyApp ( std::string app_name )
+          : derailleur::Application ( app_name ) {}
 
-    void on_switch_up (const int switch_id) override {
+     void on_switch_up ( const int switch_id ) override {
+          std::cout << "connection id taken from connection: "
+                    << this->switches_rack_ptr_->at(switch_id).ok()
+					<< std::endl;
+     }
 
-    }
+     void on_switch_down ( const int switch_id ) override {
 
-    void on_switch_down(const int switch_id) override {
+     }
 
-    }
+     void message_handler ( const int switch_id,
+     derailleur::Message* const message ) override {
 
-    void message_handler(const int switch_id,
-                 derailleur::Message* const message) override {
-
-    }
+     }
 };
 
 
-int main(int argc, char *argv[])
+int main ( int argc, char *argv[] )
 {
-    
-    MyApp myapp("Test app");
-    derailleur::Controller controller ("0.0.0.0",
-                                       6653,
-                                       4,
-                                       false,
-                                       &myapp);
+
+     MyApp myapp ( "Test app" );
+     derailleur::Controller controller ( "0.0.0.0", 6653, 4, false, &myapp );
+
+     controller.start();
 
 
-    while(1);
-    
-    return 0;
+     while ( 1 );
+
+     return 0;
 }
 
 

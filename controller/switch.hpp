@@ -16,6 +16,9 @@
 #define _SWITCH_HPP_
 
 
+//TODO: remove
+#include <string>
+
 #include "message.hpp"
 
 
@@ -36,6 +39,8 @@ public:
     Switch(fluid_base::OFConnection* connection);
 
     void add_flow_normal();
+	
+	std::string ok() { return "lslslsls"; }
     
 private:
     void add_flow_default();
