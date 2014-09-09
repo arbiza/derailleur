@@ -18,8 +18,10 @@
 // This file is the only one anyone which will use derailleur controller
 // should include. It includes the header files needed for applications.
 
+#include "controller/controller.hpp"
 #include "controller/application.hpp"
-//#include "controller/message.hpp"
+#include "controller/message.hpp"
+#include "controller/switch.hpp"
 //#include "controller/table.hpp"
 
 

@@ -15,17 +15,19 @@
 #ifndef _APPLICATION_HPP_
 #define _APPLICATION_HPP_
 
+
 #include <map>
+#include <string>
 
 #include <fluid/OFServer.hh>
 
 #include "switch.hpp"
 
 
+
 namespace derailleur {
 
 // Forward declarations
-class Controller;
 class Message;
 
 
@@ -34,27 +36,28 @@ class Application
 {
     
 public:
-    Application(const char* address,
-                const int port,
-                const int n_workers,
-                const bool secure);
-    
-
-    // TODO: Check if it is correct
-    virtual void on_switch_up (int switch_id) {}
-
-    virtual void on_switch_down(int switch_id) {}
-
-    virtual void handler(int switch_id, derailleur::Message* message) {}
-
-
-    void set_rack_pointer(std::map<int, derailleur::Switch>& switches_rack_ptr){
-        this->switches_rack_ptr_ = &switches_rack_ptr;
+    Application(const std::string name) {
+        this->name_ = name;
     }
+
+    // Abstract methods
+    virtual void on_switch_up (const int switch_id) {}
+
+    virtual void on_switch_down(const int switch_id) {}
+
+    virtual void message_handler(const int switch_id,
+                         derailleur::Message* const message) {}
+
+
+    void set_rack_pointer(
+            std::map<int, derailleur::Switch>* const switches_rack_ptr){
+        this->switches_rack_ptr_ = switches_rack_ptr;
+    }
+
+    std::string get_name() const { return this->name_; }
     
 private:
-    
-    Controller* controller_;
+    std::string name_;
     std::map<int, derailleur::Switch>* switches_rack_ptr_;
 };
 

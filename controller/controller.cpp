@@ -39,7 +39,7 @@ derailleur::Controller::Controller(const char* address,
                            keep_data_ownership(false)) {
 
     this->application_ = application;
-    this->application_->set_rack_pointer(this->switches_rack_);
+    this->application_->set_rack_pointer(&this->switches_rack_);
 }
 
 

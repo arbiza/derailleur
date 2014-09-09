@@ -16,26 +16,25 @@
 #include "../../derailleur.hpp"
 
 #include <iostream>
+#include <string>
 
 
 class MyApp : public derailleur::Application {
     
 public:
-    MyApp(const char* address,
-          const int port,
-          const int n_workers,
-          const bool secure)
-        : derailleur::Application(address, port, n_workers, secure) {}
+    MyApp(std::string app_name)
+        : derailleur::Application(app_name) {}
 
-    void on_switch_up (int switch_id) override {
+    void on_switch_up (const int switch_id) override {
 
     }
 
-    void on_switch_down(int switch_id) override {
+    void on_switch_down(const int switch_id) override {
 
     }
 
-    void handler(int switch_id, derailleur::Message* message) override {
+    void message_handler(const int switch_id,
+                 derailleur::Message* const message) override {
 
     }
 };
@@ -44,12 +43,12 @@ public:
 int main(int argc, char *argv[])
 {
     
-    // derailleur::Controller controller("0.0.0.0", 6653, 4, false);
-
-    // controller.start();
-    // while(1);
-
-    MyApp myapp("0.0.0.0", 6653, 4, false);
+    MyApp myapp("Test app");
+    derailleur::Controller controller ("0.0.0.0",
+                                       6653,
+                                       4,
+                                       false,
+                                       &myapp);
 
 
     while(1);
