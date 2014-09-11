@@ -27,8 +27,11 @@ derailleur::Switch::Switch ( fluid_base::OFConnection* connection )
 {
      fluid_msg::of13::MultipartRequestDesc request;
 
+	 uint8_t* buffer = request.pack();
+	 this->connection_->send( buffer, request.length() );
+	 fluid_msg::OFMsg::free_buffer( buffer );
 
-     add_flow_default();
+     //add_flow_default();
 
      std::cout << "Conexão: " << this->connection_->get_id() << std::endl;
 
