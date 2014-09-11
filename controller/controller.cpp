@@ -11,9 +11,6 @@
  *
  **/
 
-// TODO: remove when log class in use
-#include <iostream>
-
 
 #include <map>
 
@@ -38,8 +35,6 @@ derailleur::Controller::Controller ( const char* address,
 {
      this->application_ = application;
      this->application_->set_rack_pointer ( &this->switches_rack_ );
-	 
-	 std::cout << "app name: " << this->application_->get_name() << std::endl;
 }
 
 
@@ -50,21 +45,29 @@ void derailleur::Controller::message_callback (
      void *data,
      size_t len )
 {
-     if ( type == 6 ) {
+     switch ( type ) {
 
+     case 0: // Switch sending description: OFTP_MULTIPART_REPLAY
+
+          switches_rack_.at ( ofconn->get_id() ).
+          handle_multipart_description_reply (
+               new derailleur::Message ( this, type, data, len ) );
+          break;
+
+     case 6:	// Switch UP: OFTP_FEATURES_REPLAY
           //TODO: lock here
           switches_rack_.emplace ( std::make_pair ( int ( ofconn->get_id() ),
                                    derailleur::Switch ( ofconn ) ) );
-		  
-		  std::cout << "empilhou" << std::endl;
-		  
+
           this->application_->on_switch_up ( ofconn->get_id() );
-		  
-		  //std::cout << "era para ter rodado!" << std::endl;
           //TODO: unlock here
-     } else {
-          // switches_rack_.at(ofconn->get_id()).message_handler(
-          //     new Message(this, type, data, len));
+          break;
+
+     default:
+          this->application_->message_handler (
+               ofconn->get_id(),
+               new derailleur::Message ( this, type, data, len ) );
+          break;
      }
 }
 
@@ -80,10 +83,10 @@ void derailleur::Controller::connection_callback ( fluid_base::OFConnection
      } else if ( type == fluid_base::OFConnection::EVENT_FAILED_NEGOTIATION ) {
           // TODO: log
      } else if ( type == fluid_base::OFConnection::EVENT_CLOSED ) {
-          std::cout << "closed id: " << ofconn->get_id() << std::endl;
+          // TODO: log
           // TODO: Delete switch from rack
      } else if ( type == fluid_base::OFConnection::EVENT_DEAD ) {
-          std::cout << "closed id: " << ofconn->get_id() << std::endl;
+          // TODO: log
           // TODO: Delete switch from rack
      }
 }

@@ -11,34 +11,7 @@
  *
  **/
 
-#include <fluid/OFServer.hh>
-
 #include "message.hpp"
-
-
-derailleur::Message::Message(fluid_base::OFHandler* ofhandler,
-			     int type,
-			     void* data,
-			     size_t length) {
-    this->handler_ = ofhandler;
-    this->type_ = type;
-    this->data_ = (uint8_t*) data;
-    this->length_ = length;
-}
-
-
-
-derailleur::Message::~Message() {
-    this->handler_->free_data(this->data_);
-}
-
-
-
-int derailleur::Message::get_type() {
-    return this->type_;
-}
-
-
 
 
 
