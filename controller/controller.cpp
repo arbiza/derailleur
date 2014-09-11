@@ -22,7 +22,6 @@
 
 
 
-
 derailleur::Controller::Controller ( const char* address,
                                      const int port,
                                      const int n_workers,

@@ -26,9 +26,9 @@ public:
           : derailleur::Application ( app_name ) {}
 
      void on_switch_up ( const int switch_id ) override {
-          std::cout << "connection id taken from connection: "
-                    << this->switches_rack_ptr_->at(switch_id).ok()
-					<< std::endl;
+//           std::cout << "connection id taken from connection: "
+//                     << this->switches_rack_ptr_->at(switch_id).ok()
+// 					<< std::endl;
      }
 
      void on_switch_down ( const int switch_id ) override {
@@ -36,7 +36,7 @@ public:
      }
 
      void message_handler ( const int switch_id,
-     derailleur::Message* const message ) override {
+                            derailleur::Message* const message ) override {
 
      }
 };
