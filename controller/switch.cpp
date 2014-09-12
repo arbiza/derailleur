@@ -45,7 +45,9 @@ bool derailleur::Switch::handle_multipart_description_reply (
 {
      fluid_msg::of13::MultipartReplyDesc reply;
      reply.unpack ( message->get_data() );
-	 this->switch_description_ = reply.desc();
+     this->switch_description_ = reply.desc();
+
+     return true;
 }
 
 

@@ -26,9 +26,14 @@ public:
           : derailleur::Application ( app_name ) {}
 
      void on_switch_up ( const int switch_id ) override {
-//           std::cout << "connection id taken from connection: "
-//                     << this->switches_rack_ptr_->at(switch_id).ok()
-// 					<< std::endl;
+          derailleur::Switch* s = get_switch ( switch_id );
+
+          std::cout << "Manufacturer: " << s->get_manufacturer()
+                    << "\nHardware: " << s->get_hardware()
+                    << "\nSoftware: " << s->get_software()
+                    << "\nSerial: " << s->get_serial_number()
+                    << "\nDatapath: " << s->get_datapath()
+                    << std::endl;
      }
 
      void on_switch_down ( const int switch_id ) override {

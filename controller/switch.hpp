@@ -25,18 +25,15 @@
 
 // Forward declaration
 namespace fluid_base {
+     // Forward declaration
 class OFConnection;
 }
-
-// namespace fluid_msg {
-// class SwitchDesc;
-// }
 
 
 namespace derailleur {
 
 // Forward declaration
-class Controller;
+class Application;
 
 
 // Class comment: describe what it is for and how it should be used.
@@ -54,26 +51,29 @@ public:
      }
 
      // The following methods return attributes from switch_description_ object
-     std::string get_manufacturer () const {
-          return this->switch_description_.mfr_desc();
+     std::string get_manufacturer () {
+          return switch_description_.mfr_desc();
      }
 
-     std::string get_hardware () const {
+     std::string get_hardware () {
           return this->switch_description_.hw_desc();
      }
 
-     std::string get_software () const {
+     std::string get_software () {
           return this->switch_description_.sw_desc();
      }
 
-     std::string get_serial_number () const {
+     std::string get_serial_number () {
           return this->switch_description_.serial_num();
      }
 
-     std::string get_datapath () const {
+     std::string get_datapath () {
           return this->switch_description_.dp_desc();
      }
-
+     
+     Switch* get_pointer() {
+          return this;
+     }
 
 private:
 
@@ -88,7 +88,7 @@ private:
 
      std::string name_;
 
-     friend class derailleur::Controller;
+     friend class derailleur::Application;
 };
 
 } // namespace derailleur

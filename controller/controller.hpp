@@ -26,10 +26,12 @@
 
 #include <fluid/OFServer.hh>
 
-#include "switch.hpp"
-#include "application.hpp"
+
 
 namespace derailleur {
+
+// Forward declaration
+class Application;
 
 // This class inherits from fluid_base::OFServer ans implements Derailleur
 // controller functionalities.  Usage: ...
@@ -65,7 +67,6 @@ public:
 
 private:
      derailleur::Application* application_;
-     std::map<int, derailleur::Switch> switches_rack_;
 };
 
 } // namespace derailleur
