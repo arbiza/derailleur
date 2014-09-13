@@ -26,6 +26,8 @@
 
 #include <fluid/OFServer.hh>
 
+#include "switch.hpp"
+#include "log.hpp"
 
 
 namespace derailleur {
@@ -66,7 +68,13 @@ public:
 
 
 private:
-     derailleur::Application* application_;
+
+     std::map<int, derailleur::Switch> stack_;
+
+     //derailleur::Application* application_;
+
+     derailleur::Log log_;
+
 };
 
 } // namespace derailleur

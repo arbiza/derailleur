@@ -35,7 +35,7 @@ derailleur::Controller::Controller ( const char* address,
                               supported_version ( 4 ).
                               keep_data_ownership ( false ) )
 {
-     this->application_ = application;
+     //this->application_ = application;
 }
 
 
@@ -50,16 +50,21 @@ void derailleur::Controller::message_callback (
 
 
      case 0: // Switch sending description: OFTP_MULTIPART_REPLAY
-          std::cout <<  "reply" <<  std::endl;
-          this->application_->add_switch_multipart_desc (
-               ofconn->get_id(),
-               new derailleur::Message ( this, type, data, len ) );
+          this->log_.message_log( ofconn->get_id(), type);
+//           this->application_->add_switch_multipart_desc (
+//                ofconn->get_id(),
+//                new derailleur::Message ( this, type, data, len ) );
           break;
 
 
      case 6: // Switch UP: OFTP_FEATURES_REPLAY
+          this->log_.message_log( ofconn->get_id(), type);
+          
           //TODO: lock here
-          this->application_->add_switch ( ofconn );
+          
+          
+          
+//           this->application_->add_switch ( ofconn );
           //TODO: unlock here
           break;
 
