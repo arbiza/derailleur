@@ -86,7 +86,7 @@ private:
           const derailleur::Message* message );
 
      //TODO: this method must return a flow to be installed
-     void add_flow_default();
+     void install_flow_default();
 
      fluid_base::OFConnection* connection_;
      fluid_msg::SwitchDesc switch_description_;

@@ -13,7 +13,7 @@
 
 // TODO: remove
 #include <iostream>
- 
+
 
 #include "controller.hpp"
 #include "application.hpp"
@@ -50,7 +50,7 @@ void derailleur::Controller::message_callback (
 
 
      case 0: // Switch sending description: OFTP_MULTIPART_REPLAY
-          this->log_.message_log( ofconn->get_id(), type);
+          this->log_.message_log ( "Controller", ofconn->get_id(), type );
 //           this->application_->add_switch_multipart_desc (
 //                ofconn->get_id(),
 //                new derailleur::Message ( this, type, data, len ) );
@@ -58,12 +58,13 @@ void derailleur::Controller::message_callback (
 
 
      case 6: // Switch UP: OFTP_FEATURES_REPLAY
-          this->log_.message_log( ofconn->get_id(), type);
-          
+          this->log_.message_log ( "Controller", ofconn->get_id(), type );
+
           //TODO: lock here
-          
-          
-          
+
+          stack_.emplace ( std::make_pair ( int ( ofconn->get_id() ),
+                                            derailleur::Switch ( ofconn ) ) );
+
 //           this->application_->add_switch ( ofconn );
           //TODO: unlock here
           break;
@@ -91,9 +92,9 @@ void derailleur::Controller::connection_callback (
           // TODO: log
      } else if ( type == fluid_base::OFConnection::EVENT_CLOSED ) {
           // TODO: log
-          this->application_->del_switch ( ofconn->get_id() );
+//           this->application_->del_switch ( ofconn->get_id() );
      } else if ( type == fluid_base::OFConnection::EVENT_DEAD ) {
           // TODO: log
-          this->application_->del_switch ( ofconn->get_id() );
+//           this->application_->del_switch ( ofconn->get_id() );
      }
 }

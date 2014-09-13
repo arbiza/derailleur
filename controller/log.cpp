@@ -19,7 +19,7 @@
 
 #include <iostream>
 
-#include "log.h"
+#include "log.hpp"
 
 derailleur::Log::Log()
 {
@@ -32,17 +32,16 @@ derailleur::Log::~Log()
 }
 
 
-void derailleur::Log::message_log ( const int connection_id, const int type )
+void derailleur::Log::message_log ( 
+     const std::string logger,  const int connection_id, const int type )
 {
-     std::cout << "[Message] connection: "
-               << connection_id
-               << " - type: "
-               << type
+     std::cout << "[" <<  logger << " - Message] connection: " << connection_id
+               << " - type: " << type
                << std::endl;
 }
 
 
-void derailleur::Log::custom_log ( std::string message )
+void derailleur::Log::custom_log ( const std::string message )
 {
      std::cout << message << std::endl;
 }

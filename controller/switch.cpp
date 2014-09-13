@@ -22,14 +22,14 @@ derailleur::Switch::Switch ( fluid_base::OFConnection* connection )
      : connection_ ( connection ),  ready_(false)
 {
      //  install flow default (connection with controller)
-     add_flow_default();
+     install_flow_default();
      
      // When a switch connects, the controller will request all information
      //available about it.
-     fluid_msg::of13::MultipartRequestDesc request;
-     uint8_t* buffer = request.pack();
-     this->connection_->send ( buffer, request.length() );
-     fluid_msg::OFMsg::free_buffer ( buffer );
+//      fluid_msg::of13::MultipartRequestDesc request;
+//      uint8_t* buffer = request.pack();
+//      this->connection_->send ( buffer, request.length() );
+//      fluid_msg::OFMsg::free_buffer ( buffer );
 }
 
 
@@ -48,7 +48,7 @@ bool derailleur::Switch::handle_multipart_description_reply (
 
 
 
-void derailleur::Switch::add_flow_default()
+void derailleur::Switch::install_flow_default()
 {
      uint8_t* buffer;
      fluid_msg::of13::FlowMod fm ( 42, 0, 0xffffffffffffffff, 0,

@@ -59,19 +59,19 @@ public:
           return this->name_;
      }
 
-     derailleur::Switch* get_switch ( const int switch_id ) {
-          return &this->stack_.at ( switch_id );
-     }
+//      derailleur::Switch* get_switch ( const int switch_id ) {
+// //           return &this->stack_.at ( switch_id );
+//      }
 
 
 private:
      // Methods used by friend class Controller. They need be implemented in the
      // header file otherwise it won't compile.
      virtual bool add_switch ( fluid_base::OFConnection* ofconn ) final {
-          stack_.emplace ( std::make_pair (
-               int ( ofconn->get_id() ),
-               derailleur::Switch ( ofconn ) ) );
-          on_switch_up ( ofconn->get_id() );
+//           stack_.emplace ( std::make_pair (
+//                int ( ofconn->get_id() ),
+//                derailleur::Switch ( ofconn ) ) );
+//           on_switch_up ( ofconn->get_id() );
 
           return true;
      }
@@ -80,8 +80,8 @@ private:
           const int connection_id,
           const derailleur::Message* message ) final {
           // TODO: lock
-          stack_.at ( connection_id ).handle_multipart_description_reply (
-               message );
+//           stack_.at ( connection_id ).handle_multipart_description_reply (
+//                message );
           // TODO: unlock
      }
 
@@ -91,9 +91,6 @@ private:
 
      std::string name_;
 
-     // Container where switches objects are stored associated to the connection
-     // id (int).
-     std::map<int, derailleur::Switch> stack_;
 
      friend class derailleur::Controller;
 };
