@@ -12,10 +12,6 @@
  **/
 
 
-//TODO: remove!
-#include <iostream>
-
-
 
 #include <fluid/OFServer.hh>
 
@@ -23,29 +19,29 @@
 
 
 derailleur::Switch::Switch ( fluid_base::OFConnection* connection )
-     : connection_ ( connection )
+     : connection_ ( connection ),  ready_(false)
 {
+     //  install flow default (connection with controller)
+     add_flow_default();
+     
      // When a switch connects, the controller will request all information
      //available about it.
      fluid_msg::of13::MultipartRequestDesc request;
      uint8_t* buffer = request.pack();
      this->connection_->send ( buffer, request.length() );
      fluid_msg::OFMsg::free_buffer ( buffer );
-
-     //add_flow_default();
-
-     std::cout << "Conexão: " << this->connection_->get_id() << std::endl;
-
 }
 
 
 
 bool derailleur::Switch::handle_multipart_description_reply (
-     derailleur::Message* message )
+     const derailleur::Message* message )
 {
      fluid_msg::of13::MultipartReplyDesc reply;
      reply.unpack ( message->get_data() );
      this->switch_description_ = reply.desc();
+     
+     this->ready_ = true;
 
      return true;
 }

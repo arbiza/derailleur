@@ -21,12 +21,6 @@
 
 #include <fluid/OFServer.hh>
 
-//TODO: remove, at least methods that use OFHandler are implemented in source
-// namespace fluid_base {
-// // Forward declaration
-// class OFHandler;
-// }
-
 
 namespace derailleur {
 

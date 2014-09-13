@@ -74,11 +74,16 @@ public:
      Switch* get_pointer() {
           return this;
      }
+     
+     bool is_switch_ready () {
+          return this->ready_;
+     }
 
 private:
 
      // handlers:
-     bool handle_multipart_description_reply ( derailleur::Message* message );
+     bool handle_multipart_description_reply ( 
+          const derailleur::Message* message );
 
      //TODO: this method must return a flow to be installed
      void add_flow_default();
@@ -87,6 +92,7 @@ private:
      fluid_msg::SwitchDesc switch_description_;
 
      std::string name_;
+     bool ready_;
 
      friend class derailleur::Application;
 };

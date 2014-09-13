@@ -11,6 +11,9 @@
  *
  **/
 
+// TODO: remove
+#include <iostream>
+ 
 
 #include "controller.hpp"
 #include "application.hpp"
@@ -45,29 +48,26 @@ void derailleur::Controller::message_callback (
 {
      switch ( type ) {
 
+
      case 0: // Switch sending description: OFTP_MULTIPART_REPLAY
-
-//           switches_rack_.at ( ofconn->get_id() ).
-//           handle_multipart_description_reply (
-//                new derailleur::Message ( this, type, data, len ) );
-//           break;
-
-     case 6:	// Switch UP: OFTP_FEATURES_REPLAY
-          //TODO: lock here
-//           switches_rack_.emplace ( std::make_pair ( int ( ofconn->get_id() ),
-//                                    derailleur::Switch ( ofconn ) ) );
-
-          // add_switch method calls on_switch_up method after switch is stacked
-          this->application_->add_switch ( ofconn );
-
-          //TODO: unlock here
-          break;
-
-     default:
-          this->application_->message_handler (
+          std::cout <<  "reply" <<  std::endl;
+          this->application_->add_switch_multipart_desc (
                ofconn->get_id(),
                new derailleur::Message ( this, type, data, len ) );
           break;
+
+
+     case 6: // Switch UP: OFTP_FEATURES_REPLAY
+          //TODO: lock here
+          this->application_->add_switch ( ofconn );
+          //TODO: unlock here
+          break;
+
+//      default:
+//           this->application_->message_handler (
+//                ofconn->get_id(),
+//                new derailleur::Message ( this, type, data, len ) );
+//           break;
      }
 }
 
