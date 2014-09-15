@@ -32,8 +32,9 @@ derailleur::Log::~Log()
 }
 
 
-void derailleur::Log::message_log ( 
-     const std::string logger,  const int connection_id, const int type )
+void derailleur::Log::message_log ( const char* logger,
+                                    const int connection_id,
+                                    const int type )
 {
      std::cout << "[" <<  logger << " - Message] connection: " << connection_id
                << " - type: " << type
@@ -41,7 +42,7 @@ void derailleur::Log::message_log (
 }
 
 
-void derailleur::Log::custom_log ( const std::string message )
+void derailleur::Log::custom_log ( const char* message )
 {
      std::cout << message << std::endl;
 }

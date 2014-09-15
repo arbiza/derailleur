@@ -17,7 +17,7 @@
 
 #include "controller.hpp"
 #include "application.hpp"
-#include "message.hpp"
+#include "event.hpp"
 
 
 
@@ -44,16 +44,15 @@ void derailleur::Controller::message_callback (
      fluid_base::OFConnection *ofconn,
      uint8_t type,
      void *data,
-     size_t len )
+     size_t length )
 {
      switch ( type ) {
 
 
      case 0: // Switch sending description: OFTP_MULTIPART_REPLAY
           this->log_.message_log ( "Controller", ofconn->get_id(), type );
-//           this->application_->add_switch_multipart_desc (
-//                ofconn->get_id(),
-//                new derailleur::Message ( this, type, data, len ) );
+          stack_.at ( ofconn->get_id() ).handle_multipart_description_reply (
+               new InternalEvent ( this, type, data, length ) );
           break;
 
 
@@ -68,6 +67,7 @@ void derailleur::Controller::message_callback (
 //           this->application_->add_switch ( ofconn );
           //TODO: unlock here
           break;
+     
 
 //      default:
 //           this->application_->message_handler (

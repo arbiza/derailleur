@@ -27,27 +27,21 @@
 
 namespace derailleur {
 
-class Event {
+class InternalEvent {
 
 public:
-     Event ( const int switch_id,
-             fluid_base::OFHandler* ofhandler,
-             const int type,
-             const void* data,
-             const size_t length ) {
-          this->switch_id_ = switch_id;
+     InternalEvent ( fluid_base::OFHandler* ofhandler,
+                     const int type,
+                     const void* data,
+                     const size_t length ) {
           this->handler_ = ofhandler;
           this->type_ = type;
           this->data_ = ( uint8_t* ) data;
           this->length_ = length;
      }
 
-     ~Event() {
+     ~InternalEvent() {
           this->handler_->free_data ( this->data_ );
-     }
-
-     int get_switch_id () {
-          return this->switch_id_;
      }
 
      int get_type() const {
@@ -62,13 +56,42 @@ public:
           return this->length_;
      }
 
-private:
-     int switch_id_;
+protected:
      fluid_base::OFHandler* handler_;
      int type_;
      uint8_t* data_;
      size_t length_;
 };
+
+
+
+class Event : public InternalEvent {
+
+public:
+     Event ( const int switch_id,
+             fluid_base::OFHandler* ofhandler,
+             const int type,
+             const void* data,
+             const size_t length )
+          : InternalEvent ( ofhandler,
+                            type,
+                            data,
+                            length ) {
+          this->switch_id_ = switch_id;
+     }
+
+     ~Event() {
+          this->handler_->free_data ( this->data_ );
+     }
+
+     int get_switch_id () {
+          return this->switch_id_;
+     }
+
+private:
+     int switch_id_;
+};
+
 
 } //  namespace derailleur
 

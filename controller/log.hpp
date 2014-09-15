@@ -28,10 +28,12 @@ public:
      Log();
      ~Log();
 
-     void message_log ( 
-          const std::string logger, const int connection_id, const int type );
+     void message_log ( const char* logger,
+                        const int connection_id,
+                        const int type );
+
+     void custom_log ( const char* message );
      
-     void custom_log ( const std::string message );
 };
 
 } // namespace derailleur

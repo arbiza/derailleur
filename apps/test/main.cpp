@@ -12,8 +12,6 @@
 
 // ___________________________________________________________________
 
-
-#include <iostream>
 #include <string>
 
 
@@ -28,11 +26,11 @@ public:
      MyApp ( std::string app_name )
           : derailleur::Application ( app_name ) {}
 
-     void on_switch_up ( const int switch_id, const derailleur::Message* const message ) override {
-//           derailleur::Switch* s = get_switch ( switch_id );
-          
-          std::cout <<  "Conectado: " << switch_id << std::endl;
-          
+     void on_switch_up ( const int switch_id,
+                         const derailleur::Message* const message ) override {
+          derailleur::Switch* s =
+               derailleur::Controller::get_switch_ptr ( switch_id );
+
 //           while ( !s->is_switch_ready() ) {
 //                std::cout <<  "no" <<  std::endl;
 //                sleep(2);

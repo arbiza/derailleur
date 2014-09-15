@@ -21,6 +21,7 @@
 #include <fluid/of13msg.hh>
 
 #include "message.hpp"
+#include "log.hpp"
 
 
 // Forward declaration
@@ -33,7 +34,9 @@ class OFConnection;
 namespace derailleur {
 
 // Forward declaration
-class Application;
+class Controller;
+class InternalEvent;
+class Event;
 
 
 // Class comment: describe what it is for and how it should be used.
@@ -74,16 +77,12 @@ public:
      Switch* get_pointer() {
           return this;
      }
-     
-     bool is_switch_ready () {
-          return this->ready_;
-     }
 
 private:
 
      // handlers:
      bool handle_multipart_description_reply ( 
-          const derailleur::Message* message );
+          const derailleur::InternalEvent* event );
 
      //TODO: this method must return a flow to be installed
      void install_flow_default();
@@ -92,9 +91,10 @@ private:
      fluid_msg::SwitchDesc switch_description_;
 
      std::string name_;
-     bool ready_;
+     
+     derailleur::Log log_;
 
-     friend class derailleur::Application;
+     friend class derailleur::Controller;
 };
 
 } // namespace derailleur

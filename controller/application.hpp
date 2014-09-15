@@ -22,11 +22,7 @@
 #include <fluid/OFServer.hh>
 
 #include "switch.hpp"
-
-// namespace fluid_base {
-//      // Forward declaration
-//      class OFConnection;
-// }
+#include "log.hpp"
 
 
 namespace derailleur {
@@ -44,7 +40,7 @@ public:
           this->name_ = name;
      }
 
-// Abstract methods
+     // Abstract methods
      virtual void on_switch_up (
           const int switch_id,
           const derailleur::Message* const message ) {}
@@ -59,38 +55,11 @@ public:
           return this->name_;
      }
 
-//      derailleur::Switch* get_switch ( const int switch_id ) {
-// //           return &this->stack_.at ( switch_id );
-//      }
-
+protected:
+     derailleur::Log log_;
 
 private:
-     // Methods used by friend class Controller. They need be implemented in the
-     // header file otherwise it won't compile.
-     virtual bool add_switch ( fluid_base::OFConnection* ofconn ) final {
-//           stack_.emplace ( std::make_pair (
-//                int ( ofconn->get_id() ),
-//                derailleur::Switch ( ofconn ) ) );
-//           on_switch_up ( ofconn->get_id() );
-
-          return true;
-     }
-
-     virtual void add_switch_multipart_desc (
-          const int connection_id,
-          const derailleur::Message* message ) final {
-          // TODO: lock
-//           stack_.at ( connection_id ).handle_multipart_description_reply (
-//                message );
-          // TODO: unlock
-     }
-
-     virtual bool del_switch ( const int connection_id ) final {
-          return true;
-     }
-
      std::string name_;
-
 
      friend class derailleur::Controller;
 };

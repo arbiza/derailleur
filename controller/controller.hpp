@@ -55,7 +55,7 @@ public:
      void message_callback ( fluid_base::OFConnection* ofconn,
                              uint8_t type,
                              void* data,
-                             size_t len ) override;
+                             size_t length ) override;
 
 
 
@@ -63,8 +63,15 @@ public:
      // connection state changes.
      // @param ofcon switch connection pointer
      // @param type connection type identifier
-     void connection_callback ( fluid_base::OFConnection* ofconn,
-                                fluid_base::OFConnection::Event type ) override;
+     void connection_callback (
+          fluid_base::OFConnection* ofconn,
+          fluid_base::OFConnection::Event type ) override;
+
+          
+
+     derailleur::Switch* get_switch_ptr ( const int switch_id ) const {
+          return this->stack_.at ( switch_id ).get_pointer();
+     }
 
 
 private:
