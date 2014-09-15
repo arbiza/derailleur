@@ -24,6 +24,10 @@
 #define _CONTROLLER_HPP_
 
 
+#include <thread>
+#include <mutex>
+#include <vector>
+
 #include <fluid/OFServer.hh>
 
 #include "switch.hpp"
@@ -67,10 +71,15 @@ public:
           fluid_base::OFConnection* ofconn,
           fluid_base::OFConnection::Event type ) override;
 
-          
+
 
      const derailleur::Switch* get_switch_ptr ( const int switch_id ) {
           return this->stack_.at ( switch_id ).get_pointer();
+     }
+     
+     
+     int get_threads_size () {
+          return this->threads_.size();
      }
 
 
@@ -79,6 +88,11 @@ private:
      std::map<int, derailleur::Switch> stack_;
 
      derailleur::Application* application_;
+
+     // Threads
+     std::vector< std::thread > threads_;
+     std::mutex mutex_;
+
 
      derailleur::Log log_;
 

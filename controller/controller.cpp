@@ -12,9 +12,6 @@
  **/
 
 
-#include <thread>
-
-
 #include "controller.hpp"
 #include "application.hpp"
 #include "event.hpp"
@@ -58,15 +55,21 @@ void derailleur::Controller::message_callback (
           stack_.emplace ( std::make_pair ( int ( ofconn->get_id() ),
                                             derailleur::Switch ( ofconn ) ) );
 
-          this->application_->on_switch_up (
-               new Event ( ofconn->get_id(), this, type, data, length ) );
+//           this->application_->on_switch_up (
+//                new Event ( ofconn->get_id(), this, type, data, length ) );
+
+          threads_.push_back (
+               std::tread (
+                    &this->application_->on_switch_up,
+                    new Event ( ofconn->get_id(), this, type, data, length ) ) );
+
           //TODO: unlock here
           break;
 
 
      case 19: // Switch sending description: OFTP_MULTIPART_REPLAY
           this->log_.message_log ( "Controller", ofconn->get_id(), type );
-          
+
           stack_.at ( ofconn->get_id() ).handle_multipart_description_reply (
                new InternalEvent ( this, type, data, length ) );
           break;
