@@ -35,15 +35,13 @@ derailleur::Switch::Switch ( fluid_base::OFConnection* connection )
 
 
 
-bool derailleur::Switch::handle_multipart_description_reply (
+void derailleur::Switch::handle_multipart_description_reply (
      const derailleur::InternalEvent* event )
 {
      this->log_.custom_log( "in switch::handle_multipart_description_reply" );
      fluid_msg::of13::MultipartReplyDesc reply;
      reply.unpack ( event->get_data() );
      this->switch_description_ = reply.desc();
-
-     return true;
 }
 
 

@@ -74,14 +74,14 @@ public:
           return this->switch_description_.dp_desc();
      }
      
-     Switch* get_pointer() {
-          return this;
+     const Switch* get_pointer() {
+          return const_cast< const Switch* >( this );
      }
 
 private:
 
      // handlers:
-     bool handle_multipart_description_reply ( 
+     void handle_multipart_description_reply ( 
           const derailleur::InternalEvent* event );
 
      //TODO: this method must return a flow to be installed

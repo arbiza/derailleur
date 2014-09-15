@@ -20,7 +20,7 @@
 
 #include "controller/controller.hpp"
 #include "controller/application.hpp"
-#include "controller/message.hpp"
+#include "controller/event.hpp"
 #include "controller/switch.hpp"
 //#include "controller/table.hpp"
 

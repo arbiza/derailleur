@@ -84,7 +84,7 @@ public:
           this->handler_->free_data ( this->data_ );
      }
 
-     int get_switch_id () {
+     int get_switch_id () const {
           return this->switch_id_;
      }
 

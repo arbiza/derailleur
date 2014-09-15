@@ -11,8 +11,8 @@
  *
  **/
 
-// TODO: remove
-#include <iostream>
+
+#include <thread>
 
 
 #include "controller.hpp"
@@ -35,7 +35,8 @@ derailleur::Controller::Controller ( const char* address,
                               supported_version ( 4 ).
                               keep_data_ownership ( false ) )
 {
-     //this->application_ = application;
+     this->application_ = application;
+     this->application_->set_stack_ptr ( &this->stack_ );
 }
 
 
@@ -48,32 +49,35 @@ void derailleur::Controller::message_callback (
 {
      switch ( type ) {
 
-
-     case 0: // Switch sending description: OFTP_MULTIPART_REPLAY
-          this->log_.message_log ( "Controller", ofconn->get_id(), type );
-          stack_.at ( ofconn->get_id() ).handle_multipart_description_reply (
-               new InternalEvent ( this, type, data, length ) );
-          break;
-
-
      case 6: // Switch UP: OFTP_FEATURES_REPLAY
           this->log_.message_log ( "Controller", ofconn->get_id(), type );
 
           //TODO: lock here
 
+          // stack the new switch (New Switch object is instantiated).
           stack_.emplace ( std::make_pair ( int ( ofconn->get_id() ),
                                             derailleur::Switch ( ofconn ) ) );
 
-//           this->application_->add_switch ( ofconn );
+          this->application_->on_switch_up (
+               new Event ( ofconn->get_id(), this, type, data, length ) );
           //TODO: unlock here
           break;
-     
 
-//      default:
+
+     case 19: // Switch sending description: OFTP_MULTIPART_REPLAY
+          this->log_.message_log ( "Controller", ofconn->get_id(), type );
+          
+          stack_.at ( ofconn->get_id() ).handle_multipart_description_reply (
+               new InternalEvent ( this, type, data, length ) );
+          break;
+
+
+     default:
+          this->log_.message_log ( "Controller", ofconn->get_id(), type );
 //           this->application_->message_handler (
 //                ofconn->get_id(),
 //                new derailleur::Message ( this, type, data, len ) );
-//           break;
+          break;
      }
 }
 
