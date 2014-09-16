@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 project(derailleur)
 
 # Compiler flags
-add_definitions(-Wall -std=c++11 -stdlib=libc++)
+add_definitions(-Wall -std=c++11)
 
 set(CMAKE_BUILD_TYPE Release)
 

@@ -37,12 +37,12 @@ public:
 //           sleep ( 5 );
 // //           }
 // 
-//           std::cout << "Manufacturer: " << s->get_manufacturer()
-//                     << "\nHardware: " << s->get_hardware()
-//                     << "\nSoftware: " << s->get_software()
-//                     << "\nSerial: " << s->get_serial_number()
-//                     << "\nDatapath: " << s->get_datapath()
-//                     << std::endl;
+          std::cout << "Manufacturer: " << s->get_manufacturer()
+                    << "\nHardware: " << s->get_hardware()
+                    << "\nSoftware: " << s->get_software()
+                    << "\nSerial: " << s->get_serial_number()
+                    << "\nDatapath: " << s->get_datapath()
+                    << std::endl;
 // 
 // 
 //           sleep ( 5 );
