@@ -32,11 +32,6 @@ public:
      void on_switch_up ( const derailleur::Event* const event ) override {
           derailleur::Switch* s = get_switch ( event->get_switch_id() );
 
-//           while ( !s->is_switch_ready() ) {
-//                std::cout <<  "no" <<  std::endl;
-//           sleep ( 5 );
-// //           }
-//
           std::cout << "FEATURES REPLY:"
                     << "\nDatapath id: " <<  s->get_datapath_id()
                     << "\nn buffers: " << s->get_n_buffers()
@@ -51,19 +46,7 @@ public:
                     << "\nDatapath: " << s->get_datapath()
                     << std::endl;
 
-          
-
           std::cout << "MAC: " << s->get_mac_address() << std::endl;
-//
-//
-//           sleep ( 5 );
-//
-//           std::cout << "Manufacturer: " << s->get_manufacturer()
-//                     << "\nHardware: " << s->get_hardware()
-//                     << "\nSoftware: " << s->get_software()
-//                     << "\nSerial: " << s->get_serial_number()
-//                     << "\nDatapath: " << s->get_datapath()
-//                     << std::endl;
      }
 
      void on_switch_down ( const int switch_id ) override {

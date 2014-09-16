@@ -11,7 +11,6 @@
  *
  **/
 
-#include <stdio.h>
 
 #include <bitset>
 
@@ -27,6 +26,7 @@ derailleur::Switch::Switch ( fluid_base::OFConnection* connection,
 {
      // Stores features reply
      this->features_reply_.unpack ( event->get_data() );
+     
 
      // Extract MAC address from datapath id. It requires convert uint64_t
      // datapath id to bitset, to extract the last 48 bits where MAC address is
@@ -34,6 +34,10 @@ derailleur::Switch::Switch ( fluid_base::OFConnection* connection,
      std::bitset<64> bits ( this->get_datapath_id() );
 
      this->mac_address_ = this->convert_bits_to_mac_address ( bits.to_string() );
+
+
+     std::bitset<32> capabilities ( this->features_reply_.capabilities() );
+     this->cap_temp = capabilities.to_string();
 
 
      //  install flow default (connection with controller)
@@ -57,24 +61,6 @@ void derailleur::Switch::handle_multipart_description_reply (
      this->switch_description_ = reply.desc();
 }
 
-
-
-void derailleur::Switch::install_flow_default()
-{
-     uint8_t* buffer;
-     fluid_msg::of13::FlowMod fm ( 42, 0, 0xffffffffffffffff, 0,
-                                   fluid_msg::of13::OFPFC_ADD, 0, 0, 0,
-                                   0xffffffff, 0, 0, 0 );
-     fluid_msg::of13::OutputAction *act = new fluid_msg::of13::OutputAction (
-          fluid_msg::of13::OFPP_CONTROLLER,
-          fluid_msg::of13::OFPCML_NO_BUFFER );
-     fluid_msg::of13::ApplyActions *inst = new fluid_msg::of13::ApplyActions();
-     inst->add_action ( act );
-     fm.add_instruction ( inst );
-     buffer = fm.pack();
-     this->connection_->send ( buffer, fm.length() );
-     fluid_msg::OFMsg::free_buffer ( buffer );
-}
 
 
 
@@ -125,5 +111,46 @@ std::string derailleur::Switch::convert_bits_to_mac_address (
      }
 
      return mac;
+}
+
+
+
+
+/** OpenFlow 1.3 Switch **/
+
+derailleur::Switch13::Switch13 ( fluid_base::OFConnection* connection,
+                                 derailleur::InternalEvent* event )
+     : Switch ( connection, event ), of_version ( 1.3 )
+{
+
+}
+
+
+void derailleur::Switch13::install_flow_default()
+{
+     uint8_t* buffer;
+     fluid_msg::of13::FlowMod fm ( 42, 0, 0xffffffffffffffff, 0,
+                                   fluid_msg::of13::OFPFC_ADD, 0, 0, 0,
+                                   0xffffffff, 0, 0, 0 );
+     fluid_msg::of13::OutputAction *act = new fluid_msg::of13::OutputAction (
+          fluid_msg::of13::OFPP_CONTROLLER,
+          fluid_msg::of13::OFPCML_NO_BUFFER );
+     fluid_msg::of13::ApplyActions *inst = new fluid_msg::of13::ApplyActions();
+     inst->add_action ( act );
+     fm.add_instruction ( inst );
+     buffer = fm.pack();
+     this->connection_->send ( buffer, fm.length() );
+     fluid_msg::OFMsg::free_buffer ( buffer );
+}
+
+
+
+/** OpenFlow 1.0 Switch **/
+
+derailleur::Switch10::Switch10 ( fluid_base::OFConnection* connection,
+                                 derailleur::InternalEvent* event )
+     : Switch ( connection, event ), of_version ( 1.0 )
+{
+
 }
 
