@@ -54,9 +54,29 @@ public:
           return this->name_;
      }
      
+     std::string get_mac_address () {
+          return this->mac_address_;
+     }
+     
      // The following methods return attributes from features reply
      uint64_t get_datapath_id () {
           return this->features_reply_.datapath_id();
+     }
+     
+     uint32_t get_n_buffers () {
+          return this->features_reply_.n_buffers();
+     }
+     
+     uint8_t get_n_tables () {
+          return this->features_reply_.n_tables();
+     }
+     
+     uint8_t get_auxiliary_id () {
+          return this->features_reply_.auxiliary_id();
+     }
+     
+     uint32_t get_capabilities () {
+          return this->features_reply_.capabilities();
      }
 
      // The following methods return attributes from switch_description_ object
@@ -93,6 +113,8 @@ private:
 
      //TODO: this method must return a flow to be installed
      void install_flow_default();
+     
+     std::string convert_bits_to_mac_address ( std::string datapath_id );
 
      fluid_base::OFConnection* connection_;
      
@@ -101,6 +123,7 @@ private:
      fluid_msg::SwitchDesc switch_description_;
 
      std::string name_;
+     std::string mac_address_;
 
      derailleur::Log log_;
 

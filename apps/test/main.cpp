@@ -37,13 +37,23 @@ public:
 //           sleep ( 5 );
 // //           }
 //
-          std::cout << "????: " <<  s->get_datapath_id()
-                    << "Manufacturer: " << s->get_manufacturer()
+          std::cout << "FEATURES REPLY:"
+                    << "\nDatapath id: " <<  s->get_datapath_id()
+                    << "\nn buffers: " << s->get_n_buffers()
+                    << "\nn tables: " << s->get_n_tables()
+                    << "\nauxiliary id: " << s->get_auxiliary_id()
+                    << "\ncapabilities: " << s->get_capabilities()
+                    << "\n\nDESCRIPTION:"
+                    << "\nManufacturer: " << s->get_manufacturer()
                     << "\nHardware: " << s->get_hardware()
                     << "\nSoftware: " << s->get_software()
                     << "\nSerial: " << s->get_serial_number()
                     << "\nDatapath: " << s->get_datapath()
                     << std::endl;
+
+          
+
+          std::cout << "MAC: " << s->get_mac_address() << std::endl;
 //
 //
 //           sleep ( 5 );

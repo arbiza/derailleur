@@ -11,7 +11,9 @@
  *
  **/
 
+#include <stdio.h>
 
+#include <bitset>
 
 #include <fluid/OFServer.hh>
 
@@ -19,13 +21,21 @@
 #include "event.hpp"
 
 
-derailleur::Switch::Switch ( fluid_base::OFConnection* connection, 
+derailleur::Switch::Switch ( fluid_base::OFConnection* connection,
                              derailleur::InternalEvent* event )
      : connection_ ( connection )
 {
      // Stores features reply
-     this->features_reply_.unpack( event->get_data() );
-     
+     this->features_reply_.unpack ( event->get_data() );
+
+     // Extract MAC address from datapath id. It requires convert uint64_t
+     // datapath id to bitset, to extract the last 48 bits where MAC address is
+     // and build a string with MAC address format (xx:xx:xx:xx:xx:xx).
+     std::bitset<64> bits ( this->get_datapath_id() );
+
+     this->mac_address_ = this->convert_bits_to_mac_address ( bits.to_string() );
+
+
      //  install flow default (connection with controller)
      install_flow_default();
 
@@ -65,3 +75,55 @@ void derailleur::Switch::install_flow_default()
      this->connection_->send ( buffer, fm.length() );
      fluid_msg::OFMsg::free_buffer ( buffer );
 }
+
+
+
+std::string derailleur::Switch::convert_bits_to_mac_address (
+     std::string datapath_id )
+{
+     short position = 16; // MAC address starts at position 16 in datapath_id
+     size_t length = 4;
+     std::string mac;
+
+     for ( short i = 0; i < 12; i++ ) {
+          std::string mac_in_bits = datapath_id.substr ( position, length );
+
+          if ( mac_in_bits == "0000" )
+               mac += "0";
+          else if ( mac_in_bits == "0001" )
+               mac += "1";
+          else if ( mac_in_bits == "0010" )
+               mac += "2";
+          else if ( mac_in_bits == "0011" )
+               mac += "3";
+          else if ( mac_in_bits == "0100" )
+               mac += "4";
+          else if ( mac_in_bits == "0101" )
+               mac += "5";
+          else if ( mac_in_bits == "0110" )
+               mac += "6";
+          else if ( mac_in_bits == "0111" )
+               mac += "7";
+          else if ( mac_in_bits == "1000" )
+               mac += "8";
+          else if ( mac_in_bits == "1001" )
+               mac += "9";
+          else if ( mac_in_bits == "1010" )
+               mac += "a";
+          else if ( mac_in_bits == "1011" )
+               mac += "b";
+          else if ( mac_in_bits == "1100" )
+               mac += "c";
+          else if ( mac_in_bits == "1101" )
+               mac += "d";
+          else if ( mac_in_bits == "1110" )
+               mac += "e";
+          else if ( mac_in_bits == "1111" )
+               mac += "f";
+
+          position += length;
+     }
+
+     return mac;
+}
+
