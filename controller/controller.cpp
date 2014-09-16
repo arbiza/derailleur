@@ -52,17 +52,12 @@ void derailleur::Controller::message_callback (
           //TODO: lock here
 
           // stack the new switch (New Switch object is instantiated).
-          stack_.emplace ( std::make_pair ( int ( ofconn->get_id() ),
-                                            derailleur::Switch ( ofconn ) ) );
-
-//           this->application_->on_switch_up (
-//                new Event ( ofconn->get_id(), this, type, data, length ) );
-
-//           threads_.push_back (
-//                std::thread (
-//                     this->application_->on_switch_up,
-//                     new Event ( ofconn->get_id(), this, type, data, length )
-//                ) );
+          stack_.emplace (
+               std::make_pair ( int ( ofconn->get_id() ),
+                                derailleur::Switch (
+                                     ofconn,
+                                     new InternalEvent (
+                                          this, type, data, length ) ) ) );
 
           //TODO: unlock here
           break;
@@ -73,8 +68,8 @@ void derailleur::Controller::message_callback (
 
           stack_.at ( ofconn->get_id() ).handle_multipart_description_reply (
                new InternalEvent ( this, type, data, length ) );
-               
-          this->application_->on_switch_up( 
+
+          this->application_->on_switch_up (
                new Event ( ofconn->get_id(), this, type, data, length ) );
           break;
 

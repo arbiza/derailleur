@@ -36,17 +36,18 @@ public:
 //                std::cout <<  "no" <<  std::endl;
 //           sleep ( 5 );
 // //           }
-// 
-          std::cout << "Manufacturer: " << s->get_manufacturer()
+//
+          std::cout << "????: " <<  s->get_datapath_id()
+                    << "Manufacturer: " << s->get_manufacturer()
                     << "\nHardware: " << s->get_hardware()
                     << "\nSoftware: " << s->get_software()
                     << "\nSerial: " << s->get_serial_number()
                     << "\nDatapath: " << s->get_datapath()
                     << std::endl;
-// 
-// 
+//
+//
 //           sleep ( 5 );
-// 
+//
 //           std::cout << "Manufacturer: " << s->get_manufacturer()
 //                     << "\nHardware: " << s->get_hardware()
 //                     << "\nSoftware: " << s->get_software()
@@ -76,7 +77,7 @@ int main ( int argc, char *argv[] )
 
      while ( 1 ) {
           std::cout << "size: " << controller.get_threads_size() << std::endl;
-          sleep(5);
+          sleep ( 5 );
      }
 
      return 0;

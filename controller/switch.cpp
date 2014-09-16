@@ -19,9 +19,13 @@
 #include "event.hpp"
 
 
-derailleur::Switch::Switch ( fluid_base::OFConnection* connection )
+derailleur::Switch::Switch ( fluid_base::OFConnection* connection, 
+                             derailleur::InternalEvent* event )
      : connection_ ( connection )
 {
+     // Stores features reply
+     this->features_reply_.unpack( event->get_data() );
+     
      //  install flow default (connection with controller)
      install_flow_default();
 
@@ -38,7 +42,6 @@ derailleur::Switch::Switch ( fluid_base::OFConnection* connection )
 void derailleur::Switch::handle_multipart_description_reply (
      const derailleur::InternalEvent* event )
 {
-     this->log_.custom_log( "in switch::handle_multipart_description_reply" );
      fluid_msg::of13::MultipartReplyDesc reply;
      reply.unpack ( event->get_data() );
      this->switch_description_ = reply.desc();
