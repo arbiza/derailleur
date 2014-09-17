@@ -36,8 +36,8 @@ public:
                     << "\nDatapath id: " <<  s->get_datapath_id()
                     << "\nn buffers: " << s->get_n_buffers()
                     << "\nn tables: " << s->get_n_tables()
-                    << "\nauxiliary id: " << s->get_auxiliary_id()
-                    << "\ncapabilities: " << s->get_capabilities()
+//                     << "\nauxiliary id: " << s->get_auxiliary_id()
+//                     << "\ncapabilities: " << s->get_capabilities()
                     << "\n\nDESCRIPTION:"
                     << "\nManufacturer: " << s->get_manufacturer()
                     << "\nHardware: " << s->get_hardware()

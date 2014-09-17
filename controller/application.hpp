@@ -61,7 +61,7 @@ public:
      // Switches related methods
      derailleur::Switch* get_switch ( int switch_id ) {
           // TODO: lock here
-          return &this->stack_ptr_->at ( switch_id );
+          return this->stack_ptr_->at ( switch_id );
           // TODO: unlock here
      }
 
@@ -83,7 +83,7 @@ private:
 
      // This method is called by controller. It sets a pointer to the siwthes
      // stack.
-     void set_stack_ptr ( std::map<int, derailleur::Switch>* ptr ) {
+     void set_stack_ptr ( std::map<int, derailleur::Switch*>* ptr ) {
           this->stack_ptr_ = ptr;
      }
 
@@ -96,7 +96,7 @@ private:
      // It is a pointer to a switches container. Due to the concorrency, it is
      // private and will be accessible to child classes only through public
      // methods.
-     std::map<int, derailleur::Switch>* stack_ptr_;
+     std::map< int, derailleur::Switch* >* stack_ptr_;
 
      // Controller class is a friend class to be able to access set_stack and
      // set_locker private methods.

@@ -15,6 +15,8 @@
 #include <bitset>
 
 #include <fluid/OFServer.hh>
+#include <fluid/of10msg.hh>
+#include <fluid/of13msg.hh>
 
 #include "switch.hpp"
 #include "event.hpp"
@@ -25,11 +27,7 @@ derailleur::Switch::Switch ( fluid_base::OFConnection* connection,
      : connection_ ( connection )
 {
      // Stores features reply
-     this->features_reply_->unpack ( event->get_data() );
-
-
-     //  install flow default (connection with controller)
-     install_flow_default();
+     set_features_reply ( event->get_data() );
 
 
      // Extract MAC address from datapath id. It requires convert uint64_t
@@ -40,11 +38,14 @@ derailleur::Switch::Switch ( fluid_base::OFConnection* connection,
           this->convert_bits_to_mac_address ( bits.to_string() );
 
 
+     //  install flow default (connection with controller)
+     install_flow_default();
+
+
      // Request switch description
      multipart_description_request();
-
-     // Set capabilities to capabilities structure
-     set_capabilities();
+     
+     set_version();
 }
 
 
@@ -103,6 +104,40 @@ std::string derailleur::Switch::convert_bits_to_mac_address (
 
 /** OpenFlow 1.3 Switch **/
 
+void derailleur::Switch13::set_features_reply ( uint8_t* data )
+{
+     fluid_msg::of13::FeaturesReply reply;
+     reply.unpack ( data );
+     this->datapath_id_ = reply.datapath_id();
+     this->n_buffers_ = reply.n_buffers();
+     this->n_tables_ = reply.n_tables();
+     this->auxiliary_id_ = reply.auxiliary_id();
+
+     std::bitset<32> capabilities ( reply.capabilities() );
+
+     // Flow statistics
+     capabilities_.OFPC_FLOW_STATS = ( capabilities[0] == 1 ? true : false );
+
+     // Table statistics
+     capabilities_.OFPC_TABLE_STATS = ( capabilities[1] ==  1 ? true : false );
+
+     // Port statistics
+     capabilities_.OFPC_PORT_STATS = ( capabilities[2] ==  1 ? true : false );
+
+     // Group statistics
+     capabilities_.OFPC_GROUP_STATS = ( capabilities[3] ==  1 ? true : false );
+
+     // Can reassemble IP fragments
+     capabilities_.OFPC_IP_REASM = ( capabilities[5] ==  1 ? true : false );
+
+     // Queue statistics
+     capabilities_.OFPC_QUEUE_STATS = ( capabilities[6] ==  1 ? true : false );
+
+     // Block looping ports
+     capabilities_.OFPC_PORT_BLOCKED = ( capabilities[8] ==  1 ? true : false );
+}
+
+
 void derailleur::Switch13::install_flow_default()
 {
      uint8_t* buffer;
@@ -137,43 +172,14 @@ void derailleur::Switch13::multipart_description_reply (
 {
      fluid_msg::of13::MultipartReplyDesc reply;
      reply.unpack ( event->get_data() );
-     this->switch_description_ = reply.desc();
-}
-
-
-void derailleur::Switch13::set_capabilities()
-{
-     std::bitset<32> capabilities ( this->features_reply_.capabilities() );
-
-     // Flow statistics
-     this->capabilities_.OFPC_FLOW_STATS =
-          ( capabilities[0] == 1 ? true : false );
-     
-     // Table statistics
-     this->capabilities_.OFPC_TABLE_STATS =
-          ( capabilities[1] ==  1  ? true : false);
           
-     // Port statistics
-     this->capabilities_.OFPC_PORT_STATS =
-     ( capabilities[2] ==  1  ? true : false);
-     
-     // Group statistics
-     this->capabilities_.OFPC_GROUP_STATS =
-     ( capabilities[3] ==  1  ? true : false);
-     
-     // Can reassemble IP fragments
-     this->capabilities_.OFPC_IP_REASM =
-     ( capabilities[5] ==  1  ? true : false);
-     
-     // Queue statistics
-     this->capabilities_.OFPC_QUEUE_STATS =
-     ( capabilities[6] ==  1  ? true : false);
-     
-     // Block looping ports
-     this->capabilities_.OFPC_PORT_BLOCKED =
-     ( capabilities[8] ==  1  ? true : false);
+     fluid_msg::SwitchDesc desc = reply.desc();
+     this->manufacturer_ = desc.mfr_desc();
+     this->hardware_ = desc.hw_desc();
+     this->software_ = desc.sw_desc();
+     this->serial_number_ = desc.serial_num();
+     this->datapath_ = desc.dp_desc();     
 }
-
 
 
 

@@ -11,6 +11,7 @@
  *
  **/
 
+#include <string>
 
 #include "controller.hpp"
 #include "application.hpp"
@@ -43,34 +44,22 @@ void derailleur::Controller::message_callback (
      uint8_t type,
      void *data,
      size_t length )
-{
+{     
      switch ( type ) {
 
      case 6: // Switch UP: OFTP_FEATURES_REPLAY
           this->log_.message_log ( "Controller", ofconn->get_id(), type );
 
           //TODO: lock here
-          
-          log_.custom_log( "version " + ofconn->get_version() );
 
           // stack the new switch (New Switch object is instantiated).
-//           stack_.emplace (
-// //                std::make_pair ( int ( ofconn->get_id() ),
-// //                                 derailleur::Switch (
-// //                                      ofconn,
-// //                                      new InternalEvent (
-// //                                           this, type, data, length ) ) ) );
-//                std::make_pair (
-//                     int ( ofconn->get_id() ),
-//                     derailleur::SwitchFactory::create_switch (
-//                          ofconn->get_version(),
-//                          ofconn,
-//                          new InternalEvent ( this,
-//                                              type,
-//                                              data,
-//                                              length ) )
-//                )
-//           );
+          stack_.emplace (
+               std::make_pair (
+                    int ( ofconn->get_id() ),
+                    derailleur::SwitchFactory::create_switch (
+                         ofconn->get_version(),
+                         ofconn,
+                         new InternalEvent ( this, type, data, length ) ) ) );
 
 
           //TODO: unlock here
@@ -80,7 +69,7 @@ void derailleur::Controller::message_callback (
      case 19: // Switch sending description: OFTP_MULTIPART_REPLAY
           this->log_.message_log ( "Controller", ofconn->get_id(), type );
 
-          stack_.at ( ofconn->get_id() ).handle_multipart_description_reply (
+          stack_.at ( ofconn->get_id() )->multipart_description_reply (
                new InternalEvent ( this, type, data, length ) );
 
           this->application_->on_switch_up (

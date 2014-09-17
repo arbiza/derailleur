@@ -42,7 +42,7 @@ void derailleur::Log::message_log ( const char* logger,
 }
 
 
-void derailleur::Log::custom_log ( const char* message )
+void derailleur::Log::custom_log ( const std::string message )
 {
      std::cout << message << std::endl;
 }

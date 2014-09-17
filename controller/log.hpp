@@ -20,6 +20,7 @@
 #ifndef LOG_H
 #define LOG_H
 
+
 namespace derailleur {
 
 class Log {
@@ -32,7 +33,7 @@ public:
                         const int connection_id,
                         const int type );
 
-     void custom_log ( const char* message );
+     void custom_log ( const std::string message );
      
 };
 

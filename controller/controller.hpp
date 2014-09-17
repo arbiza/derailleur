@@ -74,7 +74,7 @@ public:
 
 
      const derailleur::Switch* get_switch_ptr ( const int switch_id ) {
-          return this->stack_.at ( switch_id ).get_pointer();
+          return this->stack_.at ( switch_id );
      }
      
      
@@ -85,7 +85,7 @@ public:
 
 private:
 
-     std::map<int, derailleur::Switch> stack_;
+     std::map<int, derailleur::Switch*> stack_;
 
      derailleur::Application* application_;
 
