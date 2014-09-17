@@ -17,6 +17,7 @@
 
 
 #include <string>
+#include <utility>
 
 #include <fluid/of13msg.hh>
 #include <fluid/of10msg.hh>
@@ -33,7 +34,7 @@ class OFConnection;
 
 namespace derailleur {
 
-// Forward declaration
+// Forward declarations
 class Controller;
 class InternalEvent;
 class Event;
@@ -41,28 +42,6 @@ class Event;
 
 
 // Capabilities structures
-typedef struct capabilities_13 {
-     
-     /* enum ofp_capabilities {
-      * OFPC_FLOW_STATS   = 1 << 0, // Flow statistics.
-      * OFPC_TABLE_STATS  = 1 << 1, // Table statistics.
-      * OFPC_PORT_STATS   = 1 << 2, // Port statistics.
-      * OFPC_GROUP_STATS  = 1 << 3, // Group statistics.
-      * OFPC_IP_REASM     = 1 << 5, // Can reassemble IP fragments.
-      * OFPC_QUEUE_STATS  = 1 << 6, // Queue statistics.
-      * OFPC_PORT_BLOCKED = 1 << 8 // Switch will block looping ports.
-      */
-     
-     bool OFPC_FLOW_STATS,
-          OFPC_TABLE_STATS,
-          OFPC_PORT_STATS,
-          OFPC_GROUP_STATS,
-          OFPC_IP_REASM,
-          OFPC_QUEUE_STATS,
-          OFPC_PORT_BLOCKED;
-          
-} Capabilities_13_;
-
 
 typedef struct capabilities_10 {
 
@@ -88,6 +67,31 @@ typedef struct capabilities_10 {
 
 } Capabilities_10_;
 
+typedef struct capabilities_13 {
+
+     /* enum ofp_capabilities {
+ * OFPC_FLOW_STATS   = 1 << 0, // Flow statistics., of_version_ ( "1.3" )
+      * OFPC_TABLE_STATS  = 1 << 1, // Table statistics.
+      * OFPC_PORT_STATS   = 1 << 2, // Port statistics.
+      * OFPC_GROUP_STATS  = 1 << 3, // Group statistics.
+      * OFPC_IP_REASM     = 1 << 5, // Can reassemble IP fragments.
+      * OFPC_QUEUE_STATS  = 1 << 6, // Queue statistics.
+      * OFPC_PORT_BLOCKED = 1 << 8 // Switch will block looping ports.
+      */
+
+     bool OFPC_FLOW_STATS,
+          OFPC_TABLE_STATS,
+          OFPC_PORT_STATS,
+          OFPC_GROUP_STATS,
+          OFPC_IP_REASM,
+          OFPC_QUEUE_STATS,
+          OFPC_PORT_BLOCKED;
+
+} Capabilities_13_;
+
+
+
+
 
 
 // Class comment: describe what it is for and how it should be used.
@@ -109,8 +113,8 @@ public:
           return this->name_;
      }
 
-     float get_version () {
-          return this->of_version;
+     char* get_version () {
+          return this->of_version_;
      }
 
      std::string get_mac_address () {
@@ -119,24 +123,17 @@ public:
 
      // The following methods return attributes from features reply
      uint64_t get_datapath_id () {
-          return this->features_reply_.datapath_id();
+          return this->features_reply_->datapath_id();
      }
 
      int get_n_buffers () {
-          return this->features_reply_.n_buffers();
+          return this->features_reply_->n_buffers();
      }
 
      int get_n_tables () {
-          return this->features_reply_.n_tables();
+          return this->features_reply_->n_tables();
      }
 
-     int get_auxiliary_id () {
-          return this->features_reply_.auxiliary_id();
-     }
-
-     std::string get_capabilities () {
-          return this->cap_temp;
-     }
 
      // The following methods return attributes from switch_description_ object
      std::string get_manufacturer () {
@@ -165,36 +162,41 @@ public:
      }
 
 
-
-
 protected:
 
-     //TODO: this method must return a flow to be installed
+     //  This flow sets a rule for communication between switch and controller
      virtual void install_flow_default() {}
 
-     
-     // Multipart description
-     virtual void multipart_description_request ();
-     virtual void multipart_description_reply (
-          const derailleur::InternalEvent* event );
 
-     
-     
+     // Multipart description
+     virtual void multipart_description_request () {}
+     virtual void multipart_description_reply (
+          const derailleur::InternalEvent* event ) {}
+
+
+     // This method read corresponding bits from features_reply_.capabilities
+     // and set true or false in the capabilities structure. This is an abstract
+     // method to be implemented by childrem.
+     virtual void set_capabilities () {}
+
+
      std::string convert_bits_to_mac_address ( std::string datapath_id );
+
 
 
      fluid_base::OFConnection* connection_;
 
-
      // Switches details
      std::string name_;
      std::string mac_address_;
-     float of_version;
+     char* of_version_;
 
      fluid_msg::SwitchDesc switch_description_;
-
+     fluid_msg::FeaturesReplyCommon* features_reply_;
+     
      derailleur::Log log_;
 
+private:
      friend class derailleur::Controller;
 };
 
@@ -206,14 +208,30 @@ class Switch13 : public Switch {
 public:
 
      Switch13 ( fluid_base::OFConnection* connection,
-                derailleur::InternalEvent* event );
+                derailleur::InternalEvent* event )
+          : Switch ( connection, event ) {
+               //this->of_version_ = "";
+          }
+
+     int get_auxiliary_id () {
+          return this->features_reply_.auxiliary_id();
+     }
 
 private:
-     
+
      virtual void install_flow_default() override;
-     
+
+     // Multipart description
+     virtual void multipart_description_request () override;
+     virtual void multipart_description_reply (
+          const derailleur::InternalEvent* event ) override;
+
+     virtual void set_capabilities () override;
+
+
+
      fluid_msg::of13::FeaturesReply features_reply_;
-     Capabilities_13_ capabilities;
+     Capabilities_13_ capabilities_;
 
 };
 
@@ -232,6 +250,32 @@ private:
 
 
 
+};
+
+
+
+class SwitchFactory {
+
+public:
+     Switch* create_switch ( char* version,
+                             fluid_base::OFConnection* connection,
+                             derailleur::InternalEvent* event ) {
+          //           if ( version == "1.0" ) {
+          //                Switch13 s13 ( connection,  event );
+          //                return s13;
+          //           } else if ( version ==  "1.3" ) {
+          //                Switch10 s10 ( connection,  event );
+          //                return s10;
+          //           }
+
+          std::string of10 = "1.0";
+          std::string of13 = "1.3";
+
+          if ( version == of10 )
+               return new Switch13 ( connection,  event );
+          else if ( version ==  of13 )
+               return new Switch10 ( connection,  event );
+     }
 };
 
 
