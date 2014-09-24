@@ -16,3 +16,8 @@ build/
 
 ## Lib directories
 lib/
+
+
+## Documentation
+## For now it is not tracked, only Doxygen configuration file was added
+doc/html/
