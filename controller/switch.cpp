@@ -22,25 +22,10 @@
 #include "event.hpp"
 
 
-// derailleur::Switch::Switch ( fluid_base::OFConnection* connection,
-//                              derailleur::InternalEvent* event)
-//      : connection_ ( connection )
-// {
-//      // Stores features reply
-//      set_features_reply ( event->get_data() );
-// 
-// 
-//      //  install flow default (connection with controller)
-//      install_flow_default();
-// 
-// 
-//      // Request switch description
-//      multipart_description_request();
-// }
-
-
-
-
+// TODO: retouch this comment
+// Extract MAC address from datapath id. It requires to convert uint64_t
+// datapath id to bitset, to extract the last 48 bits where MAC address is
+// and build a string with MAC address format (xx:xx:xx:xx:xx:xx).
 std::string derailleur::Switch::convert_bits_to_mac_address (
      std::string datapath_id )
 {
@@ -102,15 +87,12 @@ void derailleur::Switch13::set_features_reply ( uint8_t* data )
      this->n_buffers_ = reply.n_buffers();
      this->n_tables_ = reply.n_tables();
      this->auxiliary_id_ = reply.auxiliary_id();
-     
-     
-     // Extract MAC address from datapath id. It requires convert uint64_t
-     // datapath id to bitset, to extract the last 48 bits where MAC address is
-     // and build a string with MAC address format (xx:xx:xx:xx:xx:xx).
+
+
      std::bitset<64> bits ( this->get_datapath_id() );
      this->mac_address_ =
-               this->convert_bits_to_mac_address ( bits.to_string() );
-     
+          this->convert_bits_to_mac_address ( bits.to_string() );
+
 
      std::bitset<32> capabilities ( reply.capabilities() );
 
@@ -171,23 +153,79 @@ void derailleur::Switch13::multipart_description_reply (
 {
      fluid_msg::of13::MultipartReplyDesc reply;
      reply.unpack ( event->get_data() );
-          
+
      fluid_msg::SwitchDesc desc = reply.desc();
      this->manufacturer_ = desc.mfr_desc();
      this->hardware_ = desc.hw_desc();
      this->software_ = desc.sw_desc();
      this->serial_number_ = desc.serial_num();
-     this->datapath_ = desc.dp_desc();     
+     this->datapath_ = desc.dp_desc();
 }
 
 
 
 /** OpenFlow 1.0 Switch **/
 
-// derailleur::Switch10::Switch10 ( fluid_base::OFConnection* connection,
-//                                  derailleur::InternalEvent* event )
-//      : Switch ( connection, event ), of_version_ ( 1.0 )
-// {
-//
-// }
+void derailleur::Switch10::set_features_reply ( uint8_t* data )
+{
+     fluid_msg::of10::FeaturesReply reply;
+     reply.unpack ( data );
+     this->datapath_id_ = reply.datapath_id();
+     this->n_buffers_ = reply.n_buffers();
+     this->n_tables_ = reply.n_tables();
+
+     std::bitset<64> bits ( this->get_datapath_id() );
+     this->mac_address_ =
+          this->convert_bits_to_mac_address ( bits.to_string() );
+
+
+     std::bitset<32> capabilities ( reply.capabilities() );
+     
+     // Flow statistics
+     capabilities_.OFPC_FLOW_STATS = ( capabilities[0] == 1 ? true : false );
+     
+     // Table statistics
+     capabilities_.OFPC_TABLE_STATS = ( capabilities[1] ==  1 ? true : false );
+     
+     // Port statistics
+     capabilities_.OFPC_PORT_STATS = ( capabilities[2] ==  1 ? true : false );
+     
+     // 802.1d spanning tree.
+     capabilities_.OFPC_STP = ( capabilities[3] ==  1 ? true : false );
+     
+     // Reserved, must be zero.
+     capabilities_.OFPC_RESERVED = ( capabilities[4] ==  1 ? true : false );
+     
+     // Can reassemble IP fragments
+     capabilities_.OFPC_IP_REASM = ( capabilities[5] ==  1 ? true : false );
+     
+     // Queue statistics
+     capabilities_.OFPC_QUEUE_STATS = ( capabilities[6] ==  1 ? true : false );
+     
+     // Block looping ports
+     capabilities_.OFPC_ARP_MATCH_IP = ( capabilities[7] ==  1 ? true : false );
+}
+
+
+
+void derailleur::Switch10::install_flow_default()
+{
+        
+}
+
+
+
+void derailleur::Switch10::multipart_description_request()
+{
+
+}
+
+
+
+void derailleur::Switch10::multipart_description_reply (
+     const derailleur::InternalEvent* event )
+{
+
+}
+
 

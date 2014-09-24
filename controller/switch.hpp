@@ -254,14 +254,14 @@ public:
 
 private:
 
-     virtual void set_features_reply ( uint8_t* data ) override {}
+     virtual void set_features_reply ( uint8_t* data ) override;
 
-     virtual void install_flow_default() override {}
+     virtual void install_flow_default() override;
 
      // Multipart description
-     virtual void multipart_description_request () override {}
+     virtual void multipart_description_request () override;
      virtual void multipart_description_reply (
-          const derailleur::InternalEvent* event ) override {}
+          const derailleur::InternalEvent* event ) override;
 
      // Features reply attributes:
      Capabilities_10_ capabilities_;
