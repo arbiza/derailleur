@@ -35,6 +35,7 @@ class Controller;
 class InternalEvent;
 class Event;
 
+class SwitchFactory;
 
 
 // Capabilities structures
@@ -96,16 +97,15 @@ class Switch {
 
 public:
 
-     Switch ( fluid_base::OFConnection* connection,
-              derailleur::InternalEvent* event );
+     Switch ( fluid_base::OFConnection* connection )
+          : connection_ ( connection ) {}
 
-     //virtual bool install_flow ( fluid_msg::FlowModCommon flow );
 
      void set_name ( std::string name ) {
           this->name_ = name;
      }
 
-     virtual void set_features_reply ( uint8_t* data ) {}
+     virtual void set_features_reply ( uint8_t* data ) = 0;
 
 
      std::string get_name() {
@@ -164,16 +164,13 @@ public:
 protected:
 
      //  This flow sets a rule for communication between switch and controller
-     virtual void install_flow_default() {}
+     virtual void install_flow_default() = 0;
 
 
      // Multipart description
-     virtual void multipart_description_request () {}
+     virtual void multipart_description_request () = 0;
      virtual void multipart_description_reply (
-          const derailleur::InternalEvent* event ) {}
-
-
-     virtual void set_version () {}
+          const derailleur::InternalEvent* event ) = 0;
 
 
      std::string convert_bits_to_mac_address ( std::string datapath_id );
@@ -215,22 +212,18 @@ class Switch13 : public Switch {
 
 public:
 
-     Switch13 ( fluid_base::OFConnection* connection,
-                derailleur::InternalEvent* event )
-          : Switch ( connection, event ) {}
-
-     virtual void set_features_reply ( uint8_t* data ) override;
-     
-     virtual void set_version () override {
+     Switch13 ( fluid_base::OFConnection* connection )
+          : Switch ( connection ) {
           this->of_version_ = "1.3.2 (0x04)";
      }
-
 
      int get_auxiliary_id () {
           return this->auxiliary_id_;
      }
 
 private:
+
+     virtual void set_features_reply ( uint8_t* data ) override;
 
      virtual void install_flow_default() override;
 
@@ -243,6 +236,8 @@ private:
      // Features reply attributes:
      int auxiliary_id_;
      Capabilities_13_ capabilities_;
+
+     friend class derailleur::SwitchFactory;
 };
 
 
@@ -252,15 +247,26 @@ class Switch10 : public Switch {
 
 public:
 
-     Switch10 ( fluid_base::OFConnection* connection,
-                derailleur::InternalEvent* event )
-          : Switch ( connection, event ) {
+     Switch10 ( fluid_base::OFConnection* connection )
+          : Switch ( connection ) {
           this->of_version_ = "1.0.0 (0x01)";
      }
 
 private:
+
+     virtual void set_features_reply ( uint8_t* data ) override {}
+
+     virtual void install_flow_default() override {}
+
+     // Multipart description
+     virtual void multipart_description_request () override {}
+     virtual void multipart_description_reply (
+          const derailleur::InternalEvent* event ) override {}
+
      // Features reply attributes:
      Capabilities_10_ capabilities_;
+
+     friend class derailleur::SwitchFactory;
 };
 
 
@@ -270,12 +276,23 @@ class SwitchFactory {
 public:
      static Switch* create_switch ( uint8_t version,
                                     fluid_base::OFConnection* connection,
-                                    derailleur::InternalEvent* event ) {
+                                    void *data ) {
 
-          if ( version == 1 )
-               return new Switch10 ( connection,  event );
-          else if ( version ==  4 )
-               return new Switch13 ( connection,  event );
+          if ( version == 1 ) {
+               Switch10* s = new Switch10 ( connection );
+               s->set_features_reply ( ( uint8_t* ) data );
+               s->install_flow_default();
+               s->multipart_description_request();
+               return s;
+          } else if ( version ==  4 ) {
+               Switch13* s = new Switch13 ( connection );
+               s->set_features_reply ( ( uint8_t* ) data );
+               s->install_flow_default();
+               s->multipart_description_request();
+               return s;
+          }
+
+          return nullptr;
      }
 };
 

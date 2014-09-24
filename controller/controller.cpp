@@ -59,7 +59,7 @@ void derailleur::Controller::message_callback (
                     derailleur::SwitchFactory::create_switch (
                          ofconn->get_version(),
                          ofconn,
-                         new InternalEvent ( this, type, data, length ) ) ) );
+                         data ) ) );
 
 
           //TODO: unlock here

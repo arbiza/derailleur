@@ -22,31 +22,21 @@
 #include "event.hpp"
 
 
-derailleur::Switch::Switch ( fluid_base::OFConnection* connection,
-                             derailleur::InternalEvent* event )
-     : connection_ ( connection )
-{
-     // Stores features reply
-     set_features_reply ( event->get_data() );
-
-
-     // Extract MAC address from datapath id. It requires convert uint64_t
-     // datapath id to bitset, to extract the last 48 bits where MAC address is
-     // and build a string with MAC address format (xx:xx:xx:xx:xx:xx).
-     std::bitset<64> bits ( this->get_datapath_id() );
-     this->mac_address_ =
-          this->convert_bits_to_mac_address ( bits.to_string() );
-
-
-     //  install flow default (connection with controller)
-     install_flow_default();
-
-
-     // Request switch description
-     multipart_description_request();
-     
-     set_version();
-}
+// derailleur::Switch::Switch ( fluid_base::OFConnection* connection,
+//                              derailleur::InternalEvent* event)
+//      : connection_ ( connection )
+// {
+//      // Stores features reply
+//      set_features_reply ( event->get_data() );
+// 
+// 
+//      //  install flow default (connection with controller)
+//      install_flow_default();
+// 
+// 
+//      // Request switch description
+//      multipart_description_request();
+// }
 
 
 
@@ -112,6 +102,15 @@ void derailleur::Switch13::set_features_reply ( uint8_t* data )
      this->n_buffers_ = reply.n_buffers();
      this->n_tables_ = reply.n_tables();
      this->auxiliary_id_ = reply.auxiliary_id();
+     
+     
+     // Extract MAC address from datapath id. It requires convert uint64_t
+     // datapath id to bitset, to extract the last 48 bits where MAC address is
+     // and build a string with MAC address format (xx:xx:xx:xx:xx:xx).
+     std::bitset<64> bits ( this->get_datapath_id() );
+     this->mac_address_ =
+               this->convert_bits_to_mac_address ( bits.to_string() );
+     
 
      std::bitset<32> capabilities ( reply.capabilities() );
 
