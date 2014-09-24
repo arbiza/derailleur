@@ -17,6 +17,7 @@
 
 
 #include <string>
+#include <vector>
 
 #include "log.hpp"
 
@@ -166,20 +167,33 @@ protected:
      //  This flow sets a rule for communication between switch and controller
      virtual void install_flow_default() = 0;
 
-
      // Multipart description
      virtual void multipart_description_request () = 0;
      virtual void multipart_description_reply (
           const derailleur::InternalEvent* event ) = 0;
 
-
+     /**
+      * Extracts switch MAC from datapath_id.
+      * This method receives a string of bits sent by switch as datapath_id. The
+      * last 48 bits represents switch MAC whose are read and translated to 
+      * hexdecimal format that is returned as a string (without any separator).
+      * @param datapath_id datapath_id in a string of bits format.
+      * @return string with MAC without separator (xxxxxxxxxxxx).
+      */
      std::string convert_bits_to_mac_address ( std::string datapath_id );
 
 
+     /** 
+      * Controller to switch connection pointer.
+      * It points to a connection handled by fluid_base::OFserver
+      */
+     fluid_base::OFConnection* connection_; 
 
-     fluid_base::OFConnection* connection_;
-
-     // Switches details
+     /**
+      * The following attributes store information retrieved from the switch
+      * throu OpenFlow (features_reply, multipart_description_reply).
+      */
+      
      std::string name_;
      std::string mac_address_;
      std::string of_version_;

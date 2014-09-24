@@ -15,9 +15,10 @@
 #ifndef _TABLE_HPP_
 #define _TABLE_HPP_
 
-#include <vector>
 
+#include <fluid/of10msg.hh>
 #include <fluid/of13msg.hh>
+
 
 namespace derailleur {
 	

@@ -22,10 +22,6 @@
 #include "event.hpp"
 
 
-// TODO: retouch this comment
-// Extract MAC address from datapath id. It requires to convert uint64_t
-// datapath id to bitset, to extract the last 48 bits where MAC address is
-// and build a string with MAC address format (xx:xx:xx:xx:xx:xx).
 std::string derailleur::Switch::convert_bits_to_mac_address (
      std::string datapath_id )
 {
