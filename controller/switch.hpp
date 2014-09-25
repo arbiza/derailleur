@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "log.hpp"
+#include "table.hpp"
 
 
 // Forward declaration
@@ -92,8 +93,20 @@ typedef struct capabilities_13 {
 
 
 
-// Class comment: describe what it is for and how it should be used.
-// TODO: This class MUST use exceptions, because the major part of operations won't
+/**
+ * Switch class abstracts each OpenFlow switch connected to the controller. This
+ * is an abstract class.
+ * 
+ * Controller instantiates and stacks a Switch object in a container when a new 
+ * switch connects. The container is shared with Application class using a 
+ * pointer.
+ * 
+ * SwitchFactory class creates Switch objects according to OpenFlow version.
+ * 
+ * @see Controller
+ * @see Application
+ * @see SwitchFactory
+ */
 class Switch {
 
 public:
@@ -106,9 +119,8 @@ public:
           this->name_ = name;
      }
 
-     virtual void set_features_reply ( uint8_t* data ) = 0;
 
-
+     // GETTERS
      std::string get_name() {
           return this->name_;
      }
@@ -121,7 +133,6 @@ public:
           return this->mac_address_;
      }
 
-     // The following methods return attributes from features reply
      uint64_t get_datapath_id () {
           return this->datapath_id_;
      }
@@ -134,8 +145,6 @@ public:
           return this->n_tables_;
      }
 
-
-     // The following methods return attributes from switch_description_ object
      std::string get_manufacturer () {
           return this->manufacturer_;
      }
@@ -156,13 +165,18 @@ public:
           return this->datapath_;
      }
 
-     // Return a pointer to this Switch instance
+     /** Return a pointer to this Switch instance */
      const Switch* get_pointer() {
           return const_cast< const Switch* > ( this );
      }
 
 
 protected:
+
+        /**
+         * Parse response received fro 
+         */
+     virtual void set_features_reply ( uint8_t* data ) = 0;
 
      //  This flow sets a rule for communication between switch and controller
      virtual void install_flow_default() = 0;
@@ -175,7 +189,7 @@ protected:
      /**
       * Extracts switch MAC from datapath_id.
       * This method receives a string of bits sent by switch as datapath_id. The
-      * last 48 bits represents switch MAC whose are read and translated to 
+      * last 48 bits represents switch MAC whose are read and translated to
       * hexdecimal format that is returned as a string (without any separator).
       * @param datapath_id datapath_id in a string of bits format.
       * @return string with MAC without separator (xxxxxxxxxxxx).
@@ -183,17 +197,15 @@ protected:
      std::string convert_bits_to_mac_address ( std::string datapath_id );
 
 
-     /** 
+     /**
       * Controller to switch connection pointer.
       * It points to a connection handled by fluid_base::OFserver
       */
-     fluid_base::OFConnection* connection_; 
+     fluid_base::OFConnection* connection_;
 
-     /**
-      * The following attributes store information retrieved from the switch
-      * throu OpenFlow (features_reply, multipart_description_reply).
-      */
-      
+     // The following attributes store information retrieved from the switch
+     // through OpenFlow (features_reply, multipart_description_reply).
+
      std::string name_;
      std::string mac_address_;
      std::string of_version_;
@@ -211,6 +223,13 @@ protected:
          software_,
          serial_number_,
          datapath_;
+
+
+     /**
+      * Vector of flow tables (Table objects). Each table contain and manage
+      * its own flows.
+      */
+     std::vector<derailleur::Table> tables_;
 
 
      derailleur::Log log_;
