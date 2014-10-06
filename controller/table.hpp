@@ -22,12 +22,6 @@
 
 namespace derailleur {
 	
-enum {
-	MAIN = 0,
-	INPUT = 1,
-	OUTPUT = 2,
-	FIREWALL = 3,
-}
 
 
 // A Table contain OpenFlow flows (rules), this class store and manage that

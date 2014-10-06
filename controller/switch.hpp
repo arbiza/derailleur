@@ -23,25 +23,32 @@
 #include "table.hpp"
 
 
-// Forward declaration
+
+/** Forward declarations of classes from fluid_base namespace **/
 namespace fluid_base {
-// Forward declaration
 class OFConnection;
 }
+
+/** Forward declarations of classes from fluid_msg namespace **/
+namespace fluid_msg {
+class FlowModCommon;
+class Action;
+}
+
+
 
 
 namespace derailleur {
 
-// Forward declarations
+/** Forward declaration of classes from derailleur namespace **/
 class Controller;
 class InternalEvent;
 class Event;
-
 class SwitchFactory;
+class Table;
 
 
 // Capabilities structures
-
 typedef struct capabilities_10 {
 
      /* enum ofp_capabilities {
@@ -96,13 +103,16 @@ typedef struct capabilities_13 {
 /**
  * Switch class abstracts each OpenFlow switch connected to the controller. This
  * is an abstract class.
- * 
- * Controller instantiates and stacks a Switch object in a container when a new 
- * switch connects. The container is shared with Application class using a 
+ *
+ * Controller instantiates and stacks a Switch object in a container when a new
+ * switch connects. The container is shared with Application class using a
  * pointer.
- * 
+ *
  * SwitchFactory class creates Switch objects according to OpenFlow version.
- * 
+ *
+ * @param connection It is a connection pointer; messages are sent through this
+ *                      pointer.
+ *
  * @see Controller
  * @see Application
  * @see SwitchFactory
@@ -111,78 +121,125 @@ class Switch {
 
 public:
 
+
+     /**
+      * Switch constructor only initializes connection_ attribute.
+      *
+      * Classes inheriting from this class MUST implement the following methods:
+      * - public: install_flow
+      * - public: install_flow_table
+      * - protected: install_flow_default
+      * - protected: multipart_description_request
+      * - protected: multipart_description_reply
+      */
      Switch ( fluid_base::OFConnection* connection )
           : connection_ ( connection ) {}
 
 
+     /**
+      * Install the flow received by parameter in the switch.
+      * Children of this class must convert parameters to the proper version.
+      * @param flow FlowModCommon pointer
+      * @param action action settings pointer
+      * @return true on success
+      */
+     virtual short install_flow ( fluid_msg::FlowModCommon* flow,
+                                  fluid_msg::Action* action ) = 0;
+
+
+     /**
+      * Install the flow table received by parameter in the switch.
+      * @param table table containing flows to be installed (children must
+      *                 convert flows to the prover Flow Mod version)
+      * @return true on success
+      */
+     virtual short install_flow_table ( derailleur::Table* table ) = 0;
+
+
+
+     // SETTERS
      void set_name ( std::string name ) {
           this->name_ = name;
      }
 
 
+
      // GETTERS
-     std::string get_name() {
+     std::string get_name() const {
           return this->name_;
      }
 
-     std::string get_version () {
+     std::string get_version () const {
           return this->of_version_;
      }
 
-     std::string get_mac_address () {
+     std::string get_mac_address () const {
           return this->mac_address_;
      }
 
-     uint64_t get_datapath_id () {
+     uint64_t get_datapath_id () const {
           return this->datapath_id_;
      }
 
-     int get_n_buffers () {
+     int get_n_buffers () const {
           return this->n_buffers_;
      }
 
-     int get_n_tables () {
+     int get_n_tables () const {
           return this->n_tables_;
      }
 
-     std::string get_manufacturer () {
+     std::string get_manufacturer () const {
           return this->manufacturer_;
      }
 
-     std::string get_hardware () {
+     std::string get_hardware () const {
           return this->hardware_;
      }
 
-     std::string get_software () {
+     std::string get_software () const {
           return this->software_;
      }
 
-     std::string get_serial_number () {
+     std::string get_serial_number () const {
           return this->serial_number_;
      }
 
-     std::string get_datapath () {
+     std::string get_datapath () const {
           return this->datapath_;
      }
 
      /** Return a pointer to this Switch instance */
-     const Switch* get_pointer() {
+     const Switch* get_pointer() const {
           return const_cast< const Switch* > ( this );
      }
 
 
 protected:
 
-        /**
-         * Parse response received fro 
-         */
+     /**
+      * Parse response received from switches to features request message.
+      * This method MUST be implemented by children.
+      */
      virtual void set_features_reply ( uint8_t* data ) = 0;
 
-     //  This flow sets a rule for communication between switch and controller
+     /**
+      * This flow sets a rule for communication between switch and controller.
+      * This method MUST be implemented by children.
+      */
      virtual void install_flow_default() = 0;
 
-     // Multipart description
+     /**
+      * Send Multipart description request message to switch.
+      * This method MUST be implemented by children.
+      */
      virtual void multipart_description_request () = 0;
+
+     /**
+      * Parses Multipart description request answer reveived from switch and
+      * stores description fields in attributes.
+      * This method MUST be implemented by children.
+      */
      virtual void multipart_description_reply (
           const derailleur::InternalEvent* event ) = 0;
 
@@ -241,14 +298,91 @@ private:
 
 
 
+class Switch10 : public Switch {
+
+public:
+
+     /**
+      * Cosntructor calls Switch construcstor and sets the version attribute.
+      * @see Switch
+      */
+     Switch10 ( fluid_base::OFConnection* connection )
+          : Switch ( connection ) {
+          this->of_version_ = "1.0.0 (0x01)";
+     }
+
+     /**
+      * Overrides install_flow method from Switch class.
+      * Install the flow received by parameter in the switch.
+      * @param flow FlowModCommon pointer
+      * @param action actions to be performade
+      * @return true on success
+      */
+     virtual short install_flow ( fluid_msg::FlowModCommon* flow,
+                                  fluid_msg::Action* action ) override;
+
+
+     /**
+      * Install the flow table received by parameter in the switch.
+      * @param table table containing flows to be installed (children must
+      *                 convert flows to the prover Flow Mod version)
+      * @return true on success
+      */
+     virtual short install_flow_table ( derailleur::Table* table ) override;
+
+private:
+
+     virtual void set_features_reply ( uint8_t* data ) override;
+
+     virtual void install_flow_default() override;
+
+     // Multipart description
+     virtual void multipart_description_request () override;
+     virtual void multipart_description_reply (
+          const derailleur::InternalEvent* event ) override;
+
+     // Features reply attributes:
+     Capabilities_10_ capabilities_;
+
+     friend class derailleur::SwitchFactory;
+};
+
+
+
+
 class Switch13 : public Switch {
 
 public:
 
+     /**
+      * Cosntructor calls Switch construcstor and sets the version attribute.
+      * @see Switch
+      */
      Switch13 ( fluid_base::OFConnection* connection )
           : Switch ( connection ) {
           this->of_version_ = "1.3.2 (0x04)";
      }
+
+
+     /**
+      * Overrides install_flow method from Switch class.
+      * Install the flow received by parameter in the switch.
+      * @param flow FlowModCommon pointer
+      * @param action actions to be performade
+      * @return true on success
+      */
+     virtual short install_flow ( fluid_msg::FlowModCommon* flow,
+                                  fluid_msg::Action* action ) override;
+
+
+     /**
+      * Install the flow table received by parameter in the switch.
+      * @param table table containing flows to be installed (children must
+      *                 convert flows to the prover Flow Mod version)
+      * @return true on success
+      */
+     virtual short install_flow_table ( derailleur::Table* table ) override;
+
 
      int get_auxiliary_id () {
           return this->auxiliary_id_;
@@ -276,31 +410,7 @@ private:
 
 
 
-class Switch10 : public Switch {
 
-public:
-
-     Switch10 ( fluid_base::OFConnection* connection )
-          : Switch ( connection ) {
-          this->of_version_ = "1.0.0 (0x01)";
-     }
-
-private:
-
-     virtual void set_features_reply ( uint8_t* data ) override;
-
-     virtual void install_flow_default() override;
-
-     // Multipart description
-     virtual void multipart_description_request () override;
-     virtual void multipart_description_reply (
-          const derailleur::InternalEvent* event ) override;
-
-     // Features reply attributes:
-     Capabilities_10_ capabilities_;
-
-     friend class derailleur::SwitchFactory;
-};
 
 
 

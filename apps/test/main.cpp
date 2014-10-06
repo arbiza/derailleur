@@ -47,6 +47,26 @@ public:
                     << std::endl;
 
           std::cout << "MAC: " << s->get_mac_address() << std::endl;
+          
+          fluid_msg::of13::FlowMod fm;
+          //fm.xid(pi.xid());
+          fm.cookie(30);
+          fm.cookie_mask(0xffffffffffffffff);
+          fm.table_id(0);
+          fm.command(fluid_msg::of13::OFPFC_ADD);
+          fm.idle_timeout(0);
+          fm.hard_timeout(0);
+          fm.priority(100);
+          fm.buffer_id( 0xffffffff );
+          fm.out_port( fluid_msg::of13::OFPP_ANY );
+          fm.out_group( fluid_msg::of13::OFPG_ANY );
+          fm.flags(0);
+          of13::EthSrc fsrc(((uint8_t*) &src) + 2);
+          of13::EthDst fdst(((uint8_t*) &dst) + 2);
+          fm.add_oxm_field(fsrc);
+          fm.add_oxm_field(fdst);
+          of13::OutputAction act(out_port, 1024);
+          
      }
 
      void on_switch_down ( const int switch_id ) override {

@@ -11,7 +11,7 @@
  *
  **/
 
-
+#include <cstdlib>
 #include <bitset>
 
 #include <fluid/OFServer.hh>
@@ -73,7 +73,117 @@ std::string derailleur::Switch::convert_bits_to_mac_address (
 
 
 
-/** OpenFlow 1.3 Switch **/
+// OpenFlow 1.0 Switch
+
+short derailleur::Switch10::install_flow ( fluid_msg::FlowModCommon* flow,
+          fluid_msg::Action* action )
+{
+
+     return EXIT_SUCCESS;
+}
+
+
+short int derailleur::Switch10::install_flow_table ( derailleur::Table* table )
+{
+
+     return EXIT_SUCCESS;
+}
+
+void derailleur::Switch10::set_features_reply ( uint8_t* data )
+{
+     fluid_msg::of10::FeaturesReply reply;
+     reply.unpack ( data );
+     this->datapath_id_ = reply.datapath_id();
+     this->n_buffers_ = reply.n_buffers();
+     this->n_tables_ = reply.n_tables();
+
+     std::bitset<64> bits ( this->get_datapath_id() );
+     this->mac_address_ =
+          this->convert_bits_to_mac_address ( bits.to_string() );
+
+
+     std::bitset<32> capabilities ( reply.capabilities() );
+
+     // Flow statistics
+     capabilities_.OFPC_FLOW_STATS = ( capabilities[0] == 1 ? true : false );
+
+     // Table statistics
+     capabilities_.OFPC_TABLE_STATS = ( capabilities[1] ==  1 ? true : false );
+
+     // Port statistics
+     capabilities_.OFPC_PORT_STATS = ( capabilities[2] ==  1 ? true : false );
+
+     // 802.1d spanning tree.
+     capabilities_.OFPC_STP = ( capabilities[3] ==  1 ? true : false );
+
+     // Reserved, must be zero.
+     capabilities_.OFPC_RESERVED = ( capabilities[4] ==  1 ? true : false );
+
+     // Can reassemble IP fragments
+     capabilities_.OFPC_IP_REASM = ( capabilities[5] ==  1 ? true : false );
+
+     // Queue statistics
+     capabilities_.OFPC_QUEUE_STATS = ( capabilities[6] ==  1 ? true : false );
+
+     // Block looping ports
+     capabilities_.OFPC_ARP_MATCH_IP = ( capabilities[7] ==  1 ? true : false );
+}
+
+
+
+void derailleur::Switch10::install_flow_default()
+{
+
+}
+
+
+
+void derailleur::Switch10::multipart_description_request()
+{
+
+}
+
+
+
+void derailleur::Switch10::multipart_description_reply (
+     const derailleur::InternalEvent* event )
+{
+
+}
+
+
+
+// OpenFlow 1.3 Switch
+
+short derailleur::Switch13::install_flow ( fluid_msg::FlowModCommon* flow,
+          fluid_msg::Action* action )
+{
+     fluid_msg::of13::FlowMod* flow_mod =
+          static_cast<fluid_msg::of13::FlowMod*> ( flow );
+
+     fluid_msg::of13::OutputAction* output_action =
+          static_cast<fluid_msg::of13::OutputAction*> ( action );
+
+
+     fluid_msg::of13::ApplyActions *inst = new fluid_msg::of13::ApplyActions();
+     inst->add_action ( output_action );
+     flow_mod->add_instruction ( inst );
+     uint8_t* buffer = flow_mod->pack();
+     this->connection_->send ( buffer, flow_mod->length() );
+     fluid_msg::OFMsg::free_buffer ( buffer );
+
+     return EXIT_SUCCESS;
+}
+
+
+short int derailleur::Switch13::install_flow_table ( derailleur::Table* table )
+{
+
+     return EXIT_SUCCESS;
+}
+
+
+
 
 void derailleur::Switch13::set_features_reply ( uint8_t* data )
 {
@@ -160,68 +270,6 @@ void derailleur::Switch13::multipart_description_reply (
 
 
 
-/** OpenFlow 1.0 Switch **/
 
-void derailleur::Switch10::set_features_reply ( uint8_t* data )
-{
-     fluid_msg::of10::FeaturesReply reply;
-     reply.unpack ( data );
-     this->datapath_id_ = reply.datapath_id();
-     this->n_buffers_ = reply.n_buffers();
-     this->n_tables_ = reply.n_tables();
-
-     std::bitset<64> bits ( this->get_datapath_id() );
-     this->mac_address_ =
-          this->convert_bits_to_mac_address ( bits.to_string() );
-
-
-     std::bitset<32> capabilities ( reply.capabilities() );
-     
-     // Flow statistics
-     capabilities_.OFPC_FLOW_STATS = ( capabilities[0] == 1 ? true : false );
-     
-     // Table statistics
-     capabilities_.OFPC_TABLE_STATS = ( capabilities[1] ==  1 ? true : false );
-     
-     // Port statistics
-     capabilities_.OFPC_PORT_STATS = ( capabilities[2] ==  1 ? true : false );
-     
-     // 802.1d spanning tree.
-     capabilities_.OFPC_STP = ( capabilities[3] ==  1 ? true : false );
-     
-     // Reserved, must be zero.
-     capabilities_.OFPC_RESERVED = ( capabilities[4] ==  1 ? true : false );
-     
-     // Can reassemble IP fragments
-     capabilities_.OFPC_IP_REASM = ( capabilities[5] ==  1 ? true : false );
-     
-     // Queue statistics
-     capabilities_.OFPC_QUEUE_STATS = ( capabilities[6] ==  1 ? true : false );
-     
-     // Block looping ports
-     capabilities_.OFPC_ARP_MATCH_IP = ( capabilities[7] ==  1 ? true : false );
-}
-
-
-
-void derailleur::Switch10::install_flow_default()
-{
-        
-}
-
-
-
-void derailleur::Switch10::multipart_description_request()
-{
-
-}
-
-
-
-void derailleur::Switch10::multipart_description_reply (
-     const derailleur::InternalEvent* event )
-{
-
-}
 
 
