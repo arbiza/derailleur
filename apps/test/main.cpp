@@ -93,14 +93,10 @@ public:
      }
 
      void message_handler ( const derailleur::Event* const event ) override {
-          
-          std::cout << "CHEGOU!" << std::endl;
 
           switch ( event->get_type() ) {
 
           case 10: // packet-in
-               
-               std::cout << "PACKET-IN!   version: " << (int)event->get_version() << std::endl;
 
                uint64_t dst = 0, src = 0;
                void* ofpip;
@@ -133,6 +129,7 @@ public:
                               << "dst: " << dst
                               << "\nsrc: " << src
                               << "\nin port: " << in_port
+                              << "data: " << ofpi->data()
                               << std:: endl;
 
                }
