@@ -169,7 +169,7 @@ public:
           return this->name_;
      }
 
-     std::string get_version () const {
+     int get_version () const {
           return this->of_version_;
      }
 
@@ -265,7 +265,7 @@ protected:
 
      std::string name_;
      std::string mac_address_;
-     std::string of_version_;
+     int of_version_;
 
 
      // Features reply attributes:
@@ -303,12 +303,12 @@ class Switch10 : public Switch {
 public:
 
      /**
-      * Cosntructor calls Switch construcstor and sets the version attribute.
+      * Cosntructor calls Switch constructor and sets the version attribute.
       * @see Switch
       */
      Switch10 ( fluid_base::OFConnection* connection )
           : Switch ( connection ) {
-          this->of_version_ = "1.0.0 (0x01)";
+          this->of_version_ = fluid_msg::of10::OFP_VERSION;
      }
 
      /**
@@ -360,7 +360,7 @@ public:
       */
      Switch13 ( fluid_base::OFConnection* connection )
           : Switch ( connection ) {
-          this->of_version_ = "1.3.2 (0x04)";
+               this->of_version_ = fluid_msg::of13::OFP_VERSION;
      }
 
 

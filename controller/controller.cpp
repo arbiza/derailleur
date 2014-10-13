@@ -44,7 +44,7 @@ void derailleur::Controller::message_callback (
      uint8_t type,
      void *data,
      size_t length )
-{     
+{
      switch ( type ) {
 
      case 6: // Switch UP: OFTP_FEATURES_REPLAY
@@ -65,7 +65,6 @@ void derailleur::Controller::message_callback (
           //TODO: unlock here
           break;
 
-
      case 19: // Switch sending description: OFTP_MULTIPART_REPLAY
           this->log_.message_log ( "Controller", ofconn->get_id(), type );
 
@@ -73,15 +72,17 @@ void derailleur::Controller::message_callback (
                new InternalEvent ( this, type, data, length ) );
 
           this->application_->on_switch_up (
-               new Event ( ofconn->get_id(), this, type, data, length ) );
+               new Event ( ofconn->get_id(), ofconn->get_version(), this,
+                           type, data, length ) );
           break;
 
 
      default:
           this->log_.message_log ( "Controller", ofconn->get_id(), type );
-//           this->application_->message_handler (
-//                ofconn->get_id(),
-//                new derailleur::Message ( this, type, data, len ) );
+          this->application_->message_handler (
+               new Event ( ofconn->get_id(), ofconn->get_version(), this, 
+                           type, data, length )
+          );
           break;
      }
 }

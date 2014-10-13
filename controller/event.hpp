@@ -69,6 +69,7 @@ class Event : public InternalEvent {
 
 public:
      Event ( const int switch_id,
+             const uint8_t of_version,
              fluid_base::OFHandler* ofhandler,
              const int type,
              const void* data,
@@ -77,6 +78,7 @@ public:
                             type,
                             data,
                             length ) {
+          this->of_version_ = of_version;
           this->switch_id_ = switch_id;
      }
 
@@ -88,8 +90,13 @@ public:
           return this->switch_id_;
      }
 
+     uint8_t get_version () const {
+          return this->of_version_;
+     }
+
 private:
      int switch_id_;
+     uint8_t of_version_;
 };
 
 
