@@ -11,7 +11,10 @@
  *
  **/
 
+
+#include <cstring>
 #include <cstdlib>
+#include <sstream>
 #include <bitset>
 
 #include <fluid/OFServer.hh>
@@ -23,52 +26,22 @@
 
 
 std::string derailleur::Switch::convert_bits_to_mac_address (
-     std::string datapath_id )
+     uint64_t* datapath_id )
 {
-     short position = 16; // MAC address starts at position 16 in datapath_id
-     size_t length = 4;
-     std::string mac;
+     std::stringstream ss;
+     ss << std::hex << std::setfill ( '0' );
 
-     for ( short i = 0; i < 12; i++ ) {
-          std::string mac_in_bits = datapath_id.substr ( position, length );
+     uint8_t array[8];
+     memcpy ( array, datapath_id, 8 );
 
-          if ( mac_in_bits == "0000" )
-               mac += "0";
-          else if ( mac_in_bits == "0001" )
-               mac += "1";
-          else if ( mac_in_bits == "0010" )
-               mac += "2";
-          else if ( mac_in_bits == "0011" )
-               mac += "3";
-          else if ( mac_in_bits == "0100" )
-               mac += "4";
-          else if ( mac_in_bits == "0101" )
-               mac += "5";
-          else if ( mac_in_bits == "0110" )
-               mac += "6";
-          else if ( mac_in_bits == "0111" )
-               mac += "7";
-          else if ( mac_in_bits == "1000" )
-               mac += "8";
-          else if ( mac_in_bits == "1001" )
-               mac += "9";
-          else if ( mac_in_bits == "1010" )
-               mac += "a";
-          else if ( mac_in_bits == "1011" )
-               mac += "b";
-          else if ( mac_in_bits == "1100" )
-               mac += "c";
-          else if ( mac_in_bits == "1101" )
-               mac += "d";
-          else if ( mac_in_bits == "1110" )
-               mac += "e";
-          else if ( mac_in_bits == "1111" )
-               mac += "f";
+     for ( short i = 5; i >= 0; i-- ) {
+          ss <<  std::setw ( 2 ) << ( int ) array[i];
 
-          position += length;
+          if ( i > 0 )
+               ss << ":";
      }
 
-     return mac;
+     return ss.str();
 }
 
 
@@ -97,9 +70,9 @@ void derailleur::Switch10::set_features_reply ( uint8_t* data )
      this->n_buffers_ = reply.n_buffers();
      this->n_tables_ = reply.n_tables();
 
-     std::bitset<64> bits ( this->get_datapath_id() );
+
      this->mac_address_ =
-          this->convert_bits_to_mac_address ( bits.to_string() );
+          this->convert_bits_to_mac_address ( &this->datapath_id_ );
 
 
      std::bitset<32> capabilities ( reply.capabilities() );
@@ -195,9 +168,8 @@ void derailleur::Switch13::set_features_reply ( uint8_t* data )
      this->auxiliary_id_ = reply.auxiliary_id();
 
 
-     std::bitset<64> bits ( this->get_datapath_id() );
      this->mac_address_ =
-          this->convert_bits_to_mac_address ( bits.to_string() );
+               this->convert_bits_to_mac_address ( &this->datapath_id_ );
 
 
      std::bitset<32> capabilities ( reply.capabilities() );

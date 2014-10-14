@@ -120,9 +120,9 @@ public:
                     
                     
                     
-                    std::bitset<64> bits ( this->get_datapath_id() );
-                    this->mac_address_ =
-                    this->convert_bits_to_mac_address ( bits.to_string() );
+//                     std::bitset<64> bits ( this->get_datapath_id() );
+//                     this->mac_address_ =
+//                     this->convert_bits_to_mac_address ( bits.to_string() );
                     
                     
 

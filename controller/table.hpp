@@ -46,7 +46,7 @@ private:
  * make easier flows handling.
  */
 namespace flow {
-
+/*
 std::string bits_to_MAC ( std::string data )
 {
      short position = 16;                                   // MAC address starts at position 16 in datapath_id
@@ -93,7 +93,7 @@ std::string bits_to_MAC ( std::string data )
      }
 
      return mac;
-}
+}*/
 
 } //  namespace flow
 

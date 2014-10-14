@@ -245,13 +245,13 @@ protected:
 
      /**
       * Extracts switch MAC from datapath_id.
-      * This method receives a string of bits sent by switch as datapath_id. The
+      * This method receives the 64 bits (8 bytes) variable datapath_id. The
       * last 48 bits represents switch MAC whose are read and translated to
-      * hexdecimal format that is returned as a string (without any separator).
+      * hexdecimal format that is returned as a string in MAC format.
       * @param datapath_id datapath_id in a string of bits format.
-      * @return string with MAC without separator (xxxxxxxxxxxx).
+      * @return MAC as a string (xx:xx:xx:xx:xx:xx).
       */
-     std::string convert_bits_to_mac_address ( std::string datapath_id );
+     std::string convert_bits_to_mac_address ( uint64_t* datapath_id );
 
 
      /**
