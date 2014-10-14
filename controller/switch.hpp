@@ -19,8 +19,10 @@
 #include <string>
 #include <vector>
 
+#include <fluid/of10msg.hh>
+#include <fluid/of13msg.hh>
+
 #include "log.hpp"
-#include "table.hpp"
 
 
 
@@ -45,7 +47,6 @@ class Controller;
 class InternalEvent;
 class Event;
 class SwitchFactory;
-class Table;
 
 
 // Capabilities structures
@@ -153,7 +154,7 @@ public:
       *                 convert flows to the prover Flow Mod version)
       * @return true on success
       */
-     virtual short install_flow_table ( derailleur::Table* table ) = 0;
+     virtual short install_flow_table ( ) = 0;
 
 
 
@@ -282,13 +283,6 @@ protected:
          datapath_;
 
 
-     /**
-      * Vector of flow tables (Table objects). Each table contain and manage
-      * its own flows.
-      */
-     std::vector<derailleur::Table> tables_;
-
-
      derailleur::Log log_;
 
 private:
@@ -328,7 +322,7 @@ public:
       *                 convert flows to the prover Flow Mod version)
       * @return true on success
       */
-     virtual short install_flow_table ( derailleur::Table* table ) override;
+     virtual short install_flow_table (  ) override;
 
 private:
 
@@ -381,7 +375,7 @@ public:
       *                 convert flows to the prover Flow Mod version)
       * @return true on success
       */
-     virtual short install_flow_table ( derailleur::Table* table ) override;
+     virtual short install_flow_table (  ) override;
 
 
      int get_auxiliary_id () {
@@ -444,6 +438,7 @@ public:
 } // namespace derailleur
 
 #endif // _SWITCH_HPP_
+
 
 
 

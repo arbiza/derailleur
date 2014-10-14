@@ -18,8 +18,6 @@
 #include <bitset>
 
 #include <fluid/OFServer.hh>
-#include <fluid/of10msg.hh>
-#include <fluid/of13msg.hh>
 
 #include "switch.hpp"
 #include "event.hpp"
@@ -56,7 +54,7 @@ short derailleur::Switch10::install_flow ( fluid_msg::FlowModCommon* flow,
 }
 
 
-short int derailleur::Switch10::install_flow_table ( derailleur::Table* table )
+short int derailleur::Switch10::install_flow_table (  )
 {
 
      return EXIT_SUCCESS;
@@ -149,7 +147,7 @@ short derailleur::Switch13::install_flow ( fluid_msg::FlowModCommon* flow,
 }
 
 
-short int derailleur::Switch13::install_flow_table ( derailleur::Table* table )
+short int derailleur::Switch13::install_flow_table (  )
 {
 
      return EXIT_SUCCESS;
@@ -239,6 +237,9 @@ void derailleur::Switch13::multipart_description_reply (
      this->serial_number_ = desc.serial_num();
      this->datapath_ = desc.dp_desc();
 }
+
+
+
 
 
 

@@ -25,12 +25,12 @@
 namespace derailleur {
 
 // Forward declaration
-class Flow;     
+// class Flow;     
 
 /**
  * FlowTable stores Flow class derived objects.
  */
-typedef std::vector<Flow*> FlowTable;
+// typedef std::vector<Flow*> FlowTable;
 
 
 class Flow {
