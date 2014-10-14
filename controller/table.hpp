@@ -15,6 +15,7 @@
 #ifndef _TABLE_HPP_
 #define _TABLE_HPP_
 
+#include <string>
 
 #include <fluid/of10msg.hh>
 #include <fluid/of13msg.hh>
@@ -38,6 +39,20 @@ private:
     
     
 };
+
+
+
+/**
+ * Namespace flow provides functions to abstract some data manipulation to 
+ * make easier flows handling.
+ */
+namespace flow {
+
+std::string bits_to_MAC ( std::string data ) {
+     
+}
+
+} //  namespace flow
 
 } // namespace derailleur
 
