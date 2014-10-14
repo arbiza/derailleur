@@ -117,6 +117,14 @@ public:
 
                     memcpy ( ( ( uint8_t* ) &dst ) + 2, ( uint8_t* ) ofpi->data(), 6 );
                     memcpy ( ( ( uint8_t* ) &src ) + 2, ( uint8_t* ) ofpi->data() + 6, 6 );
+                    
+                    
+                    
+                    std::bitset<64> bits ( this->get_datapath_id() );
+                    this->mac_address_ =
+                    this->convert_bits_to_mac_address ( bits.to_string() );
+                    
+                    
 
                     if ( ofpi->match().in_port() == NULL ) {
                          return;
