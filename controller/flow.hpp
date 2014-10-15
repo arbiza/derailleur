@@ -20,22 +20,37 @@
 #ifndef _FLOW_H
 #define _FLOW_H
 
+
+
 #include <vector>
+#include <string>
 
 namespace derailleur {
 
+unsigned const MAC_bytes_length = 6;
+
 // Forward declaration
-// class Flow;     
+class Flow;
 
 /**
  * FlowTable stores Flow class derived objects.
  */
-// typedef std::vector<Flow*> FlowTable;
+typedef std::vector<Flow*> FlowTable;
+
 
 
 class Flow {
+
 public:
      Flow();
+
+     /**
+      * Converts uint8_t* to MAC in hex format.
+      * @param data uint8_t* from packet data; the first 6 bytes contain MAC
+      * @return string with MAC (xx:xx:xx:xx:xx:xx)
+      */
+     static std::string convert_bytes_to_MAC ( uint8_t* data );
+     
 };
 
 } // namespace derailleur

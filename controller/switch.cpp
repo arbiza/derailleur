@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <bitset>
+# include <cstdint>
 
 #include <fluid/OFServer.hh>
 
@@ -30,7 +31,7 @@ std::string derailleur::Switch::convert_bits_to_mac_address (
      ss << std::hex << std::setfill ( '0' );
 
      uint8_t array[8];
-     memcpy ( array, datapath_id, 8 );
+     std::memcpy ( array, datapath_id, 8 );
 
      for ( short i = 5; i >= 0; i-- ) {
           ss <<  std::setw ( 2 ) << ( int ) array[i];

@@ -117,29 +117,28 @@ public:
 
                     memcpy ( ( ( uint8_t* ) &dst ) + 2, ( uint8_t* ) ofpi->data(), 6 );
                     memcpy ( ( ( uint8_t* ) &src ) + 2, ( uint8_t* ) ofpi->data() + 6, 6 );
-                    
-                    
-                    
+
+
+
 //                     std::bitset<64> bits ( this->get_datapath_id() );
 //                     this->mac_address_ =
 //                     this->convert_bits_to_mac_address ( bits.to_string() );
-                    
-                    
+
+
 
                     if ( ofpi->match().in_port() == NULL ) {
                          return;
                     }
 
                     in_port = ofpi->match().in_port()->value();
-
-
+                    
+                    
                     std::cout << "Packet-in: \n"
-                              << "dst: " << dst
-                              << "\nsrc: " << src
+                              << "dst: " << derailleur::Flow::convert_bytes_to_MAC ( ( uint8_t* ) ofpi->data() )
+                    << "\nsrc: " << derailleur::Flow::convert_bytes_to_MAC ( ( uint8_t* ) ofpi->data() + 6 )
                               << "\nin port: " << in_port
-                              << "data: " << ofpi->data()
+                              << "\ndata: " << ofpi->data()
                               << std:: endl;
-
                }
 
                break;

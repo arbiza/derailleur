@@ -17,9 +17,34 @@
  *
  */
 
+#include <cstring>
+#include <cstdlib>
+#include <sstream>
+#include <iomanip>
+
+
 #include "flow.hpp"
 
-Flow::Flow()
+derailleur::Flow::Flow()
 {
 
 }
+
+std::string derailleur::Flow::convert_bytes_to_MAC ( uint8_t* data )
+{
+     std::stringstream ss;
+     ss << std::hex << std::setfill ( '0' );
+
+     uint8_t array[MAC_bytes_length];
+     std::memcpy ( array, data, MAC_bytes_length );
+
+     for ( short i = 0; i < 6; i++ ) {
+          ss <<  std::setw ( 2 ) << ( int ) array[i];
+
+          if ( i < 5 )
+                ss << ":";
+       }
+
+     return ss.str();
+}
+
