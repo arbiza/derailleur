@@ -30,7 +30,7 @@ derailleur::Flow::Flow()
 
 }
 
-std::string derailleur::Flow::convert_bytes_to_MAC ( uint8_t* data )
+std::string derailleur::Flow::convert_bits_to_MAC ( uint8_t* data )
 {
      std::stringstream ss;
      ss << std::hex << std::setfill ( '0' );

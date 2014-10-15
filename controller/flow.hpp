@@ -49,7 +49,7 @@ public:
       * @param data uint8_t* from packet data; the first 6 bytes contain MAC
       * @return string with MAC (xx:xx:xx:xx:xx:xx)
       */
-     static std::string convert_bytes_to_MAC ( uint8_t* data );
+     static std::string convert_bits_to_MAC ( uint8_t* data );
      
 };
 

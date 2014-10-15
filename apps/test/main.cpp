@@ -134,8 +134,8 @@ public:
                     
                     
                     std::cout << "Packet-in: \n"
-                              << "dst: " << derailleur::Flow::convert_bytes_to_MAC ( ( uint8_t* ) ofpi->data() )
-                    << "\nsrc: " << derailleur::Flow::convert_bytes_to_MAC ( ( uint8_t* ) ofpi->data() + 6 )
+                              << "dst: " << derailleur::Flow::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() )
+                    << "\nsrc: " << derailleur::Flow::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() + 6 )
                               << "\nin port: " << in_port
                               << "\ndata: " << ofpi->data()
                               << std:: endl;
