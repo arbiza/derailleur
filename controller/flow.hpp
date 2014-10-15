@@ -49,7 +49,14 @@ public:
       * @param data uint8_t* from packet data; the first 6 bytes contain MAC
       * @return string with MAC (xx:xx:xx:xx:xx:xx)
       */
-     static std::string convert_bits_to_MAC ( uint8_t* data );
+     static std::string convert_bits_to_MAC ( const uint8_t* data );
+     
+     /**
+      * Converts MAC stored in a string to an uint8_t vector.
+      * @param mac string containing MAC (xx:xx:xx:xx:xx:xx)
+      * @return uint8_t* each position contains a MAC byte
+      */
+     static uint8_t* convert_MAC_to_bits ( const std::string* mac );
      
 };
 

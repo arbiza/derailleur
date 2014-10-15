@@ -30,7 +30,7 @@ derailleur::Flow::Flow()
 
 }
 
-std::string derailleur::Flow::convert_bits_to_MAC ( uint8_t* data )
+std::string derailleur::Flow::convert_bits_to_MAC ( const uint8_t* data )
 {
      std::stringstream ss;
      ss << std::hex << std::setfill ( '0' );
@@ -48,3 +48,16 @@ std::string derailleur::Flow::convert_bits_to_MAC ( uint8_t* data )
      return ss.str();
 }
 
+
+uint8_t* derailleur::Flow::convert_MAC_to_bits ( const std::string* mac )
+{
+        uint8_t* array = new uint8_t[MAC_bytes_length];
+        short position = 0;
+        
+        for (short i = 0; i < 6; i++) {
+             array[i] = std::stoi( mac->substr(position, 2), nullptr, 16 );
+             position += 3;
+        }
+        
+        return array;
+}

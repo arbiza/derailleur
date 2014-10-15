@@ -131,14 +131,23 @@ public:
                     }
 
                     in_port = ofpi->match().in_port()->value();
-                    
-                    
-                    std::cout << "Packet-in: \n"
-                              << "dst: " << derailleur::Flow::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() )
-                    << "\nsrc: " << derailleur::Flow::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() + 6 )
-                              << "\nin port: " << in_port
-                              << "\ndata: " << ofpi->data()
-                              << std:: endl;
+
+
+//                     std::cout << "Packet-in: \n"
+//                               << "dst: " << derailleur::Flow::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() )
+//                     << "\nsrc: " << derailleur::Flow::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() + 6 )
+//                               << "\nin port: " << in_port
+//                               << "\ndata: " << ofpi->data()
+//                               << std:: endl;
+
+                    std::string mac = derailleur::Flow::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() );
+
+                    std::cout << "\n\nConversões:"
+                              << "\nMAC destino: " << mac
+                              << "\nuint8* original: " << ( ( uint8_t* ) ofpi->data() )
+                              << "\nuint8* pós-conversão: " << derailleur::Flow::convert_MAC_to_bits ( &mac )
+                              << "\nMAC reconvertido: " << derailleur::Flow::convert_bits_to_MAC ( derailleur::Flow::convert_MAC_to_bits ( &mac ) )
+                              << std::endl;
                }
 
                break;
