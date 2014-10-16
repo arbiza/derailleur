@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 2.8)
 
 
 # Compiler flags
-add_definitions(-Wall -std=c++11 -v)
+add_definitions(-std=c++11 -Wall -Wno-unused-function)
 
 
 # Default build type
