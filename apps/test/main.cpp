@@ -48,44 +48,6 @@ public:
 
           std::cout << "MAC: " << s->get_mac_address() << std::endl;
 
-
-
-//           /* Example from libfluid MsgApps.hh */
-//           uint8_t* buffer;
-//           /*You can also set the message field using
-//           class methods which have the same names from
-//           the field present on the specification*/
-//           fluid_msg::of13::FlowMod fm;
-//           //fm.xid(pi.xid());
-//           fm.cookie(123);
-//           fm.cookie_mask(0xffffffffffffffff);
-//           fm.table_id(0);
-//           fm.command(fluid_msg::of13::OFPFC_ADD);
-//           fm.idle_timeout(5);
-//           fm.hard_timeout(10);
-//           fm.priority(100);
-//           fm.buffer_id(0xffffffff);
-//           fm.out_port(0);
-//           fm.out_group(0);
-//           fm.flags(0);
-//           //of13::EthSrc fsrc(((uint8_t*) &src) + 2);
-//           //of13::EthDst fdst(((uint8_t*) &dst) + 2);
-//           fm.add_oxm_field(fsrc);
-//           fm.add_oxm_field(fdst);
-//           of13::OutputAction act(out_port, 1024);
-//           of13::ApplyActions inst;
-//           inst.add_action(act);
-//           fm.add_instruction(inst);
-//           buffer = fm.pack();
-//           ofconn->send(buffer, fm.length());
-//           OFMsg::free_buffer(buffer);
-//           of13::Match m;
-//           of13::MultipartRequestFlow rf(2, 0x0, 0, of13::OFPP_ANY, of13::OFPG_ANY,
-//           0x0, 0x0, m);
-//           buffer = rf.pack();
-//           ofconn->send(buffer, rf.length());
-//           OFMsg::free_buffer(buffer);
-
      }
 
      void on_switch_down ( const int switch_id ) override {
@@ -105,18 +67,18 @@ public:
 
                if ( event->get_version() == fluid_msg::of10::OFP_VERSION ) {
 
-               } else if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
-                    fluid_msg::of13::PacketIn *ofpi =
+               }
+               else if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
+                    
+                    fluid_msg::of13::PacketIn *packet_in =
                          new fluid_msg::of13::PacketIn();
 
-                    ofpip = ofpi;
+                    packet_in->unpack ( event->get_data() );
 
-                    ofpi->unpack ( event->get_data() );
+                    //data = ( uint8_t* ) packet_in->data();
 
-                    data = ( uint8_t* ) ofpi->data();
-
-                    memcpy ( ( ( uint8_t* ) &dst ) + 2, ( uint8_t* ) ofpi->data(), 6 );
-                    memcpy ( ( ( uint8_t* ) &src ) + 2, ( uint8_t* ) ofpi->data() + 6, 6 );
+//                     memcpy ( ( ( uint8_t* ) &dst ) + 2, ( uint8_t* ) ofpi->data(), 6 );
+//                     memcpy ( ( ( uint8_t* ) &src ) + 2, ( uint8_t* ) ofpi->data() + 6, 6 );
 
 
 
@@ -132,6 +94,15 @@ public:
 
                     in_port = ofpi->match().in_port()->value();
 
+//                     fluid_msg::of13::FlowMod* flow =
+//                          static_cast<fluid_msg::of13::FlowMod*> (
+//                               derailleur::flow::create_flow (
+//                                    fluid_msg::of13::OFP_VERSION,
+//                                    fluid_msg::of13::OFPFC_ADD )
+//                          );
+                    auto* flow = derailleur::flow::create_flow (
+                                      fluid_msg::of13::OFP_VERSION,
+                                      fluid_msg::of13::OFPFC_ADD );
 
 //                     std::cout << "Packet-in: \n"
 //                               << "dst: " << derailleur::Flow::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() )
@@ -140,14 +111,14 @@ public:
 //                               << "\ndata: " << ofpi->data()
 //                               << std:: endl;
 
-                    std::string mac = derailleur::Flow::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() );
-
-                    std::cout << "\n\nConversões:"
-                              << "\nMAC destino: " << mac
-                              << "\nuint8* original: " << ( ( uint8_t* ) ofpi->data() )
-                              << "\nuint8* pós-conversão: " << derailleur::Flow::convert_MAC_to_bits ( &mac )
-                              << "\nMAC reconvertido: " << derailleur::Flow::convert_bits_to_MAC ( derailleur::Flow::convert_MAC_to_bits ( &mac ) )
-                              << std::endl;
+//                     std::string mac = derailleur::flow::util::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() );
+//
+//                     std::cout << "\n\nConversões:"
+//                               << "\nMAC destino: " << mac
+//                               << "\nuint8* original: " << ( ( uint8_t* ) ofpi->data() )
+//                               << "\nuint8* pós-conversão: " << derailleur::flow::util::convert_MAC_to_bits ( &mac )
+//                               << "\nMAC reconvertido: " << derailleur::flow::util::convert_bits_to_MAC ( derailleur::Flow::convert_MAC_to_bits ( &mac ) )
+//                               << std::endl;
                }
 
                break;
