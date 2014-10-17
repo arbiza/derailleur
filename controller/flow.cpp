@@ -10,9 +10,22 @@
 #include <fluid/of13msg.hh>
 
 #include "flow.hpp"
+#include "event.hpp"
 
-derailleur::Flow::Flow()
+derailleur::Flow::Flow( const derailleur::Event* const event )
 {
+     
+     /* Set the proper OpenFlow message version */
+     if ( event->get_version() == fluid_msg::of13::OFP_VERSION )
+          flow = new fluid_msg::of13::FlowMod;
+     else if ( event->get_version() == fluid_msg::of10::OFP_VERSION )
+          flow = new fluid_msg::of10::FlowMod;
+     else {
+        this->log_.custom_log( "Flow destructed: unsupported or unknown OpenFlow version." );
+        ~Flow();
+     }
+     
+     
      /* Idle time before discarding (seconds).
       * Set default to 0 (do not expire). */
      this->flow_mod_->idle_timeout( 0 );
@@ -28,6 +41,8 @@ derailleur::Flow::Flow()
      this->flow_mod_->buffer_id ( 0xffffffff );
 
 
+     /* 
+      * 
      this->flow_mod_.flags();
      
      

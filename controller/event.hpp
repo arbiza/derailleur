@@ -24,6 +24,8 @@
 # include <cstdint>
 
 #include <fluid/OFServer.hh>
+#include <fluid/of10msg.hh>
+#include <fluid/of13msg.hh>
 
 namespace derailleur {
 
@@ -69,6 +71,7 @@ class Event : public InternalEvent {
 
 public:
      Event ( const int switch_id,
+             const 
              const uint8_t of_version,
              fluid_base::OFHandler* ofhandler,
              const int type,
