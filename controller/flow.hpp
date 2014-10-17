@@ -56,8 +56,11 @@ typedef std::vector<fluid_msg::FlowModCommon*> FlowTable;
  *
  * @param version OpenFlow version
  * @param command OpenFlow command enumerated in ofp_flow_mod_command (described
- * bellow); I used enumerator from of13 because it is the same as of10.
- * @return fluid_msg::FlowModCommon* pointer
+ *                      bellow); I used enumerator from of13 because it is the 
+ *                      same as of10.
+ * @return fluid_msg::FlowModCommon* pointer; you need to static_cast the
+ *              returning pointer to a pointer of flow mod of the version you 
+ *              are using; you may also use auto ptr* (recommended).
  *
  * enum ofp_flow_mod_command {
  *      OFPFC_ADD = 0,          // New flow.
@@ -71,35 +74,48 @@ typedef std::vector<fluid_msg::FlowModCommon*> FlowTable;
  */
 
 static fluid_msg::FlowModCommon* create_flow_from_packet_in (
+     uint8_t version, 
      const fluid_msg::of13::PacketIn* packet_in )
 {
 
      fluid_msg::FlowModCommon* flow;
 
      // OpenFlow 1.3 messages
-     if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
+     if ( version == fluid_msg::of13::OFP_VERSION ) {
           
           fluid_msg::of13::FlowMod* flow13 = new fluid_msg::of13::FlowMod;
           fluid_msg::of13::PacketIn* packet_in = new fluid_msg::of13::PacketIn();
                                    
           packet_in->unpack ( event->get_data() );
           
-          uint8_t* data = ( uint8_t* ) packet_in->data();
-          
-          uint64_t dst = 0, src = 0;
+          flow13->xid( packet_in->xid() );
           
           
-          
-                                   
-                                   
-                                   memcpy ( ( ( uint8_t* ) &dst ) + 2, ( uint8_t* ) ofpi->data(), 6 );
-                                   memcpy ( ( ( uint8_t* ) &src ) + 2, ( uint8_t* ) ofpi->data() + 6, 6 );
-                                   
+          // //fm.xid(pi.xid());
+          // fm.cookie ( 123 );
+          // fm.cookie_mask ( 0xffffffffffffffff );
+          // fm.table_id ( 0 );
+          // fm.command ( fluid_msg::of13::OFPFC_ADD );
+          // fm.idle_timeout ( 5 );
+          // fm.hard_timeout ( 10 );
+          // fm.priority ( 100 );
+          // fm.buffer_id ( 0xffffffff );
+          // fm.out_port ( 0 );
+          // fm.out_group ( 0 );
+          // fm.flags ( 0 );
+          // //of13::EthSrc fsrc(((uint8_t*) &src) + 2);
+          // //of13::EthDst fdst(((uint8_t*) &dst) + 2);
+          // fm.add_oxm_field ( fsrc );
+          // fm.add_oxm_field ( fdst );
+          // of13::OutputAction act ( out_port, 1024 );
+          // of13::ApplyActions inst;
+          // inst.add_action ( act );
+          // fm.add_instruction ( inst );
 
           flow = flow13;
      }
      // OpenFlow 1.0 messages
-     else if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
+     else if ( version == fluid_msg::of10::OFP_VERSION ) {
 
           fluid_msg::of10::FlowMod* flow10 = new fluid_msg::of10::FlowMod;
 
@@ -113,41 +129,7 @@ static fluid_msg::FlowModCommon* create_flow_from_packet_in (
 }
 
 
-/* Example from libfluid MsgApps.hh */
-// uint8_t* buffer;
-// /*You can also set the message field using
-// class methods which have the same names from
-// the field present on the specification*/
-// fluid_msg::of13::FlowMod fm;
-// //fm.xid(pi.xid());
-// fm.cookie ( 123 );
-// fm.cookie_mask ( 0xffffffffffffffff );
-// fm.table_id ( 0 );
-// fm.command ( fluid_msg::of13::OFPFC_ADD );
-// fm.idle_timeout ( 5 );
-// fm.hard_timeout ( 10 );
-// fm.priority ( 100 );
-// fm.buffer_id ( 0xffffffff );
-// fm.out_port ( 0 );
-// fm.out_group ( 0 );
-// fm.flags ( 0 );
-// //of13::EthSrc fsrc(((uint8_t*) &src) + 2);
-// //of13::EthDst fdst(((uint8_t*) &dst) + 2);
-// fm.add_oxm_field ( fsrc );
-// fm.add_oxm_field ( fdst );
-// of13::OutputAction act ( out_port, 1024 );
-// of13::ApplyActions inst;
-// inst.add_action ( act );
-// fm.add_instruction ( inst );
-// buffer = fm.pack();
-// ofconn->send ( buffer, fm.length() );
-// OFMsg::free_buffer ( buffer );
-// of13::Match m;
-// of13::MultipartRequestFlow rf ( 2, 0x0, 0, of13::OFPP_ANY, of13::OFPG_ANY,
-//                                 0x0, 0x0, m );
-// buffer = rf.pack();
-// ofconn->send ( buffer, rf.length() );
-// OFMsg::free_buffer ( buffer );
+
 
 
 /**
