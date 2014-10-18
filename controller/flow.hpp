@@ -48,20 +48,20 @@ unsigned const MAC_bytes_length = 6;
  * enumerator for each flow version.
  */
 enum flow_mod_commands {
-     ADD = 0,                   /* New flow. */
-     MODIFY = 1,                /* Modify all matching flows. */
-     MODIFY_STRICT = 2,         /* Modify entry strictly matching wildcards and
-                                   priority. */
-     DELETE = 3,                /* Delete all matching flows. */
-     DELETE_STRICT = 4,         /* Delete entry strictly matching wildcards and
-                                   priority. */
+     ADD            = 0,         /* New flow. */
+     MODIFY         = 1,        /* Modify all matching flows. */
+     MODIFY_STRICT = 2,        /* Modify entry strictly matching wildcards and
+                                    priority. */
+     DELETE         = 3,        /* Delete all matching flows. */
+     DELETE_STRICT = 4,        /* Delete entry strictly matching wildcards and
+                                    priority. */
 };
 
 enum flow_mod_flags {
      SEND_FLOW_REM = 1 << 0,    /* Send flow removed message when flow
                                    expires or is deleted. */
      CHECK_OVERLAP = 1 << 1,    /* Check for overlapping entries first. */
-     RESET_COUNTS = 1 << 2,     /* Reset flow packet and byte counts. */
+     RESET_COUNTS  = 1 << 2,    /* Reset flow packet and byte counts. */
      NO_PKT_COUNTS = 1 << 3,    /* Don’t keep track of packet count. */
      NO_BYT_COUNTS = 1 << 4,    /* Don’t keep track of byte count. */
 };
@@ -86,13 +86,15 @@ public:
       * Sets the command this flow executes on switch(es).
       */
 
-     bool set_command_ADD ( uint16_t priority );
      boot set_command_ADD ( uint16_t priority,
-                            derailleur::flow_commands command,
-                          );
+                            derailleur::flow_mod_commands command,
+                            derailleur::flow_mod_flags flag );
 
      bool set_command_MODIFY ();
      bool set_command_MODIFY_STRICT ();
+     
+     bool set_command_DELETE ();
+     bool set_command_DELETE_STRICT ();
 
 private:
      fluid_msg::FlowModCommon* flow_mod_;
