@@ -31,7 +31,6 @@
 #include <fluid/OFServer.hh>
 
 #include "switch.hpp"
-#include "log.hpp"
 
 
 namespace derailleur {
@@ -50,7 +49,8 @@ public:
                   const int port,
                   const int n_workers,
                   const bool secure,
-                  derailleur::Application* application );
+                  derailleur::Application* application,
+                  const char* log_path );
 
 
 
@@ -76,8 +76,8 @@ public:
      const derailleur::Switch* get_switch_ptr ( const int switch_id ) {
           return this->stack_.at ( switch_id );
      }
-     
-     
+
+
      int get_threads_size () {
           return this->threads_.size();
      }
@@ -92,9 +92,6 @@ private:
      // Threads
      std::vector< std::thread > threads_;
      std::mutex mutex_;
-
-
-     derailleur::Log log_;
 
 };
 

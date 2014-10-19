@@ -67,9 +67,8 @@ public:
 
                if ( event->get_version() == fluid_msg::of10::OFP_VERSION ) {
 
-               }
-               else if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
-                    
+               } else if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
+
                     fluid_msg::of13::PacketIn *packet_in =
                          new fluid_msg::of13::PacketIn();
 
@@ -132,7 +131,8 @@ int main ( int argc, char *argv[] )
 {
 
      MyApp myapp ( "Test app" );
-     derailleur::Controller controller ( "0.0.0.0", 6653, 4, false, &myapp );
+     derailleur::Controller controller ( "0.0.0.0", 6653, 4, false, &myapp,
+                                         "log.txt" );
 
      controller.start();
 

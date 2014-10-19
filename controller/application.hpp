@@ -76,9 +76,6 @@ public:
 //      }
 
 
-protected:
-     derailleur::Log log_;
-
 private:
 
      // This method is called by controller. It sets a pointer to the siwthes

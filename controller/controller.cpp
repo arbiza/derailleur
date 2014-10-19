@@ -16,6 +16,7 @@
 #include "controller.hpp"
 #include "application.hpp"
 #include "event.hpp"
+#include "log.hpp"
 
 
 
@@ -23,7 +24,8 @@ derailleur::Controller::Controller ( const char* address,
                                      const int port,
                                      const int n_workers,
                                      const bool secure,
-                                     derailleur::Application* application )
+                                     derailleur::Application* application,
+                                     const char* log_path )
      : fluid_base::OFServer ( address,
                               port,
                               n_workers,
@@ -35,6 +37,8 @@ derailleur::Controller::Controller ( const char* address,
 {
      this->application_ = application;
      this->application_->set_stack_ptr ( &this->stack_ );
+
+     derailleur::Log::Log ( log_path );
 }
 
 
@@ -48,7 +52,7 @@ void derailleur::Controller::message_callback (
      switch ( type ) {
 
      case 6: // Switch UP: OFTP_FEATURES_REPLAY
-          this->log_.message_log ( "Controller", ofconn->get_id(), type );
+          Log::Instance()->log ( "Message type 6 - OFTP_FEATURES_REPLAY" );
 
           //TODO: lock here
 
@@ -66,7 +70,7 @@ void derailleur::Controller::message_callback (
           break;
 
      case 19: // Switch sending description: OFTP_MULTIPART_REPLAY
-          this->log_.message_log ( "Controller", ofconn->get_id(), type );
+          Log::Instance()->log ( "Message type 19 - OFTP_MULTIPART_REPLAY" );
 
           stack_.at ( ofconn->get_id() )->multipart_description_reply (
                new InternalEvent ( this, type, data, length ) );
@@ -78,9 +82,10 @@ void derailleur::Controller::message_callback (
 
 
      default:
-          this->log_.message_log ( "Controller", ofconn->get_id(), type );
+          Log::Instance()->log ( "Unknown message type." );
+          
           this->application_->message_handler (
-               new Event ( ofconn->get_id(), ofconn->get_version(), this, 
+               new Event ( ofconn->get_id(), ofconn->get_version(), this,
                            type, data, length )
           );
           break;
