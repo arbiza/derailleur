@@ -21,20 +21,103 @@
 #define LOG_H
 
 
+#include <fstream>
+#include <mutex>
+
+
 namespace derailleur {
 
+
+/**
+ * Log class provide a logging feature (obviously). It is implemented using the
+ * Singleton design pattern; log object is instantiated by controller class; 
+ * when any other class tries to instantiate it a pointer to the instantiated 
+ * object will be returned. 
+ * Using a mutex Log class prevents logs to be printed wrong. It provides 
+ * different logs methods to log. 
+ * 
+ * Usage: derailleur::Log::Instance()->log ( ... );
+ *  
+ * @see Controller
+ */
 class Log {
-public:
-
-     Log();
-     ~Log();
-
-     void message_log ( const char* logger,
-                        const int connection_id,
-                        const int type );
-
-     void custom_log ( const std::string message );
      
+public:
+     
+     /**
+      * Returns the Log instance (instance_). This method checks if controller
+      * already called Log constructor, if not program is aborted; Controller
+      * must call constructor first to start it properly.
+      * @see Controller
+      * @return Log* pointer to the Log instance.
+      */
+     static Log* Instance();
+     
+     /**
+      * This methos provides the default logging format: [who] when: what
+      * Class informs who is the logger (e.g. controller) and the message to be
+      * logged, this method provided the "when".
+      * @param logger Who is logging
+      * @param message The message to be logged.
+      */
+     void log ( const char* logger,
+                const char* message );
+                
+     /**
+      * This method should be used for custom logs.
+      * @param message A custom message (e.g. "Unknown error,  probably ...")
+      */
+     void log ( const char* message);
+
+private:
+     /**
+      * Constructor is private due to the Singleton design patter; it will be
+      * called by the Controller class (it is a friend). Constructor opens the
+      * log file and instantiate instance_ pointer. Constructor writes the first
+      * log to differentiate each Controller execution.
+      * @param path path to the log file; Controller reads the path from the
+      *                 configuration file
+      * @see Controller
+      */
+     Log( const char* path );
+     
+     /**
+      * Destructor closes the log file; It is called from Controller destructor.
+      */
+     ~Log();
+     
+     /**
+      * Return the time (now) to be used in log messages.
+      * Time format example: Oct 19 18:01:41
+      */
+     static char* get_time ();
+
+     
+     /**
+      * instance_ attribute in set NULL when program starts (see the source 
+      * file). It is used to indicate if there is already a Log object 
+      * instantiated.
+      */
+     static Log* instance_;
+     
+     /**
+      * The log file. 
+      */
+     std::fstream file_;
+     
+     /**
+      * Used to avoid different threads write to the log file at the same time.
+      */
+     std::mutex mutex_;
+     
+     /**
+      * Controller is a friend class because Controller calls the constructor 
+      * who opens log file and instantiate instance_ attribute.
+      * Log destructor is called from Controller destructor when controller is
+      * shut down.
+      * @see Controller
+      */
+     friend class Controller;
 };
 
 } // namespace derailleur
