@@ -120,7 +120,10 @@ const char* derailleur::Log::get_time()
      }
 
      // Day
-     output << now->tm_mday << " ";
+     if ( now->tm_mday < 10 )
+          output <<  "0" <<  now->tm_mday << " ";
+     else
+          output << now->tm_mday << " ";
 
      // Hour
      output << now->tm_hour << ":" << now->tm_min << ":" << now->tm_sec;
@@ -147,9 +150,9 @@ void derailleur::Log::log ( const char* logger, const char* message )
 void derailleur::Log::log ( const char* message )
 {
      this->mutex_.lock();
-     
+
      this->file_ << message << std::endl;
-     
+
      this->mutex_.unlock();
 }
 
