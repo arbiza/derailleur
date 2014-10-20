@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <cstdlib>
 #include <ctime>
 #include <sstream>
@@ -56,8 +57,8 @@ void derailleur::Log::open_log_file ( const char* path )
 
                exit ( EXIT_FAILURE );
           } else {
-               this->file_ << "\n\n_________________________\n" << std::endl;
-               log ( "log instance", "NEW EXECUTION." );
+               this->file_ << "\n\n\n\n" << std::endl;
+               log ( "Log", "NEW CONTROLLER EXECUTION." );
           }
      }
 }
@@ -126,7 +127,22 @@ const char* derailleur::Log::get_time()
           output << now->tm_mday << " ";
 
      // Hour
-     output << now->tm_hour << ":" << now->tm_min << ":" << now->tm_sec;
+     if ( now->tm_hour < 10 )
+          output <<  "0" <<  now->tm_hour;
+     else
+          output << now->tm_hour;
+
+     // Minutes
+     if ( now->tm_min < 10 )
+          output <<  "0" <<  now->tm_min;
+     else
+          output << now->tm_min;
+
+     // Seconds
+     if ( now->tm_sec < 10 )
+          output <<  "0" <<  now->tm_sec;
+     else
+          output << now->tm_sec;
 
      return output.str().c_str();
 }
@@ -137,21 +153,11 @@ void derailleur::Log::log ( const char* logger, const char* message )
 {
      this->mutex_.lock();
 
-     this->file_ << "[" <<  logger << "] "
-                 <<  get_time()
+     this->file_ << std::setw ( 15 ) << setiosflags ( std::ios::left ) << logger
+                 << " | "
+                 << get_time()
                  << " - " << message
                  << std::endl;
-
-     this->mutex_.unlock();
-}
-
-
-
-void derailleur::Log::log ( const char* message )
-{
-     this->mutex_.lock();
-
-     this->file_ << message << std::endl;
 
      this->mutex_.unlock();
 }

@@ -71,11 +71,6 @@ public:
      void log ( const char* logger,
                 const char* message );
                 
-     /**
-      * This method should be used for custom logs.
-      * @param message A custom message (e.g. "Unknown error,  probably ...")
-      */
-     void log ( const char* message);
 
 private:
      /**
