@@ -82,7 +82,6 @@ void derailleur::Controller::message_callback (
 
 
      default:
-          Log::Instance()->log ( "Unknown message type." );
           
           this->application_->message_handler (
                new Event ( ofconn->get_id(), ofconn->get_version(), this,
