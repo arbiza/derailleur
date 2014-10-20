@@ -25,47 +25,43 @@
 #include "log.hpp"
 
 // Initialize instance_
-Log* Log::instance_ = NULL;
+derailleur::Log* derailleur::Log::instance_ = NULL;
 
 
-Log* derailleur::Log::Instance ()
+derailleur::Log* derailleur::Log::Instance ()
 {
-     if ( !instance_ ) {
-          std::cout << "\n\n************************************"
-                    << "\nError: Controller must be started before to try to log anything."
-                    << "\nController starts the Log object properly."
-                    << "\nProgram aborted."
-                    << "\n************************************\n\n"
-                    <<  std::endl;
-
-          exit ( EXIT_FAILURE );
-     }
+     // TODO: check if file is set
+     if ( !instance_ )
+          this->instance_ = new derailleur::Log;
 
      return instance_;
 }
 
 
 
-derailleur::Log::Log ( const char* path )
+void derailleur::Log::open_log_file ( const char* path )
 {
-     // File is opened in append mode, it means the content will be wrote after
-     // existing content.
-     if ( this->file_.open ( path, std::fstream::app ) ==  nullptr ) {
-          std::cout << "\n\n************************************"
-                    << "\nError opening log file. Program exited."
-                    << "\nCheck your configurations."
-                    << "\n************************************\n\n"
-                    <<  std::endl;
+     if ( this->file_.is_open() )
+          derailleur::Log::log ( "Log", "WARNING: Attempting to open a log file, but the file is already open." );
+     else {
+          // File is opened in append mode, it means the content will be wrote after
+          // existing content.
+          this->file_.open ( path, std::fstream::app );
 
-          exit ( EXIT_FAILURE );
+          if ( !this->file_.is_open() ) {
+               std::cout << "\n\n************************************"
+                         << "\nError opening log file. Program exited."
+                         << "\nCheck your configurations."
+                         << "\n************************************\n\n"
+                         <<  std::endl;
+
+               exit ( EXIT_FAILURE );
+          } else {
+               this->file_ << "\n\n_________________________\n" << std::endl;
+               log ( "log instance", "NEW EXECUTION." );
+          }
      }
-
-     this->file_ << "\n\n_________________________\n" << std::endl;
-     log ( "log instance", "NEW EXECUTION." );
-
-     this->instance_ = new Log;
 }
-
 
 
 derailleur::Log::~Log()
@@ -122,10 +118,10 @@ char* derailleur::Log::get_time()
           output << "Dec ";
           break;
      }
-     
+
      // Day
      output << now->tm_mday << " ";
-     
+
      // Hour
      output << now->tm_hour << ":" << now->tm_min << ":" << now->tm_sec;
 
@@ -149,17 +145,9 @@ void derailleur::Log::log ( const char* logger, const char* message )
 
 
 
-// void derailleur::Log::message_log ( const char* logger,
-//                                     const int connection_id,
-//                                     const int type )
-// {
-//      std::cout << "[" <<  logger << " - Message] connection: " << connection_id
-//                << " - type: " << type
-//                << std::endl;
-// }
-
 void derailleur::Log::log ( const char* message )
 {
-     std::cout << message << std::endl;
+     this->file_ << message << std::endl;
 }
+
 

@@ -28,6 +28,8 @@
 namespace derailleur {
 
 
+// TODO Review comments; there may be references to the previous implementation where the instance must be started by Controller.
+
 /**
  * Log class provide a logging feature (obviously). It is implemented using the
  * Singleton design pattern; log object is instantiated by controller class; 
@@ -36,7 +38,11 @@ namespace derailleur {
  * Using a mutex Log class prevents logs to be printed wrong. It provides 
  * different logs methods to log. 
  * 
- * Usage: derailleur::Log::Instance()->log ( ... );
+ * Usage: 
+ *      At first, open the log file:
+ *              derailleur::Log::Instance()->open_log_file ( "file path" );
+ *      To log use the logging methods through the Instance method:
+ *              derailleur::Log::Instance()->log ( ... );
  *  
  * @see Controller
  */
@@ -52,6 +58,8 @@ public:
       * @return Log* pointer to the Log instance.
       */
      static Log* Instance();
+     
+     void open_log_file ( const char* path );
      
      /**
       * This methos provides the default logging format: [who] when: what
@@ -79,7 +87,7 @@ private:
       *                 configuration file
       * @see Controller
       */
-     Log( const char* path );
+     Log();
      
      /**
       * Destructor closes the log file; It is called from Controller destructor.
@@ -115,9 +123,7 @@ private:
       * who opens log file and instantiate instance_ attribute.
       * Log destructor is called from Controller destructor when controller is
       * shut down.
-      * @see Controller
       */
-     friend class Controller;
 };
 
 } // namespace derailleur

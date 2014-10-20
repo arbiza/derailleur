@@ -22,8 +22,6 @@
 #include <fluid/of10msg.hh>
 #include <fluid/of13msg.hh>
 
-#include "log.hpp"
-
 
 
 /** Forward declarations of classes from fluid_base namespace **/
@@ -282,8 +280,6 @@ protected:
          serial_number_,
          datapath_;
 
-
-     derailleur::Log log_;
 
 private:
      friend class derailleur::Controller;

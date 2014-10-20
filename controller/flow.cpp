@@ -53,35 +53,35 @@ bool derailleur::Flow::set_command_ADD ( uint16_t priority,
 /**
  * Create a basic flow with some default values set. The flow is created
  * according OpenFlow version.
- */* Buffered packet to apply to, or OFP_NO_BUFFER. Not meaningful for
-* OFPFC_DELETE.
-* It is set to 0 above. */
-flow13->buffer_id ( 0xffffffff );
-
-/* Default table is set to 0. */
-flow13->table_id ( 0 );
-* @param version OpenFlow version
-* @param command OpenFlow command enumerated in ofp_flow_mod_command ( described
-          *                      bellow );
-I used enumerator from of13 because it is the
-*                      same as of10.
-* @return fluid_msg::FlowModCommon* pointer;
-you need to static_cast the
-*              returning pointer to a pointer of flow mod of the version you
-*              are using;
-you may also use auto ptr* ( recommended ).
-*
-* enum ofp_flow_mod_command {
-     *      OFPFC_ADD = 0,          // New flow.
-     *      OFPFC_MODIFY = 1,       // Modify all matching flows.
-     *      OFPFC_MODIFY_STRICT = 2,// Modify entry strictly matching wildcards
-     *                              // and priority.
-     *      OFPFC_DELETE = 3,       // Delete all matching flows.
-     *      OFPFC_DELETE_STRICT = 4,// Delete entry strictly matching wildcards and
-     *                              //priority.
-     *
-};
-*/
+ * Buffered packet to apply to, or OFP_NO_BUFFER. Not meaningful for
+// * OFPFC_DELETE.
+// * It is set to 0 above. */
+// flow13->buffer_id ( 0xffffffff );
+// 
+// /* Default table is set to 0. */
+// flow13->table_id ( 0 );
+// * @param version OpenFlow version
+// * @param command OpenFlow command enumerated in ofp_flow_mod_command ( described
+//           *                      bellow );
+// I used enumerator from of13 because it is the
+// *                      same as of10.
+// * @return fluid_msg::FlowModCommon* pointer;
+// you need to static_cast the
+// *              returning pointer to a pointer of flow mod of the version you
+// *              are using;
+// you may also use auto ptr* ( recommended ).
+// *
+// * enum ofp_flow_mod_command {
+//      *      OFPFC_ADD = 0,          // New flow.
+//      *      OFPFC_MODIFY = 1,       // Modify all matching flows.
+//      *      OFPFC_MODIFY_STRICT = 2,// Modify entry strictly matching wildcards
+//      *                              // and priority.
+//      *      OFPFC_DELETE = 3,       // Delete all matching flows.
+//      *      OFPFC_DELETE_STRICT = 4,// Delete entry strictly matching wildcards and
+//      *                              //priority.
+//      *
+// };
+// */
 
 static fluid_msg::FlowModCommon* create_flow_from_packet_in (
      uint8_t version,

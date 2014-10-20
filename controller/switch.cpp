@@ -22,6 +22,7 @@
 
 #include "switch.hpp"
 #include "event.hpp"
+#include "log.hpp"
 
 
 std::string derailleur::Switch::convert_bits_to_mac_address (
