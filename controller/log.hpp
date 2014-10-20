@@ -87,7 +87,7 @@ private:
       *                 configuration file
       * @see Controller
       */
-     Log();
+     Log() {}
      
      /**
       * Destructor closes the log file; It is called from Controller destructor.
@@ -98,7 +98,7 @@ private:
       * Return the time (now) to be used in log messages.
       * Time format example: Oct 19 18:01:41
       */
-     static char* get_time ();
+     static const char* get_time ();
 
      
      /**

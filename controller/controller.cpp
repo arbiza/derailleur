@@ -38,7 +38,7 @@ derailleur::Controller::Controller ( const char* address,
      this->application_ = application;
      this->application_->set_stack_ptr ( &this->stack_ );
 
-     derailleur::Log::Log ( log_path );
+     derailleur::Log::Instance()->open_log_file( log_path );
 }
 
 

@@ -32,7 +32,7 @@ derailleur::Log* derailleur::Log::Instance ()
 {
      // TODO: check if file is set
      if ( !instance_ )
-          this->instance_ = new derailleur::Log;
+          instance_ = new derailleur::Log;
 
      return instance_;
 }
@@ -63,6 +63,7 @@ void derailleur::Log::open_log_file ( const char* path )
 }
 
 
+
 derailleur::Log::~Log()
 {
      if ( this->file_.is_open() )
@@ -71,7 +72,7 @@ derailleur::Log::~Log()
 
 
 
-char* derailleur::Log::get_time()
+const char* derailleur::Log::get_time()
 {
      std::stringstream output; // Time format example: Oct 19 18:01:41
 

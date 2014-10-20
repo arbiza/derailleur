@@ -11,18 +11,22 @@
 
 #include "flow.hpp"
 #include "event.hpp"
+#include "log.hpp"
 
 derailleur::Flow::Flow ( const derailleur::Event* const event )
 {
 
      /* Set the proper OpenFlow message version */
      if ( event->get_version() == fluid_msg::of13::OFP_VERSION )
-          flow = new fluid_msg::of13::FlowMod;
+          flow_mod_ = new fluid_msg::of13::FlowMod;
      else if ( event->get_version() == fluid_msg::of10::OFP_VERSION )
-          flow = new fluid_msg::of10::FlowMod;
+          flow_mod_ = new fluid_msg::of10::FlowMod;
      else {
-          this->log_.custom_log ( "Flow destructed: unsupported or unknown OpenFlow version." );
-          ~Flow();
+          derailleur::Log::Instance()->log (
+               "Flow",
+               "Flow destructed: unsupported or unknown OpenFlow version." );
+          // TODO: Implement desctructor.
+          //~Flow();
      }
 
 
@@ -46,7 +50,7 @@ bool derailleur::Flow::set_command_ADD ( uint16_t priority,
           derailleur::flow_mod_commands command,
           derailleur::flow_mod_flags flag )
 {
-        
+     return true;
 }
 
 
@@ -57,7 +61,7 @@ bool derailleur::Flow::set_command_ADD ( uint16_t priority,
 // * OFPFC_DELETE.
 // * It is set to 0 above. */
 // flow13->buffer_id ( 0xffffffff );
-// 
+//
 // /* Default table is set to 0. */
 // flow13->table_id ( 0 );
 // * @param version OpenFlow version
@@ -95,10 +99,8 @@ static fluid_msg::FlowModCommon* create_flow_from_packet_in (
 
           fluid_msg::of13::FlowMod* flow13 = new fluid_msg::of13::FlowMod;
 
-          packet_in->unpack ( event->get_data() );
 
-
-          flow13->xid ( packet_in->xid() );
+          //flow13->xid ( packet_in->xid() );
 
 
           /* Mask used to restrict the cookie bits that must match when the

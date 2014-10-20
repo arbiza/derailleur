@@ -73,53 +73,7 @@ public:
                          new fluid_msg::of13::PacketIn();
 
                     packet_in->unpack ( event->get_data() );
-
-                    //data = ( uint8_t* ) packet_in->data();
-
-//                     memcpy ( ( ( uint8_t* ) &dst ) + 2, ( uint8_t* ) ofpi->data(), 6 );
-//                     memcpy ( ( ( uint8_t* ) &src ) + 2, ( uint8_t* ) ofpi->data() + 6, 6 );
-
-
-
-//                     std::bitset<64> bits ( this->get_datapath_id() );
-//                     this->mac_address_ =
-//                     this->convert_bits_to_mac_address ( bits.to_string() );
-
-
-
-                    if ( ofpi->match().in_port() == NULL ) {
-                         return;
-                    }
-
-                    in_port = ofpi->match().in_port()->value();
-
-//                     fluid_msg::of13::FlowMod* flow =
-//                          static_cast<fluid_msg::of13::FlowMod*> (
-//                               derailleur::flow::create_flow (
-//                                    fluid_msg::of13::OFP_VERSION,
-//                                    fluid_msg::of13::OFPFC_ADD )
-//                          );
-                    auto* flow = derailleur::flow::create_flow (
-                                      fluid_msg::of13::OFP_VERSION,
-                                      fluid_msg::of13::OFPFC_ADD );
-
-//                     std::cout << "Packet-in: \n"
-//                               << "dst: " << derailleur::Flow::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() )
-//                     << "\nsrc: " << derailleur::Flow::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() + 6 )
-//                               << "\nin port: " << in_port
-//                               << "\ndata: " << ofpi->data()
-//                               << std:: endl;
-
-//                     std::string mac = derailleur::flow::util::convert_bits_to_MAC ( ( uint8_t* ) ofpi->data() );
-//
-//                     std::cout << "\n\nConversões:"
-//                               << "\nMAC destino: " << mac
-//                               << "\nuint8* original: " << ( ( uint8_t* ) ofpi->data() )
-//                               << "\nuint8* pós-conversão: " << derailleur::flow::util::convert_MAC_to_bits ( &mac )
-//                               << "\nMAC reconvertido: " << derailleur::flow::util::convert_bits_to_MAC ( derailleur::Flow::convert_MAC_to_bits ( &mac ) )
-//                               << std::endl;
                }
-
                break;
           }
 
@@ -138,8 +92,7 @@ int main ( int argc, char *argv[] )
 
 
      while ( 1 ) {
-          std::cout << "size: " << controller.get_threads_size() << std::endl;
-          sleep ( 5 );
+          
      }
 
      return 0;

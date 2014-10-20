@@ -22,15 +22,12 @@
 
 #include <vector>
 
-//TODO remove when Log class is properly implemented.
-#include "log.hpp"
-
 
 // forward declarations of fluid_msg classes
 namespace fluid_msg {
-class fluid_msg::FlowModCommon;
-class fluid_msg::PacketInCommon;
-class fluid_msg::Action;
+class FlowModCommon;
+class PacketInCommon;
+class Action;
 }
 
 
@@ -38,6 +35,7 @@ namespace derailleur {
 
 // Forward declarations of derailleur classes
 class Event;
+class Flow;
 
 
 unsigned const MAC_bytes_length = 6;
@@ -86,7 +84,7 @@ public:
       * Sets the command this flow executes on switch(es).
       */
 
-     boot set_command_ADD ( uint16_t priority,
+     bool set_command_ADD ( uint16_t priority,
                             derailleur::flow_mod_commands command,
                             derailleur::flow_mod_flags flag );
 
@@ -99,9 +97,6 @@ public:
 private:
      fluid_msg::FlowModCommon* flow_mod_;
      fluid_msg::Action* action_;
-
-     //TODO it must be a pointer.
-     derailleur::Log log_;
 };
 
 
@@ -128,7 +123,7 @@ static std::string convert_bits_to_MAC ( const uint8_t* data )
      ss << std::hex << std::setfill ( '0' );
 
      uint8_t array[MAC_bytes_length];
-     std::memcpy ( array, data, MAC_bytes_length );
+     memcpy ( array, data, MAC_bytes_length );
 
      for ( short i = 0; i < 6; i++ ) {
           ss <<  std::setw ( 2 ) << ( int ) array[i];

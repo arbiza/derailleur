@@ -26,6 +26,7 @@
 #include "controller/event.hpp"
 #include "controller/switch.hpp"
 #include "controller/flow.hpp"
+#include "controller/log.hpp"
 
 
 
