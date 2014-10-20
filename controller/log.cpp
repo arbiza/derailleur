@@ -51,7 +51,6 @@ void derailleur::Log::open_log_file ( const char* path )
           if ( !this->file_.is_open() ) {
                std::cout << "\n\n************************************"
                          << "\nError opening log file. Program exited."
-                         << "\nCheck your configurations."
                          << "\n************************************\n\n"
                          <<  std::endl;
 
@@ -134,7 +133,6 @@ void derailleur::Log::log ( const char* logger, const char* message )
 {
      this->mutex_.lock();
 
-
      this->file_ << "[" <<  logger << "] "
                  <<  get_time()
                  << " - " << message
@@ -147,7 +145,11 @@ void derailleur::Log::log ( const char* logger, const char* message )
 
 void derailleur::Log::log ( const char* message )
 {
+     this->mutex_.lock();
+     
      this->file_ << message << std::endl;
+     
+     this->mutex_.unlock();
 }
 
 
