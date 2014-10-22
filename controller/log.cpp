@@ -57,7 +57,7 @@ void derailleur::Log::open_log_file ( const char* path )
 
                exit ( EXIT_FAILURE );
           } else {
-               this->file_ << "\n\n\n\n" << std::endl;
+               this->file_ << "\n" << std::endl;
                log ( "Log", "NEW CONTROLLER EXECUTION." );
           }
      }
@@ -122,21 +122,21 @@ const char* derailleur::Log::get_time()
 
      // Day
      if ( now->tm_mday < 10 )
-          output <<  "0" <<  now->tm_mday << " ";
+          output <<  "0" <<  now->tm_mday;
      else
           output << now->tm_mday << " ";
 
      // Hour
      if ( now->tm_hour < 10 )
-          output <<  "0" <<  now->tm_hour;
+          output <<  "0" <<  now->tm_hour << ":";
      else
-          output << now->tm_hour;
+          output << now->tm_hour << ":";
 
      // Minutes
      if ( now->tm_min < 10 )
-          output <<  "0" <<  now->tm_min;
+          output <<  "0" <<  now->tm_min << ":";
      else
-          output << now->tm_min;
+          output << now->tm_min << ":";
 
      // Seconds
      if ( now->tm_sec < 10 )

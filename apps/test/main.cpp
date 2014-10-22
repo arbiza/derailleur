@@ -60,20 +60,26 @@ public:
 
           case 10: // packet-in
 
-               uint64_t dst = 0, src = 0;
-               void* ofpip;
-               uint8_t* data;
-               uint16_t in_port;
+//                uint64_t dst = 0, src = 0;
+//                void* ofpip;
+//                uint8_t* data;
+//                uint16_t in_port;
+//
+//                if ( event->get_version() == fluid_msg::of10::OFP_VERSION ) {
+//
+//                } else if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
+//
+//                     fluid_msg::of13::PacketIn *packet_in =
+//                          new fluid_msg::of13::PacketIn();
+//
+//                     packet_in->unpack ( event->get_data() );
+//                }
+//                break;
+               derailleur::Log::Instance()->log ( "Test", "packet_in" );
+               break;
 
-               if ( event->get_version() == fluid_msg::of10::OFP_VERSION ) {
-
-               } else if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
-
-                    fluid_msg::of13::PacketIn *packet_in =
-                         new fluid_msg::of13::PacketIn();
-
-                    packet_in->unpack ( event->get_data() );
-               }
+          default:
+               derailleur::Log::Instance()->log ( "Test", "unknown" );
                break;
           }
 
@@ -92,7 +98,7 @@ int main ( int argc, char *argv[] )
 
 
      while ( 1 ) {
-          
+
      }
 
      return 0;
