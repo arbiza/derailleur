@@ -102,11 +102,23 @@ void derailleur::Controller::connection_callback (
 {
 
      if ( type == fluid_base::OFConnection::EVENT_STARTED ) {
-     } else if ( type == fluid_base::OFConnection::EVENT_ESTABLISHED ) {
-     } else if ( type == fluid_base::OFConnection::EVENT_FAILED_NEGOTIATION ) {
+          
           derailleur::Log::Instance()->log (
                "Controller",
-               "Switch connection attempt failed: EVENT_FAILED_NEGOTIATION" );
+               "Switch attempting to connect: EVENT_STARTED" );
+          
+     } else if ( type == fluid_base::OFConnection::EVENT_ESTABLISHED ) {
+          
+          derailleur::Log::Instance()->log (
+               "Controller",
+               "Switch's connection established: EVENT_ESTABLISHED" );
+               
+     } else if ( type == fluid_base::OFConnection::EVENT_FAILED_NEGOTIATION ) {
+          
+          derailleur::Log::Instance()->log (
+               "Controller",
+               "Switch's connection attempt failed: EVENT_FAILED_NEGOTIATION" );
+               
      } else if ( type == fluid_base::OFConnection::EVENT_CLOSED ) {
 
           derailleur::Log::Instance()->log (
