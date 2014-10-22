@@ -98,7 +98,8 @@ int main ( int argc, char *argv[] )
 
 
      while ( 1 ) {
-
+          sleep(1);
+          std::cout << "stack size: " << controller.get_stack_size() << std::endl;
      }
 
      return 0;

@@ -55,7 +55,8 @@ void derailleur::Controller::message_callback (
           Log::Instance()->log ( "Controller",
                                  "Message type 6 - OFTP_FEATURES_REPLAY" );
 
-          //TODO: lock here
+          // Lock preventing ilegal memory access
+          this->lock_ofconnections();
 
           // stack the new switch (New Switch object is instantiated).
           stack_.emplace (
@@ -66,8 +67,8 @@ void derailleur::Controller::message_callback (
                          ofconn,
                          data ) ) );
 
+          this->unlock_ofconnections();
 
-          //TODO: unlock here
           break;
 
      case 19: // Switch sending description: OFTP_MULTIPART_REPLAY
@@ -101,17 +102,32 @@ void derailleur::Controller::connection_callback (
 {
 
      if ( type == fluid_base::OFConnection::EVENT_STARTED ) {
-          // TODO: log
      } else if ( type == fluid_base::OFConnection::EVENT_ESTABLISHED ) {
-          // TODO: log
      } else if ( type == fluid_base::OFConnection::EVENT_FAILED_NEGOTIATION ) {
-          // TODO: log
+          derailleur::Log::Instance()->log (
+               "Controller",
+               "Switch connection attempt failed: EVENT_FAILED_NEGOTIATION" );
      } else if ( type == fluid_base::OFConnection::EVENT_CLOSED ) {
-          // TODO: log
-//           this->application_->del_switch ( ofconn->get_id() );
+
+          derailleur::Log::Instance()->log (
+               "Controller",
+               "Switch disconnected: EVENT_CLOSED" );
+          // Delete the switch object corresponding to the connection from the
+          // stack.
+          this->lock_ofconnections();
+          stack_.erase ( ofconn->get_id() );
+          this->unlock_ofconnections();
+
      } else if ( type == fluid_base::OFConnection::EVENT_DEAD ) {
-          // TODO: log
-//           this->application_->del_switch ( ofconn->get_id() );
+
+          derailleur::Log::Instance()->log (
+               "Controller",
+               "Switch disconnected: EVENT_DEAD" );
+          // Delete the switch object corresponding to the connection from the
+          // stack.
+          this->lock_ofconnections();
+          stack_.erase ( ofconn->get_id() );
+          this->unlock_ofconnections();
      }
 }
 

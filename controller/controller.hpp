@@ -78,8 +78,12 @@ public:
      }
 
 
-     int get_threads_size () {
+     int get_threads_size () const {
           return this->threads_.size();
+     }
+     
+     int get_stack_size () const {
+          return this->stack_.size();
      }
 
 
@@ -91,7 +95,6 @@ private:
 
      // Threads
      std::vector< std::thread > threads_;
-     std::mutex mutex_;
 
 };
 
