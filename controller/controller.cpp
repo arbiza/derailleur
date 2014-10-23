@@ -37,6 +37,7 @@ derailleur::Controller::Controller ( const char* address,
 {
      this->application_ = application;
      this->application_->set_stack_ptr ( &this->stack_ );
+     this->application_->set_mutex_ptr( &this->mutex_ );
 
      derailleur::Log::Instance()->open_log_file ( log_path );
 }

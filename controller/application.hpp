@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <mutex>
 
 #include <fluid/OFServer.hh>
 
@@ -27,17 +28,18 @@
 #include "log.hpp"
 
 
+
 namespace derailleur {
 
-// Forward declaration
+// Forward declarations
 class InternalEvent;
 class Event;
 class Controller;
 class Switch;
 
 /**
- * 
- * TODO About the virtual methods, there must be a comment instructing to use 
+ *
+ * TODO About the virtual methods, there must be a comment instructing to use
  * threads for long operation avoiding to block message handling; this comment
  * must include an example.
  */
@@ -54,7 +56,7 @@ public:
      virtual void on_switch_down ( const int switch_id ) = 0;
 
      /**
-      * 
+      *
       */
      virtual void message_handler ( const derailleur::Event* const event ) = 0;
 
@@ -83,6 +85,17 @@ public:
 //      }
 
 
+
+     // Mutex related methods.
+//      void lock () {
+//           this->mutex_->lock();
+//      }
+// 
+//      void unlock () {
+//           this->mutex_->unlock();
+//      }
+
+
 private:
 
      // This method is called by controller. It sets a pointer to the siwthes
@@ -92,18 +105,36 @@ private:
      }
 
 
+     /*
+      * Called by controller to set mutex_ pointer.
+      */
+     void set_mutex_ptr ( std::mutex* mutex ) {
+          this->mutex_ = mutex;
+     }
+
 
      // This variable stores the application name.
      std::string name_;
 
-     // This pointer is set by Controller class through set_stack_ptr method.
-     // It is a pointer to a switches container. Due to the concorrency, it is
-     // private and will be accessible to child classes only through public
-     // methods.
+     /**
+      * This pointer is set by Controller class through set_stack_ptr method.
+      * It is a pointer to a switches container. Due to the concorrency, it is
+      * private and will be accessible to child classes only through public
+      * methods.
+      */
      std::map< int, derailleur::Switch* >* stack_ptr_;
 
-     // Controller class is a friend class to be able to access set_stack and
-     // set_locker private methods.
+     /*
+      * Application class provides methods to access switches objects stacked
+      * and managed by controller; mutex_ pointer avoid an switch being deleted
+      * by controller while they are accessed by Application derived class.
+      */
+     std::mutex* mutex_;
+
+     /**
+      * Controller is a friend class to be able to access private methods such
+      * as set_stack_ptr and set_mutex_ptr.
+      */
      friend class derailleur::Controller;
 };
 
