@@ -24,7 +24,6 @@
 #define _CONTROLLER_HPP_
 
 
-#include <thread>
 #include <mutex>
 #include <vector>
 
@@ -78,10 +77,6 @@ public:
      }
 
 
-     int get_threads_size () const {
-          return this->threads_.size();
-     }
-
      int get_stack_size () const {
           return this->stack_.size();
      }
@@ -92,9 +87,6 @@ private:
      std::map<int, derailleur::Switch*> stack_;
 
      derailleur::Application* application_;
-
-     // Threads
-     std::vector< std::thread > threads_;
 
      /**
       * fluid_base::OFServer provides methods to lock and to unlock program

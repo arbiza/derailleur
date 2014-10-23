@@ -35,8 +35,12 @@ class Event;
 class Controller;
 class Switch;
 
-
-// It's an interface class
+/**
+ * 
+ * TODO About the virtual methods, there must be a comment instructing to use 
+ * threads for long operation avoiding to block message handling; this comment
+ * must include an example.
+ */
 class Application {
 
 public:
@@ -45,11 +49,14 @@ public:
      }
 
      // Abstract methods
-     virtual void on_switch_up ( const derailleur::Event* const event ) {}
+     virtual void on_switch_up ( const derailleur::Event* const event ) = 0;
 
-     virtual void on_switch_down ( const int switch_id ) {}
+     virtual void on_switch_down ( const int switch_id ) = 0;
 
-     virtual void message_handler ( const derailleur::Event* const event ) {}
+     /**
+      * 
+      */
+     virtual void message_handler ( const derailleur::Event* const event ) = 0;
 
 
 
