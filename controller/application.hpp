@@ -50,9 +50,21 @@ public:
           this->name_ = name;
      }
 
+     std::string get_name() const {
+          return this->name_;
+     }
+
+
      // Abstract methods
+
+     /**
+      *
+      */
      virtual void on_switch_up ( const derailleur::Event* const event ) = 0;
 
+     /**
+      *
+      */
      virtual void on_switch_down ( const int switch_id ) = 0;
 
      /**
@@ -61,28 +73,42 @@ public:
      virtual void message_handler ( const derailleur::Event* const event ) = 0;
 
 
-
-     std::string get_name() const {
-          return this->name_;
-     }
-
-
      // Switches related methods
-     derailleur::Switch* get_switch ( int switch_id ) {
-          // TODO: lock here
-          return this->stack_ptr_->at ( switch_id );
-          // TODO: unlock here
+
+     /**
+      * Return the number of switches on the stack.
+      */
+     size_t get_number_of_switches () {
+          return this->stack_ptr_->size();
      }
 
-     // I will complete it later.
-//      std::vector<derailleur::Switch*> get_switches_list () {
-//           std::vector<derailleur::Switch*> switches;
-//
-//           // TODO: lock
-//
-//           // TODO: unlock
-//      return std::move( switches );
-//      }
+     /**
+      * Return a vector with all IDs of the switches in the stack.
+      */
+     std::vector<int> get_switches_IDs () {
+
+          std::vector<int> ids;
+
+          for ( auto& s : *this->stack_ptr_ )
+               ids.push_back ( s.first );
+          return ids;
+     }
+     
+     /**
+      * 
+      */
+     derailleur::Switch* access_switch ( short id ) {
+          
+          derailleur::Switch* s;
+          this->mutex_->lock();
+          
+          s = &
+          
+          this->mutex_->unlock();
+          return s;
+          
+     }
+
 
 
 
@@ -90,7 +116,7 @@ public:
 //      void lock () {
 //           this->mutex_->lock();
 //      }
-// 
+//
 //      void unlock () {
 //           this->mutex_->unlock();
 //      }
