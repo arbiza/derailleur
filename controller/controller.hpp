@@ -81,7 +81,7 @@ public:
      int get_threads_size () const {
           return this->threads_.size();
      }
-     
+
      int get_stack_size () const {
           return this->stack_.size();
      }
@@ -95,6 +95,14 @@ private:
 
      // Threads
      std::vector< std::thread > threads_;
+
+     /**
+      * fluid_base::OFServer provides methods to lock and to unlock program
+      * execution, but using it blocks the program when it is not necessary (e.g.
+      * to manage containers); this attribute is used to prevent illegal access
+      * to the stack_ attribute where switches objects are stacked.
+      */
+     std::mutex mutex_;
 
 };
 

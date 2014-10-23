@@ -56,7 +56,7 @@ void derailleur::Controller::message_callback (
                                  "Message type 6 - OFTP_FEATURES_REPLAY" );
 
           // Lock preventing ilegal memory access
-          this->lock_ofconnections();
+          this->mutex_.lock();
 
           // stack the new switch (New Switch object is instantiated).
           stack_.emplace (
@@ -67,7 +67,7 @@ void derailleur::Controller::message_callback (
                          ofconn,
                          data ) ) );
 
-          this->unlock_ofconnections();
+          this->mutex_.unlock();
 
           break;
 
@@ -126,9 +126,9 @@ void derailleur::Controller::connection_callback (
                "Switch disconnected: EVENT_CLOSED" );
           // Delete the switch object corresponding to the connection from the
           // stack.
-          this->lock_ofconnections();
+          this->mutex_.lock();
           stack_.erase ( ofconn->get_id() );
-          this->unlock_ofconnections();
+          this->mutex_.unlock();
 
      } else if ( type == fluid_base::OFConnection::EVENT_DEAD ) {
 
@@ -137,9 +137,9 @@ void derailleur::Controller::connection_callback (
                "Switch disconnected: EVENT_DEAD" );
           // Delete the switch object corresponding to the connection from the
           // stack.
-          this->lock_ofconnections();
+          this->mutex_.lock();
           stack_.erase ( ofconn->get_id() );
-          this->unlock_ofconnections();
+          this->mutex_.unlock();
      }
 }
 
