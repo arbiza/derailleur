@@ -251,6 +251,9 @@ protected:
       * @return MAC as a string (xx:xx:xx:xx:xx:xx).
       */
      std::string convert_bits_to_mac_address ( uint64_t* datapath_id );
+     
+     
+     //Switch* operator=(Switch*);
 
 
      /**
@@ -427,6 +430,8 @@ public:
 
           return nullptr;
      }
+     
+     
 };
 
 

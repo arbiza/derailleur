@@ -95,18 +95,10 @@ public:
      }
      
      /**
-      * 
+      * TODO: REMOVE!!!!!!! Just for test
       */
-     derailleur::Switch* access_switch ( short id ) {
-          
-          derailleur::Switch* s;
-          this->mutex_->lock();
-          
-          s = &
-          
-          this->mutex_->unlock();
-          return s;
-          
+     const derailleur::Switch* get_switch ( const short id ) {
+          return this->stack_ptr_->at( id )->get_pointer();
      }
 
 
