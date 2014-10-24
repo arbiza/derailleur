@@ -227,7 +227,7 @@ public:
 
           // OpenFlow 1.3
           if ( get_switch_version ( switch_id ) ==
-                    ( int ) fluid_msg::of13::OFP_VERSION ) {
+                    fluid_msg::of13::OFP_VERSION ) {
 
                this->mutex_->lock();
 
@@ -252,7 +252,7 @@ public:
           }
           // OpenFlow 1.0
           else if ( get_switch_version ( switch_id ) ==
-                    ( int ) fluid_msg::of10::OFP_VERSION ) {
+                    fluid_msg::of10::OFP_VERSION ) {
 
                this->mutex_->lock();
           

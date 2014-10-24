@@ -23,6 +23,7 @@
 
 #include <fstream>
 #include <mutex>
+#include <string>
 
 
 namespace derailleur {

@@ -32,9 +32,10 @@ public:
      void on_switch_up ( const derailleur::Event* const event ) override {
           derailleur::Switch* s = get_switch_copy( event->get_switch_id() );
           
+          std::string log( "on switch up event - MAC " );
+          log += s->get_mac_address();
           
-          
-          std::cout << "on_switch_up: " << s->get_mac_address() << std::endl;
+          derailleur::Log::Instance()->log( "MyApp", log.c_str() );
      }
 
      void on_switch_down ( const int switch_id ) override {
