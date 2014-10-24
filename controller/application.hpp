@@ -55,25 +55,36 @@ public:
      }
 
 
-     // Abstract methods
+     ////// (Pure) Abstract methods
 
      /**
-      *
+      * Pure virtual method triggered by Controller when a switch connection
+      * is established. This method MUST be implemented by Application children.
+      * @param event Event object containing data sent by switch.
+      * @see Event
       */
      virtual void on_switch_up ( const derailleur::Event* const event ) = 0;
 
      /**
-      *
+      * Pure virtual method triggered by Controller when a switch disconnects.
+      * This method MUST be implemented by Application children.
+      * @param switch_id Controller sends the switch identifier.
       */
      virtual void on_switch_down ( const int switch_id ) = 0;
 
      /**
-      *
+      * * Pure virtual method triggered by Controller when a switch send any
+      * message but some messages handled by controller to create switch objects
+      * with information retrieved from each connected switch.
+      * This method MUST be implemented by Application children.
+      * @param event Event object containing data to be used in message handling.
+      * @see Event
+      * @see Controller
       */
      virtual void message_handler ( const derailleur::Event* const event ) = 0;
 
 
-     // Switches related methods
+     ////// Switches related methods
 
      /**
       * Return the number of switches on the stack.
@@ -83,7 +94,7 @@ public:
      }
 
      /**
-      * Return a vector with all IDs of the switches in the stack.
+      * Return a vector with all IDs of stacked switches.
       */
      std::vector<int> get_switches_IDs () {
 
@@ -93,31 +104,75 @@ public:
                ids.push_back ( s.first );
           return ids;
      }
-     
-     /**
-      * TODO: REMOVE!!!!!!! Just for test
-      */
-     const derailleur::Switch* get_switch ( const short id ) {
-          return this->stack_ptr_->at( id )->get_pointer();
+
+
+     //// Switch SETTERS
+     void set_switch_name ( short switch_id, std::string name ) {
+
      }
 
 
+     //// Switch GETTERS     
+     std::string get_switch_name ( short switch_id ) const {
 
+     }
 
-     // Mutex related methods.
-//      void lock () {
-//           this->mutex_->lock();
-//      }
-//
-//      void unlock () {
-//           this->mutex_->unlock();
-//      }
+     int get_switch_version ( short switch_id ) const {
+
+     }
+
+     std::string get_switch_mac_address ( short switch_id ) const {
+
+     }
+
+     uint64_t get_switch_datapath_id ( short switch_id ) const {
+
+     }
+
+     int get_switch_n_buffers ( short switch_id ) const {
+
+     }
+
+     int get_switch_n_tables ( short switch_id ) const {
+
+     }
+
+     std::string get_switch_manufacturer ( short switch_id ) const {
+
+     }
+
+     std::string get_switch_hardware ( short switch_id ) const {
+
+     }
+
+     std::string get_switch_software ( short switch_id ) const {
+
+     }
+
+     std::string get_switch_serial_number ( short switch_id ) const {
+
+     }
+
+     std::string get_switch_datapath ( short switch_id ) const {
+
+     }
+
+     /** Available only in OpenFlow 1.3 switch (possibly 1.3+) */
+     int get_auxiliary_id ( short switch_id ) {
+
+     }
+
+     derailleur::Switch* get_switch_copy ( short switch_id ) {
+
+     }
 
 
 private:
 
-     // This method is called by controller. It sets a pointer to the siwthes
-     // stack.
+     /**
+      * This method is called by controller. It sets a pointer to the siwthes
+      * stack.
+      */
      void set_stack_ptr ( std::map<int, derailleur::Switch*>* ptr ) {
           this->stack_ptr_ = ptr;
      }
@@ -131,7 +186,9 @@ private:
      }
 
 
-     // This variable stores the application name.
+     /**
+      * It in just the application name.
+      */
      std::string name_;
 
      /**
@@ -151,7 +208,7 @@ private:
 
      /**
       * Controller is a friend class to be able to access private methods such
-      * as set_stack_ptr and set_mutex_ptr.
+      * as set_stack_ptr used to share stack pointer with this class.
       */
      friend class derailleur::Controller;
 };

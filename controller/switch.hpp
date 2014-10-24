@@ -132,7 +132,18 @@ public:
       * - protected: multipart_description_reply
       */
      Switch ( fluid_base::OFConnection* connection )
-          : connection_ ( connection ) {}
+          : connection_ ( connection ),
+            switch_id_ ( connection->get_id() ) {}
+
+
+     /**
+      * Why is this getter here and not in the Application class? Because 
+      * methods in the Application class receive as parameter a switch ID; 
+      * this method aims to be used by switches' copies instances.
+      */
+     short get_switch_id () const {
+          return this->switch_id_;
+     }
 
 
      /**
@@ -153,65 +164,6 @@ public:
       * @return true on success
       */
      virtual short install_flow_table ( ) = 0;
-
-
-
-     // SETTERS
-     void set_name ( std::string name ) {
-          this->name_ = name;
-     }
-
-
-
-     // GETTERS
-     std::string get_name() const {
-          return this->name_;
-     }
-
-     int get_version () const {
-          return this->of_version_;
-     }
-
-     std::string get_mac_address () const {
-          return this->mac_address_;
-     }
-
-     uint64_t get_datapath_id () const {
-          return this->datapath_id_;
-     }
-
-     int get_n_buffers () const {
-          return this->n_buffers_;
-     }
-
-     int get_n_tables () const {
-          return this->n_tables_;
-     }
-
-     std::string get_manufacturer () const {
-          return this->manufacturer_;
-     }
-
-     std::string get_hardware () const {
-          return this->hardware_;
-     }
-
-     std::string get_software () const {
-          return this->software_;
-     }
-
-     std::string get_serial_number () const {
-          return this->serial_number_;
-     }
-
-     std::string get_datapath () const {
-          return this->datapath_;
-     }
-
-     /** Return a pointer to this Switch instance */
-     const Switch* get_pointer() const {
-          return const_cast< const Switch* > ( this );
-     }
 
 
 protected:
@@ -251,8 +203,8 @@ protected:
       * @return MAC as a string (xx:xx:xx:xx:xx:xx).
       */
      std::string convert_bits_to_mac_address ( uint64_t* datapath_id );
-     
-     
+
+
      //Switch* operator=(Switch*);
 
 
@@ -261,6 +213,8 @@ protected:
       * It points to a connection handled by fluid_base::OFserver
       */
      fluid_base::OFConnection* connection_;
+
+     short switch_id_;
 
      // The following attributes store information retrieved from the switch
      // through OpenFlow (features_reply, multipart_description_reply).
@@ -285,7 +239,20 @@ protected:
 
 
 private:
+
+     /**
+      * Controller is a friend class because they creates switch objects and
+      * needs to access some private members.
+      */
      friend class derailleur::Controller;
+
+     /**
+      * Application class provides methods through which their children access
+      * switches' methods; it is a friend, so that Application may set switches'
+      * attributes directly without calling, for example, a setter inside a
+      * setter or a getter inside a getter.
+      */
+     friend class derailleur::Application;
 };
 
 
@@ -321,7 +288,7 @@ public:
       *                 convert flows to the prover Flow Mod version)
       * @return true on success
       */
-     virtual short install_flow_table (  ) override;
+     virtual short install_flow_table ( ) override;
 
 private:
 
@@ -353,7 +320,7 @@ public:
       */
      Switch13 ( fluid_base::OFConnection* connection )
           : Switch ( connection ) {
-               this->of_version_ = fluid_msg::of13::OFP_VERSION;
+          this->of_version_ = fluid_msg::of13::OFP_VERSION;
      }
 
 
@@ -374,12 +341,8 @@ public:
       *                 convert flows to the prover Flow Mod version)
       * @return true on success
       */
-     virtual short install_flow_table (  ) override;
+     virtual short install_flow_table ( ) override;
 
-
-     int get_auxiliary_id () {
-          return this->auxiliary_id_;
-     }
 
 private:
 
@@ -430,8 +393,8 @@ public:
 
           return nullptr;
      }
-     
-     
+
+
 };
 
 
