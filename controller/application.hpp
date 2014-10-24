@@ -93,7 +93,9 @@ public:
       */
      size_t get_number_of_switches () {
           this->mutex_->lock();
-          return this->stack_ptr_->size();
+          size_t aux = this->stack_ptr_->size();
+          this->mutex_->unlock();
+          return aux;
      }
 
      /**
@@ -106,6 +108,7 @@ public:
           this->mutex_->lock();
           for ( auto& s : *this->stack_ptr_ )
                ids.push_back ( s.first );
+          this->mutex_->unlock();
           return ids;
      }
 
@@ -121,68 +124,79 @@ public:
      //// Switch GETTERS
      std::string get_switch_name ( short switch_id ) const {
           this->mutex_->lock();
-          return this->stack_ptr_->at ( switch_id )->name_;
+          std::string aux = this->stack_ptr_->at ( switch_id )->name_;
           this->mutex_->unlock();
+          return aux;
      }
 
-     int get_switch_version ( short switch_id ) const {
+     uint8_t get_switch_version ( short switch_id ) const {
           this->mutex_->lock();
-          return this->stack_ptr_->at ( switch_id )->of_version_;
+          uint8_t aux = this->stack_ptr_->at ( switch_id )->of_version_;
           this->mutex_->unlock();
+          return aux;
      }
 
      std::string get_switch_mac_address ( short switch_id ) const {
           this->mutex_->lock();
-          return this->stack_ptr_->at ( switch_id )->mac_address_;
+          std::string aux = this->stack_ptr_->at ( switch_id )->mac_address_;
           this->mutex_->unlock();
+          return aux;
      }
 
      uint64_t get_switch_datapath_id ( short switch_id ) const {
           this->mutex_->lock();
-          return this->stack_ptr_->at ( switch_id )->datapath_id_;
+          uint64_t aux = this->stack_ptr_->at ( switch_id )->datapath_id_;
           this->mutex_->unlock();
+          return aux;
      }
 
-     int get_switch_n_buffers ( short switch_id ) const {
+     uint32_t get_switch_n_buffers ( short switch_id ) const {
           this->mutex_->lock();
-          return this->stack_ptr_->at ( switch_id )->n_buffers_;
+          uint32_t aux = this->stack_ptr_->at ( switch_id )->n_buffers_;
           this->mutex_->unlock();
+          return aux;
      }
 
-     int get_switch_n_tables ( short switch_id ) const {
+     uint8_t get_switch_n_tables ( short switch_id ) const {
           this->mutex_->lock();
-          return this->stack_ptr_->at ( switch_id )->n_tables_;
+          uint8_t aux = this->stack_ptr_->at ( switch_id )->n_tables_;
           this->mutex_->unlock();
+          return aux;
      }
 
      std::string get_switch_manufacturer ( short switch_id ) const {
           this->mutex_->lock();
-          return this->stack_ptr_->at ( switch_id )->manufacturer_;
+          std::string aux = this->stack_ptr_->at ( switch_id )->manufacturer_;
           this->mutex_->unlock();
+          return aux;
      }
 
      std::string get_switch_hardware ( short switch_id ) const {
           this->mutex_->lock();
-          return this->stack_ptr_->at ( switch_id )->hardware_;
+          std::string aux = this->stack_ptr_->at ( switch_id )->hardware_;
           this->mutex_->unlock();
+          return aux;
      }
 
      std::string get_switch_software ( short switch_id ) const {
           this->mutex_->lock();
-          return this->stack_ptr_->at ( switch_id )->software_;
+          std::string aux = this->stack_ptr_->at ( switch_id )->software_;
           this->mutex_->unlock();
+          return aux;
      }
 
      std::string get_switch_serial_number ( short switch_id ) const {
           this->mutex_->lock();
-          return this->stack_ptr_->at ( switch_id )->serial_number_;
+          std::string aux = this->stack_ptr_->at ( switch_id )->serial_number_;
           this->mutex_->unlock();
+          return aux;
      }
 
      std::string get_switch_datapath ( short switch_id ) const {
           this->mutex_->lock();
-          return this->stack_ptr_->at ( switch_id )->datapath_;
+          std::string aux = this->stack_ptr_->at ( switch_id )->datapath_;
           this->mutex_->unlock();
+          return aux;
      }
 
      /** Available only in OpenFlow 1.3 switch (possibly 1.3+) */
@@ -215,9 +229,13 @@ public:
           if ( get_switch_version ( switch_id ) ==
                     ( int ) fluid_msg::of13::OFP_VERSION ) {
 
+               this->mutex_->lock();
+
                derailleur::Switch13* s13_ptr =
                     static_cast<derailleur::Switch13*> (
                          this->stack_ptr_->at ( switch_id ) );
+
+               this->mutex_->unlock();
 
                /**
                 * Set connection pointer to nullptr, this way Application children
@@ -226,24 +244,27 @@ public:
                 */
                s13_ptr->set_null_connection_ptr();
 
+               // Copy the content of the pointer to and object
                derailleur::Switch13 s13 = *s13_ptr;
-               return *s13;
+               // s receives a pointer to the copied object (it is not a pointer
+               // to the switch object on the stack).
+               s = &s13;
           }
           // OpenFlow 1.0
           else if ( get_switch_version ( switch_id ) ==
                     ( int ) fluid_msg::of10::OFP_VERSION ) {
 
-               derailleur::Switch10 s10 =
-                    *static_cast<derailleur::Switch10> (
+               this->mutex_->lock();
+          
+               derailleur::Switch10* s10_ptr =
+                    static_cast<derailleur::Switch10*> (
                          this->stack_ptr_->at ( switch_id ) );
+                    
+               this->mutex_->unlock();
 
-               /**
-                * Set connection pointer to nullptr, this way Application children
-                * won't be able to access the switch through connection pointer, only
-                * through methods provided by this class.
-                */
-               s10.set_null_connection_ptr();
-               return &s10;
+               s10_ptr->set_null_connection_ptr();
+               derailleur::Switch10 s10 = *s10_ptr;
+               s = &s10;
           }
 
           return s;

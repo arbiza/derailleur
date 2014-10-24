@@ -73,11 +73,15 @@ void derailleur::Controller::message_callback (
           break;
 
      case 19: // Switch sending description: OFTP_MULTIPART_REPLAY
+          
           Log::Instance()->log ( "Controller",
                                  "Message type 19 - OFTP_MULTIPART_REPLAY" );
+          this->mutex_.lock();
 
           stack_.at ( ofconn->get_id() )->multipart_description_reply (
                new InternalEvent ( this, type, data, length ) );
+          
+          this->mutex_.unlock();
 
           this->application_->on_switch_up (
                new Event ( ofconn->get_id(), ofconn->get_version(), this,

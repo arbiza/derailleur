@@ -30,8 +30,11 @@ public:
           : derailleur::Application ( app_name ) {}
 
      void on_switch_up ( const derailleur::Event* const event ) override {
-          const derailleur::Switch* s = get_switch( event->get_switch_id() );
-
+          derailleur::Switch* s = get_switch_copy( event->get_switch_id() );
+          
+          
+          
+          std::cout << "on_switch_up: " << s->get_mac_address() << std::endl;
      }
 
      void on_switch_down ( const int switch_id ) override {
@@ -44,21 +47,6 @@ public:
 
           case 10: // packet-in
 
-//                uint64_t dst = 0, src = 0;
-//                void* ofpip;
-//                uint8_t* data;
-//                uint16_t in_port;
-//
-//                if ( event->get_version() == fluid_msg::of10::OFP_VERSION ) {
-//
-//                } else if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
-//
-//                     fluid_msg::of13::PacketIn *packet_in =
-//                          new fluid_msg::of13::PacketIn();
-//
-//                     packet_in->unpack ( event->get_data() );
-//                }
-//                break;
                derailleur::Log::Instance()->log ( "Test", "packet_in" );
                break;
 

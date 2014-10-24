@@ -138,12 +138,57 @@ public:
 
 
      /**
-      * Why is this getter here and not in the Application class? Because 
-      * methods in the Application class receive as parameter a switch ID; 
+      * Why is this getter is not in the Application class? Because
+      * methods in the Application class receive as parameter a switch ID;
       * this method aims to be used by switches' copies instances.
       */
      short get_switch_id () const {
           return this->switch_id_;
+     }
+
+     //// Switch GETTERS
+     std::string get_name () const {
+          return this->name_;
+     }
+
+     uint8_t get_version () const {
+          return this->of_version_;
+     }
+
+     std::string get_mac_address () const {
+          return this->mac_address_;
+     }
+
+     uint64_t get_datapath_id () const {
+          return this->datapath_id_;
+     }
+
+     uint32_t get_n_buffers () const {
+          return this->n_buffers_;
+     }
+
+     uint8_t get_n_tables () const {
+          return this->n_tables_;
+     }
+
+     std::string get_manufacturer () const {
+          return this->manufacturer_;
+     }
+
+     std::string get_hardware () const {
+          return this->hardware_;
+     }
+
+     std::string get_software () const {
+          return this->software_;
+     }
+
+     std::string get_serial_number () const {
+          return this->serial_number_;
+     }
+
+     std::string get_datapath () const {
+          return this->datapath_;
      }
 
 
@@ -222,13 +267,13 @@ protected:
 
      std::string name_;
      std::string mac_address_;
-     int of_version_;
+     uint8_t of_version_;
 
 
      // Features reply attributes:
      uint64_t datapath_id_;
-     int n_buffers_;
-     int n_tables_;
+     uint32_t n_buffers_;
+     uint8_t n_tables_;
 
      // Switch description (Multipart) attributes.
      // They are set by multipart_description_reply
@@ -240,7 +285,7 @@ protected:
 
 
 private:
-     
+
      void set_null_connection_ptr () {
           this->connection_ = nullptr;
      }
@@ -327,8 +372,8 @@ public:
           : Switch ( connection ) {
           this->of_version_ = fluid_msg::of13::OFP_VERSION;
      }
-     
-     
+
+
      uint8_t get_auxiliary_id () {
           return this->auxiliary_id_;
      }

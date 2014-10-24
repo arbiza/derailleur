@@ -77,8 +77,11 @@ public:
      }
 
 
-     int get_stack_size () const {
-          return this->stack_.size();
+     size_t get_stack_size () {
+          this->mutex_.lock();
+          size_t aux = this->stack_.size();
+          this->mutex_.unlock();
+          return aux;
      }
 
 
