@@ -42,6 +42,7 @@ namespace derailleur {
 
 /** Forward declaration of classes from derailleur namespace **/
 class Controller;
+class Application;
 class InternalEvent;
 class Event;
 class SwitchFactory;
@@ -239,6 +240,10 @@ protected:
 
 
 private:
+     
+     void set_null_connection_ptr () {
+          this->connection_ = nullptr;
+     }
 
      /**
       * Controller is a friend class because they creates switch objects and
@@ -321,6 +326,11 @@ public:
      Switch13 ( fluid_base::OFConnection* connection )
           : Switch ( connection ) {
           this->of_version_ = fluid_msg::of13::OFP_VERSION;
+     }
+     
+     
+     uint8_t get_auxiliary_id () {
+          return this->auxiliary_id_;
      }
 
 

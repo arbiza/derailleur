@@ -23,6 +23,8 @@
 #include <mutex>
 
 #include <fluid/OFServer.hh>
+#include <fluid/of10msg.hh>
+#include <fluid/of13msg.hh>
 
 #include "switch.hpp"
 #include "log.hpp"
@@ -90,6 +92,7 @@ public:
       * Return the number of switches on the stack.
       */
      size_t get_number_of_switches () {
+          this->mutex_->lock();
           return this->stack_ptr_->size();
      }
 
@@ -100,6 +103,7 @@ public:
 
           std::vector<int> ids;
 
+          this->mutex_->lock();
           for ( auto& s : *this->stack_ptr_ )
                ids.push_back ( s.first );
           return ids;
@@ -108,62 +112,141 @@ public:
 
      //// Switch SETTERS
      void set_switch_name ( short switch_id, std::string name ) {
-
+          this->mutex_->lock();
+          this->stack_ptr_->at ( switch_id )->name_ = name;
+          this->mutex_->unlock();
      }
 
 
-     //// Switch GETTERS     
+     //// Switch GETTERS
      std::string get_switch_name ( short switch_id ) const {
-
+          this->mutex_->lock();
+          return this->stack_ptr_->at ( switch_id )->name_;
+          this->mutex_->unlock();
      }
 
      int get_switch_version ( short switch_id ) const {
-
+          this->mutex_->lock();
+          return this->stack_ptr_->at ( switch_id )->of_version_;
+          this->mutex_->unlock();
      }
 
      std::string get_switch_mac_address ( short switch_id ) const {
-
+          this->mutex_->lock();
+          return this->stack_ptr_->at ( switch_id )->mac_address_;
+          this->mutex_->unlock();
      }
 
      uint64_t get_switch_datapath_id ( short switch_id ) const {
-
+          this->mutex_->lock();
+          return this->stack_ptr_->at ( switch_id )->datapath_id_;
+          this->mutex_->unlock();
      }
 
      int get_switch_n_buffers ( short switch_id ) const {
-
+          this->mutex_->lock();
+          return this->stack_ptr_->at ( switch_id )->n_buffers_;
+          this->mutex_->unlock();
      }
 
      int get_switch_n_tables ( short switch_id ) const {
-
+          this->mutex_->lock();
+          return this->stack_ptr_->at ( switch_id )->n_tables_;
+          this->mutex_->unlock();
      }
 
      std::string get_switch_manufacturer ( short switch_id ) const {
-
+          this->mutex_->lock();
+          return this->stack_ptr_->at ( switch_id )->manufacturer_;
+          this->mutex_->unlock();
      }
 
      std::string get_switch_hardware ( short switch_id ) const {
-
+          this->mutex_->lock();
+          return this->stack_ptr_->at ( switch_id )->hardware_;
+          this->mutex_->unlock();
      }
 
      std::string get_switch_software ( short switch_id ) const {
-
+          this->mutex_->lock();
+          return this->stack_ptr_->at ( switch_id )->software_;
+          this->mutex_->unlock();
      }
 
      std::string get_switch_serial_number ( short switch_id ) const {
-
+          this->mutex_->lock();
+          return this->stack_ptr_->at ( switch_id )->serial_number_;
+          this->mutex_->unlock();
      }
 
      std::string get_switch_datapath ( short switch_id ) const {
-
+          this->mutex_->lock();
+          return this->stack_ptr_->at ( switch_id )->datapath_;
+          this->mutex_->unlock();
      }
 
      /** Available only in OpenFlow 1.3 switch (possibly 1.3+) */
-     int get_auxiliary_id ( short switch_id ) {
+     uint8_t get_auxiliary_id ( short switch_id ) {
 
+          uint8_t auxiliary_id = 0;
+
+          if ( get_switch_version ( switch_id ) ==
+                    ( int ) fluid_msg::of10::OFP_VERSION ) {
+
+               this->mutex_->lock();
+
+               derailleur::Switch13* s =
+                    static_cast<derailleur::Switch13*> (
+                         this->stack_ptr_->at ( switch_id ) );
+               return s->get_auxiliary_id();
+
+               this->mutex_->unlock();
+          }
+
+          return auxiliary_id;
      }
 
      derailleur::Switch* get_switch_copy ( short switch_id ) {
 
+          // It is the default return; returned when any error occurs
+          derailleur::Switch* s = nullptr;
+
+          // OpenFlow 1.3
+          if ( get_switch_version ( switch_id ) ==
+                    ( int ) fluid_msg::of13::OFP_VERSION ) {
+
+               derailleur::Switch13* s13_ptr =
+                    static_cast<derailleur::Switch13*> (
+                         this->stack_ptr_->at ( switch_id ) );
+
+               /**
+                * Set connection pointer to nullptr, this way Application children
+                * won't be able to access the switch through connection pointer, only
+                * through methods provided by this class.
+                */
+               s13_ptr->set_null_connection_ptr();
+
+               derailleur::Switch13 s13 = *s13_ptr;
+               return *s13;
+          }
+          // OpenFlow 1.0
+          else if ( get_switch_version ( switch_id ) ==
+                    ( int ) fluid_msg::of10::OFP_VERSION ) {
+
+               derailleur::Switch10 s10 =
+                    *static_cast<derailleur::Switch10> (
+                         this->stack_ptr_->at ( switch_id ) );
+
+               /**
+                * Set connection pointer to nullptr, this way Application children
+                * won't be able to access the switch through connection pointer, only
+                * through methods provided by this class.
+                */
+               s10.set_null_connection_ptr();
+               return &s10;
+          }
+
+          return s;
      }
 
 
@@ -196,6 +279,10 @@ private:
       * It is a pointer to a switches container. Due to the concorrency, it is
       * private and will be accessible to child classes only through public
       * methods.
+      *
+      * May occur an access attempt to an object just removed from the stack by
+      * controller; std::map is exception safe so that it is not necessary to
+      * worry about exceptions on map access.
       */
      std::map< int, derailleur::Switch* >* stack_ptr_;
 
