@@ -56,7 +56,7 @@ short derailleur::Switch10::install_flow ( fluid_msg::FlowModCommon* flow,
 }
 
 
-short int derailleur::Switch10::install_flow_table (  )
+short int derailleur::Switch10::install_flow_table ( )
 {
 
      return EXIT_SUCCESS;
@@ -106,7 +106,27 @@ void derailleur::Switch10::set_features_reply ( uint8_t* data )
 
 void derailleur::Switch10::install_flow_default()
 {
+     uint8_t* buffer;
 
+     fluid_msg::of10::FlowMod fm (
+          0,                                                // xid
+          0,                                                // cookie
+          fluid_msg::of10::OFPFC_ADD,                       // command
+          0,                                                // idle timeout
+          0,                                                // hard timeout
+          0,                                                // priority
+          0xffffffff,                                       // buffer id
+          0,                                                // out_port
+          0                                                 // flags
+     );
+
+     fluid_msg::of10::OutputAction act ( fluid_msg::of10::OFPP_CONTROLLER,
+                                         1024 );
+     fm.add_action ( act );
+     
+     buffer = fm.pack();
+     this->connection_->send( buffer, fm.length() );
+     fluid_msg::OFMsg::free_buffer ( buffer );
 }
 
 
@@ -149,7 +169,7 @@ short derailleur::Switch13::install_flow ( fluid_msg::FlowModCommon* flow,
 }
 
 
-short int derailleur::Switch13::install_flow_table (  )
+short int derailleur::Switch13::install_flow_table ( )
 {
 
      return EXIT_SUCCESS;
@@ -169,7 +189,7 @@ void derailleur::Switch13::set_features_reply ( uint8_t* data )
 
 
      this->mac_address_ =
-               this->convert_bits_to_mac_address ( &this->datapath_id_ );
+          this->convert_bits_to_mac_address ( &this->datapath_id_ );
 
 
      std::bitset<32> capabilities ( reply.capabilities() );
@@ -200,9 +220,21 @@ void derailleur::Switch13::set_features_reply ( uint8_t* data )
 void derailleur::Switch13::install_flow_default()
 {
      uint8_t* buffer;
-     fluid_msg::of13::FlowMod fm ( 42, 0, 0xffffffffffffffff, 0,
-                                   fluid_msg::of13::OFPFC_ADD, 0, 0, 0,
-                                   0xffffffff, 0, 0, 0 );
+
+     fluid_msg::of13::FlowMod fm;
+     //fm.xid(pi.xid());
+     fm.cookie ( 0 );
+     fm.cookie_mask ( 0xffffffffffffffff );
+     fm.table_id ( 0 );
+     fm.command ( fluid_msg::of13::OFPFC_ADD );
+     fm.idle_timeout ( 0 );
+     fm.hard_timeout ( 0 );
+     fm.priority ( 0 );
+     fm.buffer_id ( 0xffffffff );
+     fm.out_port ( 0 );
+     fm.out_group ( 0 );
+     fm.flags ( 0 );
+
      fluid_msg::of13::OutputAction *act = new fluid_msg::of13::OutputAction (
           fluid_msg::of13::OFPP_CONTROLLER,
           fluid_msg::of13::OFPCML_NO_BUFFER );

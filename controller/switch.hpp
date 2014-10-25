@@ -432,13 +432,16 @@ public:
                                     fluid_base::OFConnection* connection,
                                     void *data ) {
 
+          // OpenFlow 1.0 Switch
           if ( version == 1 ) {
                Switch10* s = new Switch10 ( connection );
                s->set_features_reply ( ( uint8_t* ) data );
                s->install_flow_default();
                s->multipart_description_request();
                return s;
-          } else if ( version ==  4 ) {
+          }
+          // OpenFlow 1.3 Switch
+          else if ( version ==  4 ) {
                Switch13* s = new Switch13 ( connection );
                s->set_features_reply ( ( uint8_t* ) data );
                s->install_flow_default();
