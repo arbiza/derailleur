@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 
 #include <fluid/of10msg.hh>
 #include <fluid/of13msg.hh>
@@ -48,7 +49,9 @@ class Event;
 class SwitchFactory;
 
 
-// Capabilities structures
+/**
+ * Capabilities structures for OpenFlow 1.0 switches.
+ */
 typedef struct capabilities_10 {
 
      /* enum ofp_capabilities {
@@ -73,10 +76,14 @@ typedef struct capabilities_10 {
 
 } Capabilities_10_;
 
+
+/**
+ * Capabilities structures for OpenFlow 1.3 switches.
+ */
 typedef struct capabilities_13 {
 
      /* enum ofp_capabilities {
-     * OFPC_FLOW_STATS   = 1 << 0, // Flow statistics., of_version_ ( "1.3" )
+      * OFPC_FLOW_STATS   = 1 << 0, // Flow statistics., of_version_ ( "1.3" )
       * OFPC_TABLE_STATS  = 1 << 1, // Table statistics.
       * OFPC_PORT_STATS   = 1 << 2, // Port statistics.
       * OFPC_GROUP_STATS  = 1 << 3, // Group statistics.
@@ -96,7 +103,27 @@ typedef struct capabilities_13 {
 } Capabilities_13_;
 
 
+/**
+ * Arp6 is an Arp-like structure for IPv6 neiborhood.
+ * It is used to provide L2 leaning switching features and may be used to
+ * provide an overview of the entire network connected to the switch.
+ */
+typedef struct arp6 {
+     uint16_t ip[8];
+     uint8_t mac[6];
+     uint32_t port;
+} Arp6;
 
+/**
+ * Arp4 is an Arp-like structure for IPv4 neiborhood.
+ * It is used to provide L2 leaning switching features and may be used to
+ * provide an overview of the entire network connected to the switch.
+ */
+typedef struct arp4 {
+     uint8_t ip[4];
+     uint8_t mac[6];
+     uint32_t port;
+} Arp4;
 
 
 
@@ -282,7 +309,9 @@ protected:
          software_,
          serial_number_,
          datapath_;
-
+         
+     std::list<Arp6> arp_table_v6_;
+     std::list<Arp4> arp_table_v4_;
 
 private:
 
