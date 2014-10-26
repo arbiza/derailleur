@@ -309,7 +309,7 @@ protected:
          software_,
          serial_number_,
          datapath_;
-         
+     
      std::list<Arp6> arp_table_v6_;
      std::list<Arp4> arp_table_v4_;
 

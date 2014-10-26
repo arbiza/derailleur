@@ -20,15 +20,25 @@
 #ifndef _FLOW_H
 #define _FLOW_H
 
+#include <vector>
+
+
+// forward declarations of fluid_msg classes
+namespace fluid_msg {
+class FlowModCommon;
+class PacketInCommon;
+class Action;
+}
+
 
 namespace derailleur {
 
+// Forward declarations of derailleur classes
+class Event;
+class Flow;
 
 
-unsigned const MAC_LENGTH = 6;
-unsigned const IPV4_LENGTH = 4;
-unsigned const IPV6_LENGTH = 8;
-
+unsigned const MAC_bytes_length = 6;
 
 /**
  * enum flow_commands provides the same enumerations than of13 and of10
@@ -58,17 +68,47 @@ enum flow_mod_flags {
 /**
  * FlowTable stores Flow class derived objects.
  */
-//typedef std::vector<Flow*> FlowTable;
+typedef std::vector<Flow*> FlowTable;
+
+
+class Flow {
+
+public:
+     /**
+      * Constructor creates a flow with default values for fields common to
+      * OpenFlow message versions.
+      */
+     Flow ( const derailleur::Event* const event );
+
+     /**
+      * Sets the command this flow executes on switch(es).
+      */
+
+     bool set_command_ADD ( uint16_t priority,
+                            derailleur::flow_mod_commands command,
+                            derailleur::flow_mod_flags flag );
+
+     bool set_command_MODIFY ();
+     bool set_command_MODIFY_STRICT ();
+     
+     bool set_command_DELETE ();
+     bool set_command_DELETE_STRICT ();
+
+private:
+     fluid_msg::FlowModCommon* flow_mod_;
+     fluid_msg::Action* action_;
+};
+
+
 
 
 
 /**
- * TODO: rewrite this comment.
- * Namespace flow provides useful functions such as conversions and analyzers.
+ * Namespace util provides useful functions such as conversions and analyzers.
  * This functions may be also used to handle switches messages translating
  * received data to strings.
  */
-namespace flow {
+namespace util {
 
 
 /**
@@ -82,8 +122,8 @@ static std::string convert_bits_to_MAC ( const uint8_t* data )
      std::stringstream ss;
      ss << std::hex << std::setfill ( '0' );
 
-     uint8_t array[MAC_LENGTH];
-     memcpy ( array, data, MAC_LENGTH );
+     uint8_t array[MAC_bytes_length];
+     memcpy ( array, data, MAC_bytes_length );
 
      for ( short i = 0; i < 6; i++ ) {
           ss <<  std::setw ( 2 ) << ( int ) array[i];
@@ -104,7 +144,7 @@ static std::string convert_bits_to_MAC ( const uint8_t* data )
 static uint8_t* convert_MAC_to_bits ( const std::string* mac )
 {
 
-     uint8_t* array = new uint8_t[MAC_LENGTH];
+     uint8_t* array = new uint8_t[MAC_bytes_length];
      short position = 0;
 
      for ( short i = 0; i < 6; i++ ) {
@@ -116,7 +156,8 @@ static uint8_t* convert_MAC_to_bits ( const std::string* mac )
 }
 
 
-} // namespace flow
+
+} // namespace util
 
 
 
