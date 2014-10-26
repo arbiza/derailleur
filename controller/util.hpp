@@ -24,10 +24,21 @@
 namespace derailleur {
 
 
+#include <string>
+#include <sstream>
+#include <cstring>
 
-unsigned const MAC_LENGTH = 6;
-unsigned const IPV4_LENGTH = 4;
-unsigned const IPV6_LENGTH = 8;
+
+enum IP {
+     v4 = 4,
+     v6 = 6,
+};
+
+enum LENGTH {
+     mac = 6,
+     ipv4 = 4,
+     ipv6 = 6,
+};
 
 
 /**
@@ -68,7 +79,10 @@ enum flow_mod_flags {
  * This functions may be also used to handle switches messages translating
  * received data to strings.
  */
-namespace flow {
+namespace util {
+
+
+////// L2 functions
 
 
 /**
@@ -82,8 +96,8 @@ static std::string convert_bits_to_MAC ( const uint8_t* data )
      std::stringstream ss;
      ss << std::hex << std::setfill ( '0' );
 
-     uint8_t array[MAC_LENGTH];
-     memcpy ( array, data, MAC_LENGTH );
+     uint8_t array[LENGTH.mac];
+     memcpy ( array, data, LENGTH.mac );
 
      for ( short i = 0; i < 6; i++ ) {
           ss <<  std::setw ( 2 ) << ( int ) array[i];
@@ -104,7 +118,7 @@ static std::string convert_bits_to_MAC ( const uint8_t* data )
 static uint8_t* convert_MAC_to_bits ( const std::string* mac )
 {
 
-     uint8_t* array = new uint8_t[MAC_LENGTH];
+     uint8_t* array = new uint8_t[LENGTH.mac];
      short position = 0;
 
      for ( short i = 0; i < 6; i++ ) {
@@ -116,10 +130,118 @@ static uint8_t* convert_MAC_to_bits ( const std::string* mac )
 }
 
 
-} // namespace flow
+////// L3 functions
+
+/**
+ * Returns the IP version of the received packet.
+ * @param data Data sent in the packet where physical and network addresses are.
+ */
+static short get_ip_version ( uint8_t* data )
+{
+
+}
+
+
+/**
+ *
+ */
+static std::string convert_ipv4_to_string ( uint8_t* ipv4_array )
+{
+
+}
+
+/**
+ *
+ */
+static std::string convert_ipv6_to_string ( uint16_t* ipv6_array )
+{
+
+}
+
+/**
+ * 
+ */
+static uint8_t* convert_ipv4_to_bits ( std::string ipv4 ) {
+     
+}
+
+/**
+ * 
+ */
+static uint16_t* convert_ipv6_to_bits ( std::string ipv6 ) {
+
+  }
+
+
+//// Source IP
+
+/**
+ * Return the source IP (v4 | v6) address contained in data parameter.
+ * @return string with IP address formatted according its version (4 | 6).
+ */
+static std::string get_source_ip_from_data ( uint8_t* data )
+{
+     std::string ip;
+     
+     if ( get_ip_version ( data ) ==  IP.ipv6 ) {
+          uint16_t ipv6[8] = get_source_ipv6_in_bits ( data );
+          ip = convert_ipv6_to_string( ipv6 );
+     } else {
+          uint8_t ipv4[4] = get_source_ipv4_in_bits ( data );
+          ip = convert_ipv4_to_string( ipv4 );
+     }
+     return ip;
+}
+
+
+/**
+ * Extracts the IPv4 address bits from data and converts it to uint8_t array.
+ * @return uint8_t[4] with fields of IPv4 address
+ */
+static uint8_t* get_source_ipv4_from_data_in_bits ( uint8_t* data )
+{
+
+}
+
+/**
+ * Extracts the IPv6 address bits from data and converts it to uint16_t array.
+ * @return uint16_t[8] with fields of IPv6 address
+ */
+static uint16_t* get_source_ipv6_from_data_in_bits ( uint8_t* data )
+{
+
+}
+
+//// Destination IP
+
+/**
+ *
+ */
+static std::string get_destination_ip_from_data ( uint8_t* data )
+{
+
+}
+
+/**
+ *
+ */
+static uint8_t* get_destination_ipv4_from_data_in_bits ( uint8_t* data )
+{
+
+}
+
+/**
+ *
+ */
+static uint16_t* get_destination_ipv6_from_data_in_bits ( uint8_t* data )
+{
+
+}
 
 
 
+
+} // namespace util
 } // namespace derailleur
 
 #endif // _FLOW_H
