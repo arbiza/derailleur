@@ -239,6 +239,43 @@ public:
      virtual short install_flow_table ( ) = 0;
 
 
+
+     ////// L2/L3 Switching related methods
+     /**
+      * This method extracts source IP(v4 | v6) and MAC addresses from the data 
+      * parameter, check if it is already present in ARP-like tables; if not a 
+      * new entry is added in the proper table (v4 | v6); if the entry exists
+      * this method does nothing.
+      *
+      * @param data data from an OpenFlow packet; Event class provides the
+      * method get_data() that may be used as parameter when calling this
+      * method.
+      * @return returns true if a new connected device was added to any of the
+      * ARP-like tables; otherwise return false.
+      * @see Event
+      */
+     bool learning_switch ( uint8_t* data );
+
+
+     /**
+      * Returns a copy of the ARP-like table for IPv4 connections.
+      */
+     std::list<Arp4> get_IPv4_neighborhood () {
+          this->mutex_.lock();
+          return arp_table_v4_;
+          this->mutex_.unlock();
+     }
+
+     /**
+      * Returns a copy of the ARP-like table for IPv6 connections.
+      */
+     std::list<Arp6> get_IPv6_neighborhood () {
+          this->mutex_.lock();
+          return arp_table_v6_;
+          this->mutex_.unlock();
+     }
+
+
 protected:
 
      /**
@@ -278,8 +315,6 @@ protected:
      std::string convert_bits_to_mac_address ( uint64_t* datapath_id );
 
 
-     //Switch* operator=(Switch*);
-
 
      /**
       * Controller to switch connection pointer.
@@ -287,6 +322,10 @@ protected:
       */
      fluid_base::OFConnection* connection_;
 
+
+     /**
+      * Each switch instance stores its own libfluid connection ID.
+      */
      short switch_id_;
 
      // The following attributes store information retrieved from the switch
@@ -309,9 +348,15 @@ protected:
          software_,
          serial_number_,
          datapath_;
-     
+
      std::list<Arp6> arp_table_v6_;
      std::list<Arp4> arp_table_v4_;
+
+
+     /**
+      * This mutex is used to prevent errors when accessing ARP-like tables.
+      */
+     std::mutex mutex_;
 
 private:
 
