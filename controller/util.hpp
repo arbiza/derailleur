@@ -54,6 +54,60 @@ enum LENGTH {
 
 
 /**
+ * struct l1 contains protocol codes of the Link Layer (first layer of TCP/IP 
+ * model stack).
+ */
+struct l1 {
+     const char* arp = "0x0806";
+};
+
+/**
+ * struct l2 contains protocol codes of the Internet Layer (second layer of 
+ * TCP/IP model stack).
+ */
+struct l2 {
+     const char* ipv4 = "0x0800";
+     const char* ipv4 = "0x08dd";
+};
+
+/**
+ * struct l3 contains protocol codes of the Transport Layer (third layer of 
+ * TCP/IP model stack).
+ */
+struct l3 {
+     
+};
+
+/**
+ * struct l4 contains protocol codes of the Application Layer (fourth layer of 
+ * TCP/IP model stack).
+ */
+struct l4 {
+     
+};
+
+/**
+ * struct protocols contains an instance of each of the above layers; this way
+ * protocols codes may be used accessing nested instances.
+ */
+struct protocols {
+     const struct l1 link_layer;
+     const struct l2 internet_layer;
+     const struct l3 transport_layer;
+     const struct l4 application_layer;
+};
+
+/**
+ * Instance of the struct protocols. Protocols codes may be accessed as 
+ * following:
+ * derailleur::util::Protocols.link_layer.arp;
+ */
+static const struct protocols Protocols;
+
+
+
+
+/**
  *
  */
 short get_protocol_type_from_data ( )
