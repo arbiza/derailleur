@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <mutex>
 
 #include <fluid/of10msg.hh>
 #include <fluid/of13msg.hh>
@@ -148,20 +149,15 @@ class Switch {
 
 public:
 
-
      /**
-      * Switch constructor only initializes connection_ attribute.
-      *
-      * Classes inheriting from this class MUST implement the following methods:
-      * - public: install_flow
-      * - public: install_flow_table
-      * - protected: install_flow_default
-      * - protected: multipart_description_request
-      * - protected: multipart_description_reply
+      * Copy constructor.
+      * Only objects created using the above constructor passing a connection
+      * object as argument have a connection pointer. When a copy is made the
+      * copy's connection is set to null; it is because all the communication
+      * with switches must be through switches objects in the controller stack;
+      * switches copies may represent a switch that is not connected anymore.
       */
-     Switch ( fluid_base::OFConnection* connection )
-          : connection_ ( connection ),
-            switch_id_ ( connection->get_id() ) {}
+     Switch ( const Switch& source );
 
 
      /**
@@ -217,6 +213,10 @@ public:
      std::string get_datapath () const {
           return this->datapath_;
      }
+     
+     uint8_t get_of_version () const {
+          return this->of_version_;
+     }
 
 
      /**
@@ -242,10 +242,10 @@ public:
 
      ////// L2/L3 Switching related methods
      /**
-      * This method extracts source IP(v4 | v6) and MAC addresses from the data 
-      * parameter, check if it is already present in ARP-like tables; if not a 
+      * This method extracts source IP(v4 | v6) and MAC addresses from the data
+      * parameter, check if it is already present in ARP-like tables; if not a
       * new entry is added in the proper table (v4 | v6); if the entry exists
-      * this method does nothing.
+      * with the same MAC and IP this method does nothing, otherwise overwrites.
       *
       * @param data data from an OpenFlow packet; Event class provides the
       * method get_data() that may be used as parameter when calling this
@@ -277,6 +277,22 @@ public:
 
 
 protected:
+
+     /**
+      * Switch constructor only initializes connection_ attribute.
+      * It is protected because it is only used by Controller (friend) class
+      * and its children.
+      *
+      * Classes inheriting from this class MUST implement the following methods:
+      * - public: install_flow
+      * - public: install_flow_table
+      * - protected: install_flow_default
+      * - protected: multipart_description_request
+      * - protected: multipart_description_reply
+      */
+     Switch ( fluid_base::OFConnection* connection )
+          : connection_ ( connection ),
+            switch_id_ ( connection->get_id() ) {}
 
      /**
       * Parse response received from switches to features request message.
@@ -359,6 +375,13 @@ protected:
      std::mutex mutex_;
 
 private:
+
+     /**
+      * Switch default constructor is private to prevent users to instantiate
+      * switches objects; Switches objects may be created by Controller and may
+      * be copied through the copy constructor (who calls this method).
+      */
+     //Switch ();
 
      void set_null_connection_ptr () {
           this->connection_ = nullptr;

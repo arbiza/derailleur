@@ -23,6 +23,31 @@
 #include "switch.hpp"
 #include "event.hpp"
 #include "log.hpp"
+#include "util.hpp"
+
+
+
+derailleur::Switch::Switch ( const derailleur::Switch& source )
+{
+     /* sets connectio to null to prevent access attempets to a pointer that may
+        do not exist anymore.*/
+     this->connection_ = nullptr;
+     this->switch_id_ = source.get_switch_id();
+     this->name_ = source.get_name();
+     this->mac_address_ = source.get_mac_address();
+     this->of_version_ = source.get_of_version();
+     this->datapath_id_ = source.get_datapath_id();
+     this->n_buffers_ = source.get_n_buffers();
+     this->n_tables_ = source.get_n_tables();
+     this->manufacturer_ = source.get_manufacturer();
+     this->hardware_ = source.get_hardware();
+     this->software_ = source.get_software();
+     this->serial_number_ = source.get_serial_number();
+     this->datapath_ = source.get_datapath();
+
+     /* ARP-like tables and mutex are not copied in the copy. */
+}
+
 
 
 std::string derailleur::Switch::convert_bits_to_mac_address (
@@ -42,6 +67,12 @@ std::string derailleur::Switch::convert_bits_to_mac_address (
      }
 
      return ss.str();
+}
+
+
+bool derailleur::Switch::learning_switch ( uint8_t* data )
+{
+     return true;
 }
 
 
@@ -123,9 +154,9 @@ void derailleur::Switch10::install_flow_default()
      fluid_msg::of10::OutputAction act ( fluid_msg::of10::OFPP_CONTROLLER,
                                          1024 );
      fm.add_action ( act );
-     
+
      buffer = fm.pack();
-     this->connection_->send( buffer, fm.length() );
+     this->connection_->send ( buffer, fm.length() );
      fluid_msg::OFMsg::free_buffer ( buffer );
 }
 
