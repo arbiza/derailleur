@@ -59,24 +59,31 @@ enum LENGTH {
 
 /**
  * struct l1 contains protocol codes of the Link Layer (first layer of TCP/IP
- * model stack).
+ * model stack) according to oxm_ofb_match_fields (OpenFlow 1.3).
  */
 struct l1 {
-     const char* arp = "0x0806";
+     const uint16_t arp = 0x0806;
+     
+     /**
+      * IPv6 also appear here in link layer protocols because in IPv6 networks
+      * neighborhood discovery is made by NDP (Neighbor Discovery Protocol) that
+      * uses ICMPv6 packets; OpenFlow identifies IPv6 in the first layer.
+      */
+     const uint16_t ipv6 = 0x08dd;
 };
 
 /**
  * struct l2 contains protocol codes of the Internet Layer (second layer of
- * TCP/IP model stack).
+ * TCP/IP model stack) according to oxm_ofb_match_fields (OpenFlow 1.3).
  */
 struct l2 {
-     const char* ipv4 = "0x0800";
-     const char* ipv6 = "0x08dd";
+     const uint16_t ipv4 = 0x0800;
+     const uint16_t ipv6 = 0x08dd;
 };
 
 /**
  * struct l3 contains protocol codes of the Transport Layer (third layer of
- * TCP/IP model stack).
+ * TCP/IP model stack) according to oxm_ofb_match_fields (OpenFlow 1.3).
  */
 struct l3 {
 
@@ -84,7 +91,7 @@ struct l3 {
 
 /**
  * struct l4 contains protocol codes of the Application Layer (fourth layer of
- * TCP/IP model stack).
+ * TCP/IP model stack) according to oxm_ofb_match_fields (OpenFlow 1.3).
  */
 struct l4 {
 
@@ -111,55 +118,29 @@ static struct protocols Protocols;
 
 
 
-/**
- *
- */
-short get_protocol_type_from_data ( )
-{
 
-     // TODO remove this temporary return
-     short i = 0;
-     return i;
-}
-
-
-////// Link layer (L2) functions
+////// Link layer (L1) functions
 
 /**
- * oxm_ofb_match_fields
+ * Return the code of the link layer protocol used in the packet. This method
+ * reads the 13th and 14th bytes from packet data where the protocol code is.
+ * Even protocol codes are in hex format (e.g. 0x0800) it is stored in the
+ * memory in bits, as an interger (e.g. 0x0800 = 2048); this way the returning
+ * value may be compared to l1, l2, l3 and l4 structures fields.
  */
-std::string get_link_layer_protocol ( const derailleur::Event* event )
+const uint16_t get_link_layer_protocol ( const uint8_t* data )
 {
+     uint8_t bytes[2];
 
-     uint16_t protocol = 0;
-     //stringstream ss;
-     std::bitset<16>* bit_code = nullptr;
+     // Copy the 13th and 14th bytes to the bytes array.
+     memcpy ( bytes, data + 12, 2 );
 
-     if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
+     // 1) copy bytes[0] to the leftmost bits of protocol; 2) does an OR 
+     // operation with bytes[1] against the rightmost bits of protocol (all 0)
+     // to concatenate both bytes.
+     uint16_t protocol = ( ( uint16_t ) bytes[0] <<  8 ) |  bytes[1];
 
-          uint8_t bits[2];
-          memcpy ( bits, event->get_data() + 12, 2 );
-
-//           // Copy first uint8_t to the left most bits.
-//           protocol = bits[0] << 8;
-//
-//           // protocol receives the result of the OR operation.
-//           protocol |= bits[1];
-
-          std::bitset<8> byte_0 ( bits[0] );
-          std::bitset<8> byte_1 ( bits[1] );
-
-          std::cout <<  "byte[0] " << byte_0.to_string() << " - byte[1] " <<  byte_1.to_string() <<  std::endl;
-
-          protocol = ( ( uint16_t ) bits[0] <<  8 ) |  bits[1];
-
-          //ss <<  std::setw ( 2 ) << ( int ) protocol;
-          bit_code = new std::bitset<16> ( protocol );
-     }
-
-     //return ss.str();
-     //return (int) protocol;
-     return bit_code->to_string();
+     return protocol;
 }
 
 

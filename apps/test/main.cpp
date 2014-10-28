@@ -32,17 +32,11 @@ public:
      void on_switch_up ( const derailleur::Event* const event ) override {
           derailleur::Switch* s = get_switch_copy ( event->get_switch_id() );
 
-          std::string log ( "on switch up event - MAC " );
+          std::string log ( "on switch up - MAC " );
           log += s->get_mac_address();
+          log += " - connection ID: " + event->get_switch_id();
 
           derailleur::Log::Instance()->log ( "MyApp", log.c_str() );
-
-          std::vector<int> v = get_switches_IDs();
-
-          std::cout << "IDs: ";
-          for ( int i : v )
-               std::cout << i << " ";
-          std::cout << std::endl;
      }
 
      void on_switch_down ( const int switch_id ) override {
@@ -51,27 +45,44 @@ public:
 
      void message_handler ( const derailleur::Event* const event ) override {
 
-          switch ( event->get_type() ) {
+          // packet-in
+          if ( event->get_type() == 10 ) {
 
-          case 10: // packet-in
 
-               derailleur::Log::Instance()->log ( "Test", "packet_in" );
+               fluid_msg::PacketInCommon* packet_in = nullptr;
 
-               std::cout << derailleur::util::get_link_layer_protocol ( event )
-                         << std::endl;
+               if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
+                    packet_in = new fluid_msg::of13::PacketIn();
+                    packet_in->unpack ( event->get_data() );
+               } else {
+                    packet_in = new fluid_msg::of10::PacketIn();
+                    packet_in->unpack ( event->get_data() );
+               }
 
-//                std::cout << "código arp: "
-//                          << derailleur::util::Protocols.link_layer.arp
-//                          << std::endl;
+               uint16_t l1_protocol = derailleur::util::get_link_layer_protocol (
+                                           ( uint8_t* ) packet_in->data()
+                                      );
 
-               break;
+               // Check if neighborhood discovery protocols are used in this
+               // packet: NDP for IPv6 and ARP for IPv4.
+               if ( l1_protocol == derailleur::util::Protocols.link_layer.ipv6 ||
+                    l1_protocol == derailleur::util::Protocols.link_layer.arp )
+                    
 
-          default:
+
+
+                    std::cout << "protocol: "
+                              << derailleur::util::get_link_layer_protocol (
+                                   ( uint8_t* ) packet_in->data() )
+                              << std::endl;
+
+
+          } else {
                derailleur::Log::Instance()->log ( "Test", "unknown" );
-               break;
           }
 
      }
+
 };
 
 
