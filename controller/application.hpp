@@ -102,6 +102,7 @@ public:
 
 
      //// Switch SETTERS
+
      void set_switch_name ( short switch_id, std::string name ) {
           this->mutex_->lock();
           this->stack_ptr_->at ( switch_id )->name_ = name;
@@ -110,6 +111,7 @@ public:
 
 
      //// Switch GETTERS
+
      std::string get_switch_name ( short switch_id ) const {
           this->mutex_->lock();
           std::string aux = this->stack_ptr_->at ( switch_id )->name_;
@@ -190,10 +192,36 @@ public:
      /** Available only in OpenFlow 1.3 switch (possibly 1.3+) */
      uint8_t get_auxiliary_id ( short switch_id );
 
-          
-     
 
+
+     /**
+      * Returns a copy of the switch without connection pointer. This method
+      * copies all values of the switch object, but not the connection pointer
+      * to avoid trying attempts to use a connection pointer that may not exist
+      * anymore due to a disconnection.
+      */
      derailleur::Switch* get_switch_copy ( short switch_id );
+     
+     
+     ////// L2/L3 Switching related methods
+     /**
+      * This method extracts source IP(v4 | v6) and MAC addresses from the data
+      * parameter, check if it is already present in the swith's ARP-like tables; 
+      * if not a new entry is added in the proper table (v4 | v6); if the entry 
+      * exists with the same MAC and IP this method does nothing, otherwise 
+      * overwrites.
+      * 
+      *TODO: comment and implement about installing flow.
+      *
+      * @param switch_id switch identifier
+      * @param data data from an OpenFlow packet; Event class provides the
+      * method get_data() that may be used as parameter when calling this
+      * method.
+      * @return returns true if a new connected device was added to any of the
+      * ARP-like tables; otherwise return false.
+      * @see Event
+      */
+     bool learning_switch ( short switch_id, uint8_t* data );
 
 
 private:

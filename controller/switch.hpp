@@ -237,24 +237,7 @@ public:
       * @return true on success
       */
      virtual short install_flow_table ( ) = 0;
-
-
-
-     ////// L2/L3 Switching related methods
-     /**
-      * This method extracts source IP(v4 | v6) and MAC addresses from the data
-      * parameter, check if it is already present in ARP-like tables; if not a
-      * new entry is added in the proper table (v4 | v6); if the entry exists
-      * with the same MAC and IP this method does nothing, otherwise overwrites.
-      *
-      * @param data data from an OpenFlow packet; Event class provides the
-      * method get_data() that may be used as parameter when calling this
-      * method.
-      * @return returns true if a new connected device was added to any of the
-      * ARP-like tables; otherwise return false.
-      * @see Event
-      */
-     bool learning_switch ( uint8_t* data );
+     
 
 
      /**

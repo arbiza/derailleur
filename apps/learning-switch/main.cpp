@@ -29,8 +29,8 @@ public:
      LearningSwitch ( std::string app_name )
           : derailleur::Application ( app_name ) {}
 
-          
-          
+
+
      void on_switch_up ( const derailleur::Event* const event ) override {
           derailleur::Switch* s = get_switch_copy ( event->get_switch_id() );
 
@@ -42,14 +42,14 @@ public:
                                              log.str().c_str() );
      }
 
-     
-     
+
+
      void on_switch_down ( const int switch_id ) override {
 
      }
 
-     
-     
+
+
      void message_handler ( const derailleur::Event* const event ) override {
 
           // packet-in
@@ -70,22 +70,21 @@ public:
                                            ( uint8_t* ) packet_in->data()
                                       );
 
-               // Check if neighborhood discovery protocols are used in this
-               // packet: NDP for IPv6 and ARP for IPv4.
+               /* Check if neighborhood discovery protocols are used in this
+                * packet: IPv6 (NDP/ICMPv6) or ARP for IPv4. */
                if ( l1_protocol == derailleur::util::Protocols.link_layer.ipv6 ||
-                         l1_protocol == derailleur::util::Protocols.link_layer.arp )
+                         l1_protocol == derailleur::util::Protocols.link_layer.arp ) {
 
-
-
-
-                    std::cout << "protocol: "
-                              << derailleur::util::get_link_layer_protocol (
-                                   ( uint8_t* ) packet_in->data() )
-                              << std::endl;
-
+                    /* learning_switch inherited method extract link and internet
+                     * layers information from packet data, updates switches'
+                     * ARP-like tables (IPv4 and IPv6) and installs the proper
+                     * flow in the switch. */
+                    this->learning_switch ( event->get_switch_id(), packet_in );
+               }
 
           } else {
-               derailleur::Log::Instance()->log ( "Test", "unknown" );
+               derailleur::Log::Instance()->log ( "Learning Switch app",
+                                                  "unknown or unhandled packet" );
           }
 
      }
@@ -105,7 +104,6 @@ int main ( int argc, char *argv[] )
      while ( 1 ) {
           sleep ( 1 );
 
-          //std::cout << "stack size: " << controller.get_stack_size() << std::endl;
      }
 
      return 0;

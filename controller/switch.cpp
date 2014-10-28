@@ -70,12 +70,6 @@ std::string derailleur::Switch::convert_bits_to_mac_address (
 }
 
 
-bool derailleur::Switch::learning_switch ( uint8_t* data )
-{
-     return true;
-}
-
-
 
 // OpenFlow 1.0 Switch
 
