@@ -24,6 +24,10 @@
 # include <sstream>
 # include <cstring>
 
+// TODO remove
+#include <bitset>
+#include <iostream>
+
 # include "event.hpp"
 
 
@@ -54,7 +58,7 @@ enum LENGTH {
 
 
 /**
- * struct l1 contains protocol codes of the Link Layer (first layer of TCP/IP 
+ * struct l1 contains protocol codes of the Link Layer (first layer of TCP/IP
  * model stack).
  */
 struct l1 {
@@ -62,28 +66,28 @@ struct l1 {
 };
 
 /**
- * struct l2 contains protocol codes of the Internet Layer (second layer of 
+ * struct l2 contains protocol codes of the Internet Layer (second layer of
  * TCP/IP model stack).
  */
 struct l2 {
      const char* ipv4 = "0x0800";
-     const char* ipv4 = "0x08dd";
+     const char* ipv6 = "0x08dd";
 };
 
 /**
- * struct l3 contains protocol codes of the Transport Layer (third layer of 
+ * struct l3 contains protocol codes of the Transport Layer (third layer of
  * TCP/IP model stack).
  */
 struct l3 {
-     
+
 };
 
 /**
- * struct l4 contains protocol codes of the Application Layer (fourth layer of 
+ * struct l4 contains protocol codes of the Application Layer (fourth layer of
  * TCP/IP model stack).
  */
 struct l4 {
-     
+
 };
 
 /**
@@ -91,18 +95,18 @@ struct l4 {
  * protocols codes may be used accessing nested instances.
  */
 struct protocols {
-     const struct l1 link_layer;
-     const struct l2 internet_layer;
-     const struct l3 transport_layer;
-     const struct l4 application_layer;
+     struct l1 link_layer;
+     struct l2 internet_layer;
+     struct l3 transport_layer;
+     struct l4 application_layer;
 };
 
 /**
- * Instance of the struct protocols. Protocols codes may be accessed as 
+ * Instance of the struct protocols. Protocols codes may be accessed as
  * following:
  * derailleur::util::Protocols.link_layer.arp;
  */
-static const struct protocols Protocols;
+static struct protocols Protocols;
 
 
 
@@ -124,22 +128,38 @@ short get_protocol_type_from_data ( )
 /**
  * oxm_ofb_match_fields
  */
-short get_link_layer_protocol ( const derailleur::Event* event )
+std::string get_link_layer_protocol ( const derailleur::Event* event )
 {
 
-     short i = 0;
+     uint16_t protocol = 0;
+     //stringstream ss;
+     std::bitset<16>* bit_code = nullptr;
 
      if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
 
-          //uint8_t array[2];
-          uint8_t opcode[2];
-          memcpy ( opcode, event->get_data() + 12, 1 );
-          //memcpy ( opcode + 1, event->get_data() + 13, 1 );
+          uint8_t bits[2];
+          memcpy ( bits, event->get_data() + 12, 2 );
 
-          i = ( short ) opcode[0];
+//           // Copy first uint8_t to the left most bits.
+//           protocol = bits[0] << 8;
+//
+//           // protocol receives the result of the OR operation.
+//           protocol |= bits[1];
+
+          std::bitset<8> byte_0 ( bits[0] );
+          std::bitset<8> byte_1 ( bits[1] );
+
+          std::cout <<  "byte[0] " << byte_0.to_string() << " - byte[1] " <<  byte_1.to_string() <<  std::endl;
+
+          protocol = ( ( uint16_t ) bits[0] <<  8 ) |  bits[1];
+
+          //ss <<  std::setw ( 2 ) << ( int ) protocol;
+          bit_code = new std::bitset<16> ( protocol );
      }
 
-     return i;
+     //return ss.str();
+     //return (int) protocol;
+     return bit_code->to_string();
 }
 
 

@@ -60,9 +60,9 @@ public:
                std::cout << derailleur::util::get_link_layer_protocol ( event )
                          << std::endl;
 
-               std::cout << "código arp: "
-                         << derailleur::util::Protocols.link_layer.arp
-                         << std::endl;
+//                std::cout << "código arp: "
+//                          << derailleur::util::Protocols.link_layer.arp
+//                          << std::endl;
 
                break;
 
