@@ -1,8 +1,8 @@
 ### Project options (set your options here)
 
 
-project(Testing_Derailleur_Controller)
-set(EXECUTABLE testing)
+project(Learning_Switch)
+set(EXECUTABLE learning-switch)
 set(SOURCES main.cpp)
 
 

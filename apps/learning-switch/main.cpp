@@ -15,7 +15,7 @@
 
 #include <iostream>
 #include <vector>
-#include <string>
+#include <sstream>
 
 
 #include "../../derailleur.hpp"
@@ -23,26 +23,33 @@
 #include <unistd.h>
 
 
-class MyApp : public derailleur::Application {
+class LearningSwitch : public derailleur::Application {
 
 public:
-     MyApp ( std::string app_name )
+     LearningSwitch ( std::string app_name )
           : derailleur::Application ( app_name ) {}
 
+          
+          
      void on_switch_up ( const derailleur::Event* const event ) override {
           derailleur::Switch* s = get_switch_copy ( event->get_switch_id() );
 
-          std::string log ( "on switch up - MAC " );
-          log += s->get_mac_address();
-          log += " - connection ID: " + event->get_switch_id();
+          std::stringstream      log;
+          log << "on switch up - MAC " << s->get_mac_address();
+          log << " - connection ID: " << event->get_switch_id();
 
-          derailleur::Log::Instance()->log ( "MyApp", log.c_str() );
+          derailleur::Log::Instance()->log ( "LearningSwitch",
+                                             log.str().c_str() );
      }
 
+     
+     
      void on_switch_down ( const int switch_id ) override {
 
      }
 
+     
+     
      void message_handler ( const derailleur::Event* const event ) override {
 
           // packet-in
@@ -66,8 +73,8 @@ public:
                // Check if neighborhood discovery protocols are used in this
                // packet: NDP for IPv6 and ARP for IPv4.
                if ( l1_protocol == derailleur::util::Protocols.link_layer.ipv6 ||
-                    l1_protocol == derailleur::util::Protocols.link_layer.arp )
-                    
+                         l1_protocol == derailleur::util::Protocols.link_layer.arp )
+
 
 
 
@@ -89,8 +96,8 @@ public:
 int main ( int argc, char *argv[] )
 {
 
-     MyApp myapp ( "Test app" );
-     derailleur::Controller controller ( "0.0.0.0", 6653, 4, false, &myapp,
+     LearningSwitch app ( "Learning Switch app" );
+     derailleur::Controller controller ( "0.0.0.0", 6653, 4, false, &app,
                                          "log.txt" );
 
      controller.start();
