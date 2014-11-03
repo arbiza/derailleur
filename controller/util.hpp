@@ -119,7 +119,11 @@ static struct protocols Protocols;
 
 
 
-////// Link layer (L1) functions
+
+////////////////////////////////////////////////////////////////////////////////
+////// Link layer functions
+////////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * Return the code of the link layer protocol used in the packet. This method
@@ -145,11 +149,11 @@ const uint16_t get_link_layer_protocol ( const uint8_t* data )
 
 
 /**
- * Converts uint8_t* to MAC in hex format.
+ * Extracts destination MAC from data and return in hex formatted string.
  * @param data uint8_t* from packet data; the first 6 bytes contain MAC
  * @return string with MAC (xx:xx:xx:xx:xx:xx)
  */
-std::string convert_bits_to_MAC ( const uint8_t* data )
+std::string get_destination_MAC ( const uint8_t* data )
 {
 
      std::stringstream ss;
@@ -170,11 +174,37 @@ std::string convert_bits_to_MAC ( const uint8_t* data )
 
 
 /**
+ * Extracts source MAC from data and return in hex formatted string.
+ * @param data uint8_t* from packet data; 6 to 12 first bytes contain source MAC
+ * @return string with MAC (xx:xx:xx:xx:xx:xx)
+ */
+std::string get_source_MAC ( const uint8_t* data )
+{
+
+     std::stringstream ss;
+     ss << std::hex << std::setfill ( '0' );
+
+     uint8_t array[LENGTH::mac];
+     memcpy ( array, data + 6, LENGTH::mac );
+
+     for ( short i = 0; i < 6; i++ ) {
+          ss <<  std::setw ( 2 ) << ( int ) array[i];
+
+          if ( i < 5 )
+          ss << ":";
+       }
+
+     return ss.str();
+}
+
+
+
+/**
  * Converts MAC stored in a string to an uint8_t vector.
  * @param mac string containing MAC (xx:xx:xx:xx:xx:xx)
  * @return uint8_t* each position contains a MAC byte
  */
-uint8_t* convert_MAC_to_bits ( const std::string* mac )
+uint8_t* MAC_converter ( const std::string* mac )
 {
 
      uint8_t* array = new uint8_t[LENGTH::mac];
@@ -189,7 +219,15 @@ uint8_t* convert_MAC_to_bits ( const std::string* mac )
 }
 
 
-////// Network layer (L3) functions
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+////// Network layer functions
+////////////////////////////////////////////////////////////////////////////////
+
+
 
 /**
  * Returns the IP version of the received packet.
@@ -206,19 +244,29 @@ short get_ip_version ( const uint8_t* data )
 /**
  *
  */
-uint8_t* convert_ipv4_to_bits ( const std::string ipv4 )
+uint16_t* ipv6_converter ( const std::string ipv6 )
 {
-     uint8_t* ip = new uint8_t[LENGTH::ipv4];
-
+     uint16_t* ip = new uint16_t[LENGTH::ipv6];
      return ip;
 }
 
 /**
  *
  */
-uint16_t* convert_ipv6_to_bits ( const std::string ipv6 )
+std::string ipv6_converter ( const uint16_t* ipv6_array )
 {
-     uint16_t* ip = new uint16_t[LENGTH::ipv6];
+     std::string ip;
+     return ip;
+}
+
+
+/**
+ *
+ */
+uint8_t* ipv4_converter ( const std::string ipv4 )
+{
+     uint8_t* ip = new uint8_t[LENGTH::ipv4];
+
      return ip;
 }
 
@@ -226,20 +274,13 @@ uint16_t* convert_ipv6_to_bits ( const std::string ipv6 )
 /**
  * // TODO consider L3 protocol (e.g. ARP,  IP, ICMP); may change fields positions.
  */
-std::string convert_ipv4_to_string ( const uint8_t* ipv4_array )
+std::string ipv4_converter ( const uint8_t* ipv4_array )
 {
      std::string ip;
      return ip;
 }
 
-/**
- *
- */
-std::string convert_ipv6_to_string ( const uint16_t* ipv6_array )
-{
-     std::string ip;
-     return ip;
-}
+
 
 
 
@@ -250,7 +291,7 @@ std::string convert_ipv6_to_string ( const uint16_t* ipv6_array )
  * Extracts the IPv4 address bits from data and converts it to uint8_t array.
  * @return uint8_t[4] with fields of IPv4 address
  */
-uint8_t* get_source_ipv4_in_bits ( const uint8_t* data )
+uint8_t* get_source_ipv4 ( const uint8_t* data )
 {
      uint8_t* ip = new uint8_t[LENGTH::ipv4];
      return ip;
@@ -260,7 +301,7 @@ uint8_t* get_source_ipv4_in_bits ( const uint8_t* data )
  * Extracts the IPv6 address bits from data and converts it to uint16_t array.
  * @return uint16_t[8] with fields of IPv6 address
  */
-uint16_t* get_source_ipv6_in_bits ( const uint8_t* data )
+uint16_t* get_source_ipv6 ( const uint8_t* data )
 {
      uint16_t* ip = new uint16_t[LENGTH::ipv6];
      return ip;
@@ -272,7 +313,7 @@ uint16_t* get_source_ipv6_in_bits ( const uint8_t* data )
 /**
  *
  */
-uint8_t* get_destination_ipv4_in_bits ( const uint8_t* data )
+uint8_t* get_destination_ipv4 ( const uint8_t* data )
 {
      uint8_t* ip = new uint8_t[LENGTH::ipv4];
      return ip;
@@ -281,7 +322,7 @@ uint8_t* get_destination_ipv4_in_bits ( const uint8_t* data )
 /**
  *
  */
-uint16_t* get_destination_ipv6_in_bits ( const uint8_t* data )
+uint16_t* get_destination_ipv6 ( const uint8_t* data )
 {
      uint16_t* ip = new uint16_t[LENGTH::ipv6];
      return ip;
@@ -298,10 +339,10 @@ std::string get_source_ip ( const uint8_t* data )
 
      if ( get_ip_version ( data ) ==  IP::v6 ) {
           uint16_t* ipv6 = get_source_ipv6_in_bits ( data );
-          ip = convert_ipv6_to_string ( ipv6 );
+          ip = ipv6_to_string ( ipv6 );
      } else {
           uint8_t* ipv4 = get_source_ipv4_in_bits ( data );
-          ip = convert_ipv4_to_string ( ipv4 );
+          ip = ipv4_to_string ( ipv4 );
      }
      return ip;
 }
