@@ -245,8 +245,9 @@ public:
       */
      std::list<Arp4> get_IPv4_neighborhood () {
           this->mutex_.lock();
-          return arp_table_v4_;
+          std::list<Arp4> arp = this->arp_table_v4_;
           this->mutex_.unlock();
+          return arp;
      }
 
      /**
@@ -254,8 +255,9 @@ public:
       */
      std::list<Arp6> get_IPv6_neighborhood () {
           this->mutex_.lock();
-          return arp_table_v6_;
+          std::list<Arp6> arp = this->arp_table_v6_;
           this->mutex_.unlock();
+          return arp;
      }
 
 

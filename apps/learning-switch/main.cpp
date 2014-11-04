@@ -79,7 +79,8 @@ public:
                      * layers information from packet data, updates switches'
                      * ARP-like tables (IPv4 and IPv6) and installs the proper
                      * flow in the switch. */
-                    this->learning_switch ( event->get_switch_id(), packet_in );
+                    this->learning_switch ( event->get_switch_id(),
+                                            packet_in );
                }
 
           } else {

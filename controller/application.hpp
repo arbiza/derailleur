@@ -27,6 +27,12 @@
 #include "switch.hpp"
 
 
+namespace fluid_msg {
+
+// Forward declarations
+class PacketInCommon;
+}
+
 
 namespace derailleur {
 
@@ -201,27 +207,28 @@ public:
       * anymore due to a disconnection.
       */
      derailleur::Switch* get_switch_copy ( short switch_id );
-     
-     
+
+
      ////// L2/L3 Switching related methods
      /**
       * This method extracts source IP(v4 | v6) and MAC addresses from the data
-      * parameter, check if it is already present in the swith's ARP-like tables; 
-      * if not a new entry is added in the proper table (v4 | v6); if the entry 
-      * exists with the same MAC and IP this method does nothing, otherwise 
+      * parameter, check if it is already present in the swith's ARP-like tables;
+      * if not a new entry is added in the proper table (v4 | v6); if the entry
+      * exists with the same MAC and IP this method does nothing, otherwise
       * overwrites.
-      * 
+      *
       *TODO: comment and implement about installing flow.
       *
       * @param switch_id switch identifier
-      * @param data data from an OpenFlow packet; Event class provides the
-      * method get_data() that may be used as parameter when calling this
+      * @param data data from an OpenFlow packet; Packet_in class from libfluid
+      * provides the data() method that may be used as parameter when calling this
       * method.
       * @return returns true if a new connected device was added to any of the
       * ARP-like tables; otherwise return false.
       * @see Event
       */
-     bool learning_switch ( short switch_id, uint8_t* data );
+     bool learning_switch ( short switch_id,
+                            fluid_msg::PacketInCommon* packet_in );
 
 
 private:

@@ -89,3 +89,37 @@ derailleur::Switch* derailleur::Application::get_switch_copy ( short int switch_
 
      return s;
 }
+
+
+bool derailleur::Application::learning_switch ( short int switch_id,
+          fluid_msg::PacketInCommon* packet_in )
+{
+     uint8_t ip_version;
+     
+     // OpenFlow 1.3
+     if ( packet_in->version() ==  fluid_msg::of13::OFP_VERSION ) {
+          
+          /* TODO:
+           *   - check ip version
+           *   - get switch arp
+           *   - check if source in known (does IP and MAC match?):
+           *     - no: store de source in ARP table
+           *     - yes: check destination (if unknown, store)
+           *   - set flow
+           */
+          
+          
+          /* At first, it checks if the source is unknown; */
+          
+          /* Second, checks if the destination is unknown. If the switch knows
+           * the destination, it does not need to flood to discover the 
+           * destination. */
+          
+     }
+     // OpenFlow 1.0
+     else if ( packet_in->version() ==  fluid_msg::of10::OFP_VERSION ) {
+          
+     }
+    
+     return true;
+}

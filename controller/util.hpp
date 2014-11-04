@@ -117,6 +117,7 @@ static struct protocols Protocols;
 
 
 
+
 // Functions interfaces
 //==============================================================================
 
@@ -194,14 +195,27 @@ std::string ipv4_converter ( const uint8_t* ipv4_array );
 
 
 /**
- * Extracts the IPv4 address bits from data and converts it to uint8_t array.
+ * Return the source IP (v4 | v6) address contained in data parameter.
+ * @return string with IP address formatted according its version (4 | 6).
+ */
+std::string get_source_ip ( const uint8_t* data );
+
+
+/**
+ *
+ */
+std::string get_destination_ip ( const uint8_t* data );
+
+
+/**
+ * Extracts the IPv4 address from data and converts it to uint8_t array.
  * @return uint8_t[4] with fields of IPv4 address
  */
 uint8_t* get_source_ipv4 ( const uint8_t* data );
 
 
 /**
- * Extracts the IPv6 address bits from data and converts it to uint16_t array.
+ * Extracts the IPv6 address bits data and converts it to uint16_t array.
  * @return uint16_t[8] with fields of IPv6 address
  */
 uint16_t* get_source_ipv6 ( const uint8_t* data );
@@ -217,19 +231,6 @@ uint8_t* get_destination_ipv4 ( const uint8_t* data );
  *
  */
 uint16_t* get_destination_ipv6 ( const uint8_t* data );
-
-
-/**
- * Return the source IP (v4 | v6) address contained in data parameter.
- * @return string with IP address formatted according its version (4 | 6).
- */
-std::string get_source_ip ( const uint8_t* data );
-
-
-/**
- *
- */
-std::string get_destination_ip ( const uint8_t* data );
 
 
 
@@ -384,13 +385,11 @@ std::string get_source_ip ( const uint8_t* data )
 {
      std::string ip;
 
-     if ( get_ip_version ( data ) ==  IP::v6 ) {
-          uint16_t* ipv6 = get_source_ipv6_in_bits ( data );
-          ip = ipv6_to_string ( ipv6 );
-     } else {
-          uint8_t* ipv4 = get_source_ipv4_in_bits ( data );
-          ip = ipv4_to_string ( ipv4 );
-     }
+     if ( get_ip_version ( data ) ==  IP::v6 )
+          ip = ipv6_converter ( get_source_ipv6 ( data ) );
+     else
+          ip = ipv4_converter ( get_source_ipv4 ( data ) );
+
      return ip;
 }
 
