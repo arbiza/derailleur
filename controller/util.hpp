@@ -63,7 +63,7 @@ enum LENGTH {
  */
 struct l1 {
      const uint16_t arp = 0x0806;
-     
+
      /**
       * IPv6 also appear here in link layer protocols because in IPv6 networks
       * neighborhood discovery is made by NDP (Neighbor Discovery Protocol) that
@@ -117,12 +117,12 @@ static struct protocols Protocols;
 
 
 
+// Functions interfaces
+//==============================================================================
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-////// Link layer functions
-////////////////////////////////////////////////////////////////////////////////
+// Link layer functions  =======================================================
 
 
 /**
@@ -132,6 +132,113 @@ static struct protocols Protocols;
  * memory in bits, as an interger (e.g. 0x0800 = 2048); this way the returning
  * value may be compared to l1, l2, l3 and l4 structures fields.
  */
+const uint16_t get_link_layer_protocol ( const uint8_t* data );
+
+
+/**
+ * Extracts destination MAC from data and return in hex formatted string.
+ * @param data uint8_t* from packet data; the first 6 bytes contain MAC
+ * @return string with MAC (xx:xx:xx:xx:xx:xx)
+ */
+std::string get_destination_MAC ( const uint8_t* data );
+
+
+/**
+ * Extracts source MAC from data and return in hex formatted string.
+ * @param data uint8_t* from packet data; 6 to 12 first bytes contain source MAC
+ * @return string with MAC (xx:xx:xx:xx:xx:xx)
+ */
+std::string get_source_MAC ( const uint8_t* data );
+
+
+/**
+ * Converts MAC stored in a string to an uint8_t vector.
+ * @param mac string containing MAC (xx:xx:xx:xx:xx:xx)
+ * @return uint8_t* each position contains a MAC byte
+ */
+uint8_t* MAC_converter ( const std::string* mac );
+
+
+// Network layer functions  ====================================================
+
+
+/**
+ * Returns the IP version of the received packet.
+ * @param data Data sent in the packet where physical and network addresses are.
+ */
+short get_ip_version ( const uint8_t* data );
+
+
+/**
+ *
+ */
+uint16_t* ipv6_converter ( const std::string ipv6 );
+
+
+/**
+ *
+ */
+std::string ipv6_converter ( const uint16_t* ipv6_array );
+
+
+/**
+ *
+ */
+uint8_t* ipv4_converter ( const std::string ipv4 );
+
+
+/**
+ * // TODO consider L3 protocol (e.g. ARP,  IP, ICMP); may change fields positions.
+ */
+std::string ipv4_converter ( const uint8_t* ipv4_array );
+
+
+/**
+ * Extracts the IPv4 address bits from data and converts it to uint8_t array.
+ * @return uint8_t[4] with fields of IPv4 address
+ */
+uint8_t* get_source_ipv4 ( const uint8_t* data );
+
+
+/**
+ * Extracts the IPv6 address bits from data and converts it to uint16_t array.
+ * @return uint16_t[8] with fields of IPv6 address
+ */
+uint16_t* get_source_ipv6 ( const uint8_t* data );
+
+
+/**
+ *
+ */
+uint8_t* get_destination_ipv4 ( const uint8_t* data );
+
+
+/**
+ *
+ */
+uint16_t* get_destination_ipv6 ( const uint8_t* data );
+
+
+/**
+ * Return the source IP (v4 | v6) address contained in data parameter.
+ * @return string with IP address formatted according its version (4 | 6).
+ */
+std::string get_source_ip ( const uint8_t* data );
+
+
+/**
+ *
+ */
+std::string get_destination_ip ( const uint8_t* data );
+
+
+
+//==============================================================================
+
+
+
+
+
 const uint16_t get_link_layer_protocol ( const uint8_t* data )
 {
      uint8_t bytes[2];
@@ -139,7 +246,7 @@ const uint16_t get_link_layer_protocol ( const uint8_t* data )
      // Copy the 13th and 14th bytes to the bytes array.
      memcpy ( bytes, data + 12, 2 );
 
-     // 1) copy bytes[0] to the leftmost bits of protocol; 2) does an OR 
+     // 1) copy bytes[0] to the leftmost bits of protocol; 2) does an OR
      // operation with bytes[1] against the rightmost bits of protocol (all 0)
      // to concatenate both bytes.
      uint16_t protocol = ( ( uint16_t ) bytes[0] <<  8 ) |  bytes[1];
@@ -148,11 +255,7 @@ const uint16_t get_link_layer_protocol ( const uint8_t* data )
 }
 
 
-/**
- * Extracts destination MAC from data and return in hex formatted string.
- * @param data uint8_t* from packet data; the first 6 bytes contain MAC
- * @return string with MAC (xx:xx:xx:xx:xx:xx)
- */
+
 std::string get_destination_MAC ( const uint8_t* data )
 {
 
@@ -173,11 +276,7 @@ std::string get_destination_MAC ( const uint8_t* data )
 }
 
 
-/**
- * Extracts source MAC from data and return in hex formatted string.
- * @param data uint8_t* from packet data; 6 to 12 first bytes contain source MAC
- * @return string with MAC (xx:xx:xx:xx:xx:xx)
- */
+
 std::string get_source_MAC ( const uint8_t* data )
 {
 
@@ -191,19 +290,14 @@ std::string get_source_MAC ( const uint8_t* data )
           ss <<  std::setw ( 2 ) << ( int ) array[i];
 
           if ( i < 5 )
-          ss << ":";
-       }
+               ss << ":";
+     }
 
      return ss.str();
 }
 
 
 
-/**
- * Converts MAC stored in a string to an uint8_t vector.
- * @param mac string containing MAC (xx:xx:xx:xx:xx:xx)
- * @return uint8_t* each position contains a MAC byte
- */
 uint8_t* MAC_converter ( const std::string* mac )
 {
 
@@ -219,20 +313,6 @@ uint8_t* MAC_converter ( const std::string* mac )
 }
 
 
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-////// Network layer functions
-////////////////////////////////////////////////////////////////////////////////
-
-
-
-/**
- * Returns the IP version of the received packet.
- * @param data Data sent in the packet where physical and network addresses are.
- */
 short get_ip_version ( const uint8_t* data )
 {
      // TODO remove this temporary return
@@ -241,18 +321,14 @@ short get_ip_version ( const uint8_t* data )
 }
 
 
-/**
- *
- */
 uint16_t* ipv6_converter ( const std::string ipv6 )
 {
      uint16_t* ip = new uint16_t[LENGTH::ipv6];
      return ip;
 }
 
-/**
- *
- */
+
+
 std::string ipv6_converter ( const uint16_t* ipv6_array )
 {
      std::string ip;
@@ -260,9 +336,6 @@ std::string ipv6_converter ( const uint16_t* ipv6_array )
 }
 
 
-/**
- *
- */
 uint8_t* ipv4_converter ( const std::string ipv4 )
 {
      uint8_t* ip = new uint8_t[LENGTH::ipv4];
@@ -271,9 +344,7 @@ uint8_t* ipv4_converter ( const std::string ipv4 )
 }
 
 
-/**
- * // TODO consider L3 protocol (e.g. ARP,  IP, ICMP); may change fields positions.
- */
+
 std::string ipv4_converter ( const uint8_t* ipv4_array )
 {
      std::string ip;
@@ -281,26 +352,13 @@ std::string ipv4_converter ( const uint8_t* ipv4_array )
 }
 
 
-
-
-
-
-//// Source IP
-
-/**
- * Extracts the IPv4 address bits from data and converts it to uint8_t array.
- * @return uint8_t[4] with fields of IPv4 address
- */
 uint8_t* get_source_ipv4 ( const uint8_t* data )
 {
      uint8_t* ip = new uint8_t[LENGTH::ipv4];
      return ip;
 }
 
-/**
- * Extracts the IPv6 address bits from data and converts it to uint16_t array.
- * @return uint16_t[8] with fields of IPv6 address
- */
+
 uint16_t* get_source_ipv6 ( const uint8_t* data )
 {
      uint16_t* ip = new uint16_t[LENGTH::ipv6];
@@ -308,20 +366,13 @@ uint16_t* get_source_ipv6 ( const uint8_t* data )
 }
 
 
-//// Destination IP
-
-/**
- *
- */
 uint8_t* get_destination_ipv4 ( const uint8_t* data )
 {
      uint8_t* ip = new uint8_t[LENGTH::ipv4];
      return ip;
 }
 
-/**
- *
- */
+
 uint16_t* get_destination_ipv6 ( const uint8_t* data )
 {
      uint16_t* ip = new uint16_t[LENGTH::ipv6];
@@ -329,10 +380,6 @@ uint16_t* get_destination_ipv6 ( const uint8_t* data )
 }
 
 
-/**
- * Return the source IP (v4 | v6) address contained in data parameter.
- * @return string with IP address formatted according its version (4 | 6).
- */
 std::string get_source_ip ( const uint8_t* data )
 {
      std::string ip;
@@ -348,9 +395,6 @@ std::string get_source_ip ( const uint8_t* data )
 }
 
 
-/**
- *
- */
 std::string get_destination_ip ( const uint8_t* data )
 {
      std::string ip;
@@ -359,11 +403,7 @@ std::string get_destination_ip ( const uint8_t* data )
 
 
 
-////// Data layer functions
-
-
-
-}                                                           // namespace util
+} // namespace util
 } // namespace derailleur
 
 #endif // _FLOW_H
