@@ -71,6 +71,49 @@ std::string derailleur::Switch::convert_bits_to_mac_address (
 
 
 
+bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4 entry )
+{
+
+     bool matched = false;
+     bool new_device = false;
+
+     this->mutex_.lock();
+
+     for ( Arp4 each : arp_table_v4_ ) {
+
+          /* If entry already exists. */
+          if ( each.mac == entry.mac && each.ip == entry.ip ) {
+               matched = true;
+          } else {
+
+               /* Check if MAC, IP or port are already in the table; if yes table
+                * entry will be updated. */
+               if ( each.mac == entry.mac || each.ip == entry.ip )
+                    if ( !matched ) {
+                         each.ip = entry.ip;
+                         each.mac = entry.mac;
+                         matched = true;
+                         new_device = true;
+                    }
+                    else
+                         arp_table_v4_.erase( each );
+          }
+     }
+
+     /* If entry did not match, it is a new device. */
+     if ( !matched ) {
+        arp_table_v4_.push_back ( entry );
+        new_device = true;  
+     }
+
+     this->mutex_.unlock();
+     
+     return new_device;
+}
+
+
+
+
 // OpenFlow 1.0 Switch
 
 short derailleur::Switch10::install_flow ( fluid_msg::FlowModCommon* flow,

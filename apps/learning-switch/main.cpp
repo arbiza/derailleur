@@ -66,22 +66,12 @@ public:
                     packet_in->unpack ( event->get_data() );
                }
 
-               uint16_t l1_protocol = derailleur::util::get_link_layer_protocol (
-                                           ( uint8_t* ) packet_in->data()
-                                      );
 
-               /* Check if neighborhood discovery protocols are used in this
-                * packet: IPv6 (NDP/ICMPv6) or ARP for IPv4. */
-               if ( l1_protocol == derailleur::util::Protocols.link_layer.ipv6 ||
-                         l1_protocol == derailleur::util::Protocols.link_layer.arp ) {
-
-                    /* learning_switch inherited method extract link and internet
-                     * layers information from packet data, updates switches'
-                     * ARP-like tables (IPv4 and IPv6) and installs the proper
-                     * flow in the switch. */
-                    this->learning_switch ( event->get_switch_id(),
-                                            packet_in );
-               }
+               /* learning_switch inherited method extract link and internet
+                * layers information from packet data, updates switches'
+                * ARP-like tables (IPv4 and IPv6) and installs the proper
+                * flow in the switch. */
+               this->learning_switch ( event->get_switch_id(), packet_in );
 
           } else {
                derailleur::Log::Instance()->log ( "Learning Switch app",

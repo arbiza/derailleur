@@ -112,7 +112,6 @@ typedef struct capabilities_13 {
 typedef struct arp6 {
      uint16_t ip[8];
      uint8_t mac[6];
-     uint32_t port;
 } Arp6;
 
 /**
@@ -123,7 +122,6 @@ typedef struct arp6 {
 typedef struct arp4 {
      uint8_t ip[4];
      uint8_t mac[6];
-     uint32_t port;
 } Arp4;
 
 
@@ -371,6 +369,25 @@ private:
      void set_null_connection_ptr () {
           this->connection_ = nullptr;
      }
+     
+     
+     /**
+      * Checks if there is an entry in the IPv4 ARP-like table for a new device.
+      * It is private and is primarily used by Application class.
+      * @param entry Arp4 struct containing MAC, IPv4 and port.
+      * @return true if a new entry was added; false if not.
+      */
+     bool set_IPv4_neighbor (Arp4 entry);
+     
+     
+     /**
+      * Checks if there is an entry in the IPv6 ARP-like table for a new device.
+      * It is private and is primarily used by Application class.
+      * @param entry Arp4 struct containing MAC, IPv6 and port.
+      * @return true if a new entry was added; false if not.
+      */
+     bool set_IPv6_neighbor (Arp6 entry);
+     
 
      /**
       * Controller is a friend class because they creates switch objects and

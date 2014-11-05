@@ -4,6 +4,7 @@
 #include <fluid/of13msg.hh>
 
 #include "application.hpp"
+#include "util.hpp"
 
 
 std::vector< int > derailleur::Application::get_switches_IDs()
@@ -94,32 +95,56 @@ derailleur::Switch* derailleur::Application::get_switch_copy ( short int switch_
 bool derailleur::Application::learning_switch ( short int switch_id,
           fluid_msg::PacketInCommon* packet_in )
 {
-     uint8_t ip_version;
-     
-     // OpenFlow 1.3
-     if ( packet_in->version() ==  fluid_msg::of13::OFP_VERSION ) {
-          
-          /* TODO:
-           *   - check ip version
-           *   - get switch arp
-           *   - check if source in known (does IP and MAC match?):
-           *     - no: store de source in ARP table
-           *     - yes: check destination (if unknown, store)
-           *   - set flow
-           */
-          
-          
-          /* At first, it checks if the source is unknown; */
-          
-          /* Second, checks if the destination is unknown. If the switch knows
-           * the destination, it does not need to flood to discover the 
-           * destination. */
-          
+     uint16_t link_layer = derailleur::util::get_link_layer_protocol (
+                                ( uint8_t* ) packet_in->data() );
+
+     /* Check if the link layer protocol is IPv6 (NDP/ICMPv6) */
+     if ( link_layer == derailleur::util::Protocols.link_layer.ipv6 ) {
+
      }
-     // OpenFlow 1.0
-     else if ( packet_in->version() ==  fluid_msg::of10::OFP_VERSION ) {
+     /* Check if the link layer protocol is ARP (used for neighborhood
+      * discovering in IPv4). */
+     else if ( link_layer == derailleur::util::Protocols.link_layer.arp ) {
           
+          derailleur::Arp4 arp_entry;
+          
+          memcpy ( arp_entry.mac, packet_in->data() + 6, 6 );
+          memcpy ( arp_entry.ip, packet_in->data() + 90, 4 );
+          
+          stack_ptr_->at( switch_id ).set_IPv4_neighbor( arp_entry );
+
      }
-    
+     /* If neither ARP of ICMPv6 are used return false because it is not
+      * a neighborhood discovering operation. */
+     else {
+          return false;
+     }
+
+
+//      // OpenFlow 1.3
+//      if ( packet_in->version() ==  fluid_msg::of13::OFP_VERSION ) {
+//
+//           /* TODO:
+//            *   - check ip version - OK
+//            *   - get switch arp
+//            *   - check if source in known (does IP and MAC match?):
+//            *     - no: store de source in ARP table
+//            *     - yes: check destination (if unknown, store)
+//            *   - set flow
+//            */
+//
+//
+//           /* At first, it checks if the source is unknown; */
+//
+//           /* Second, checks if the destination is unknown. If the switch knows
+//            * the destination, it does not need to flood to discover the
+//            * destination. */
+//
+//      }
+//      // OpenFlow 1.0
+//      else if ( packet_in->version() ==  fluid_msg::of10::OFP_VERSION ) {
+//
+//      }
+
      return true;
 }
