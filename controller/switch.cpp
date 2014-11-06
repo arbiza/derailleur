@@ -71,7 +71,7 @@ std::string derailleur::Switch::convert_bits_to_mac_address (
 
 
 
-bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4 entry )
+bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4* entry )
 {
 
      bool matched = false;
@@ -79,35 +79,42 @@ bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4 entry )
 
      this->mutex_.lock();
 
-     for ( Arp4 each : arp_table_v4_ ) {
+     //for ( Arp4 each : arp_table_v4_ ) {
+     for ( std::list<Arp4>::iterator it = arp_table_v4_.begin();
+               it != arp_table_v4_.end(); ++it ) {
 
           /* If entry already exists. */
-          if ( each.mac == entry.mac && each.ip == entry.ip ) {
+          if ( derailleur::util::compare_byte_arrays ( it->mac, entry->mac, 6 )
+                    &&
+                    derailleur::util::compare_byte_arrays ( it->ip, entry->ip, 6 ) ) {
                matched = true;
           } else {
 
                /* Check if MAC, IP or port are already in the table; if yes table
                 * entry will be updated. */
-               if ( each.mac == entry.mac || each.ip == entry.ip )
+               if ( derailleur::util::compare_byte_arrays ( it->mac, entry->mac, 6 )
+                         ||
+                         derailleur::util::compare_byte_arrays ( it->ip, entry->ip, 6 ) ) {
                     if ( !matched ) {
-                         each.ip = entry.ip;
-                         each.mac = entry.mac;
+                         memcpy ( it->ip, entry->ip, 4 );
+                         memcpy ( it->mac, entry->mac, 6 );
                          matched = true;
                          new_device = true;
+                    } else {
+                         arp_table_v4_.erase ( it );
                     }
-                    else
-                         arp_table_v4_.erase( each );
+               }
           }
      }
 
      /* If entry did not match, it is a new device. */
      if ( !matched ) {
-        arp_table_v4_.push_back ( entry );
-        new_device = true;  
+          arp_table_v4_.push_back ( *entry );
+          new_device = true;
      }
 
      this->mutex_.unlock();
-     
+
      return new_device;
 }
 

@@ -108,10 +108,10 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           
           derailleur::Arp4 arp_entry;
           
-          memcpy ( arp_entry.mac, packet_in->data() + 6, 6 );
-          memcpy ( arp_entry.ip, packet_in->data() + 90, 4 );
+          memcpy ( arp_entry.mac, (uint8_t*) packet_in->data() + 6, 6 );
+          memcpy ( arp_entry.ip, (uint8_t*) packet_in->data() + 90, 4 );
           
-          stack_ptr_->at( switch_id ).set_IPv4_neighbor( arp_entry );
+          stack_ptr_->at( switch_id )->set_IPv4_neighbor( &arp_entry );
 
      }
      /* If neither ARP of ICMPv6 are used return false because it is not

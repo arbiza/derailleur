@@ -377,7 +377,7 @@ private:
       * @param entry Arp4 struct containing MAC, IPv4 and port.
       * @return true if a new entry was added; false if not.
       */
-     bool set_IPv4_neighbor (Arp4 entry);
+     bool set_IPv4_neighbor (Arp4* entry);
      
      
      /**
