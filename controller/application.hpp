@@ -207,6 +207,7 @@ public:
       * anymore due to a disconnection.
       */
      derailleur::Switch* get_switch_copy ( short switch_id );
+     void get_switch_copy ( short switch_id, derailleur::Switch& other );
 
 
      ////// L2/L3 Switching related methods
@@ -229,6 +230,20 @@ public:
       */
      bool learning_switch ( short switch_id,
                             fluid_msg::PacketInCommon* packet_in );
+                            
+                            
+     /**
+      * Returns a copy of the ARP-like table for IPv4 connections of switch 
+      * identified by parameter switch_id.
+      */
+     std::list<derailleur::Arp4> get_IPv4_neighborhood ( short switch_id );
+     
+
+     /**
+      * Returns a copy of the ARP-like table for IPv6 connections of switch 
+      * identified by parameter switch_id.
+      */
+     std::list<derailleur::Arp6> get_IPv6_neighborhood ( short switch_id );
 
 
 private:

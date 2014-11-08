@@ -2,11 +2,14 @@
 # include <sstream>
 # include <cstring>
 
+#include "util.hpp"
+
 
 // Link layer functions  =======================================================
 
 
-const uint16_t get_link_layer_protocol ( const uint8_t* data )
+const uint16_t derailleur::util::get_link_layer_protocol ( 
+     const uint8_t* data )
 {
      uint8_t bytes[2];
 
@@ -22,7 +25,7 @@ const uint16_t get_link_layer_protocol ( const uint8_t* data )
 }
 
 
-std::string get_destination_MAC ( const uint8_t* data )
+std::string derailleur::util::get_destination_MAC ( const uint8_t* data )
 {
 
      std::stringstream ss;
@@ -42,7 +45,7 @@ std::string get_destination_MAC ( const uint8_t* data )
 }
 
 
-std::string get_source_MAC ( const uint8_t* data )
+std::string derailleur::util::get_source_MAC ( const uint8_t* data )
 {
 
      std::stringstream ss;
@@ -63,7 +66,7 @@ std::string get_source_MAC ( const uint8_t* data )
 
 
 
-uint8_t* MAC_converter ( const std::string* mac )
+uint8_t* derailleur::util::MAC_converter ( const std::string* mac )
 {
 
      uint8_t* array = new uint8_t[LENGTH::mac];
@@ -78,10 +81,30 @@ uint8_t* MAC_converter ( const std::string* mac )
 }
 
 
+std::string derailleur::util::MAC_converter ( const uint8_t* mac )
+{
+     std::stringstream ss;
+     ss << std::hex << std::setfill ( '0' );
+
+     uint8_t array[LENGTH::mac];
+     memcpy ( array, mac, LENGTH::mac );
+
+     for ( short i = 0; i < 6; i++ ) {
+          ss <<  std::setw ( 2 ) << ( int ) array[i];
+
+          if ( i < 5 )
+          ss << ":";
+       }
+
+     return ss.str();
+}
+
+
+
 // Network layer functions  ====================================================
 
 
-short get_ip_version ( const uint8_t* data )
+short derailleur::util::get_ip_version ( const uint8_t* data )
 {
 
      return 0;                                              // TODO: fix it
@@ -89,7 +112,7 @@ short get_ip_version ( const uint8_t* data )
 
 
 
-uint16_t* ipv6_converter ( const std::string ipv6 )
+uint16_t* derailleur::util::ipv6_converter ( const std::string ipv6 )
 {
      uint16_t* ip = new uint16_t[LENGTH::ipv6];
      return ip;
@@ -97,7 +120,7 @@ uint16_t* ipv6_converter ( const std::string ipv6 )
 
 
 
-std::string ipv6_converter ( const uint16_t* ipv6_array )
+std::string derailleur::util::ipv6_converter ( const uint16_t* ipv6_array )
 {
      std::string ip;
      return ip;
@@ -105,7 +128,7 @@ std::string ipv6_converter ( const uint16_t* ipv6_array )
 
 
 
-uint8_t* ipv4_converter ( const std::string ipv4 )
+uint8_t* derailleur::util::ipv4_converter ( const std::string ipv4 )
 {
 
      uint8_t* ip = new uint8_t[4];
@@ -114,7 +137,7 @@ uint8_t* ipv4_converter ( const std::string ipv4 )
 
 
 
-std::string ipv4_converter ( const uint8_t* ipv4_array )
+std::string derailleur::util::ipv4_converter ( const uint8_t* ipv4_array )
 {
      std::string ip;
      return ip;
@@ -122,7 +145,7 @@ std::string ipv4_converter ( const uint8_t* ipv4_array )
 
 
 
-std::string get_destination_ip ( const uint8_t* data )
+std::string derailleur::util::get_destination_ip ( const uint8_t* data )
 {
      std::string ip;
      return ip;
@@ -130,7 +153,7 @@ std::string get_destination_ip ( const uint8_t* data )
 
 
 
-uint8_t* get_source_ipv4 ( const uint8_t* data )
+uint8_t* derailleur::util::get_source_ipv4 ( const uint8_t* data )
 {
 
      uint8_t* ip = new uint8_t[4];
@@ -139,7 +162,7 @@ uint8_t* get_source_ipv4 ( const uint8_t* data )
 
 
 
-uint16_t* get_source_ipv6 ( const uint8_t* data )
+uint16_t* derailleur::util::get_source_ipv6 ( const uint8_t* data )
 {
 
      uint16_t* ip = new uint16_t[4];
@@ -148,7 +171,7 @@ uint16_t* get_source_ipv6 ( const uint8_t* data )
 
 
 
-std::string get_source_ip ( const uint8_t* data )
+std::string derailleur::util::get_source_ip ( const uint8_t* data )
 {
      std::string ip;
 
@@ -162,7 +185,7 @@ std::string get_source_ip ( const uint8_t* data )
 
 
 
-uint8_t* get_destination_ipv4 ( const uint8_t* data )
+uint8_t* derailleur::util::get_destination_ipv4 ( const uint8_t* data )
 {
 
      uint8_t* ip = new uint8_t[4];
@@ -171,7 +194,7 @@ uint8_t* get_destination_ipv4 ( const uint8_t* data )
 
 
 
-uint16_t* get_destination_ipv6 ( const uint8_t* data )
+uint16_t* derailleur::util::get_destination_ipv6 ( const uint8_t* data )
 {
 
      uint16_t* ip = new uint16_t[4];

@@ -71,6 +71,7 @@ std::string derailleur::Switch::convert_bits_to_mac_address (
 
 
 
+
 bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4* entry )
 {
 
@@ -79,7 +80,6 @@ bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4* entry )
 
      this->mutex_.lock();
 
-     //for ( Arp4 each : arp_table_v4_ ) {
      for ( std::list<Arp4>::iterator it = arp_table_v4_.begin();
                it != arp_table_v4_.end(); ++it ) {
 

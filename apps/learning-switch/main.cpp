@@ -14,8 +14,8 @@
 
 
 #include <iostream>
-#include <vector>
 #include <sstream>
+#include <list>
 
 
 #include "../../derailleur.hpp"
@@ -32,10 +32,11 @@ public:
 
 
      void on_switch_up ( const derailleur::Event* const event ) override {
-          derailleur::Switch* s = get_switch_copy ( event->get_switch_id() );
+          derailleur::Switch13 s;
+          get_switch_copy ( event->get_switch_id(), s );
 
           std::stringstream      log;
-          log << "on switch up - MAC " << s->get_mac_address();
+          log << "on switch up - MAC " << s.get_mac_address();
           log << " - connection ID: " << event->get_switch_id();
 
           derailleur::Log::Instance()->log ( "LearningSwitch",
@@ -67,11 +68,21 @@ public:
                }
 
 
-               /* learning_switch inherited method extract link and internet
+               /* learning_switch inherited method extracts link and internet
                 * layers information from packet data, updates switches'
                 * ARP-like tables (IPv4 and IPv6) and installs the proper
                 * flow in the switch. */
-               this->learning_switch ( event->get_switch_id(), packet_in );
+//                if ( this->learning_switch (
+//                               event->get_switch_id(), packet_in ) ) {
+//
+//                     std::list<derailleur::Arp4> arp =
+//                          get_IPv4_neighborhood ( event->get_switch_id() );
+//
+//                     for ( derailleur::Arp4 each : arp )
+//                          std::cout << "MAC: "
+//                                    << derailleur::util::MAC_converter ( each.mac )
+//                                    <<  std::endl;
+//                }
 
           } else {
                derailleur::Log::Instance()->log ( "Learning Switch app",
