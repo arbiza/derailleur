@@ -46,12 +46,7 @@ void derailleur::Application::get_switch_copy ( short int switch_id,
 {
     this->mutex_->lock();
     
-    derailleur::Switch* source = this->stack_ptr_->at ( switch_id );         
-    
-//     if ( source->get_of_version() == fluid_msg::of13::OFP_VERSION )
-//          other = new derailleur::Switch13();
-//     else
-//          other = new derailleur::Switch10();
+    derailleur::Switch* source = this->stack_ptr_->at ( switch_id );
     
     other.connection_ = nullptr;
     other.switch_id_ = source->switch_id_;
@@ -72,57 +67,6 @@ void derailleur::Application::get_switch_copy ( short int switch_id,
     this->mutex_->unlock();
 }
 
-
-
-derailleur::Switch* derailleur::Application::get_switch_copy ( short int switch_id )
-{
-     // It is the default return; returned when any error occurs
-     derailleur::Switch* s = nullptr;
-
-     // OpenFlow 1.3
-     if ( get_switch_version ( switch_id ) ==
-               fluid_msg::of13::OFP_VERSION ) {
-
-          this->mutex_->lock();
-
-          derailleur::Switch13* s13_ptr =
-               static_cast<derailleur::Switch13*> (
-                    this->stack_ptr_->at ( switch_id ) );
-
-          this->mutex_->unlock();
-
-          /**
-           * Set connection pointer to nullptr, this way Application children
-           * won't be able to access the switch through connection pointer, only
-           * through methods provided by this class.
-           */
-          //s13_ptr->set_null_connection_ptr();
-
-          // Copy the content of the pointer to and object
-          derailleur::Switch13 s13 = *s13_ptr;
-          // s receives a pointer to the copied object (it is not a pointer
-          // to the switch object on the stack).
-          s = &s13;
-     }
-     // OpenFlow 1.0
-     else if ( get_switch_version ( switch_id ) ==
-               fluid_msg::of10::OFP_VERSION ) {
-
-          this->mutex_->lock();
-
-          derailleur::Switch10* s10_ptr =
-               static_cast<derailleur::Switch10*> (
-                    this->stack_ptr_->at ( switch_id ) );
-
-          this->mutex_->unlock();
-
-          //s10_ptr->set_null_connection_ptr();
-          derailleur::Switch10 s10 = *s10_ptr;
-          s = &s10;
-     }
-
-     return s;
-}
 
 
 bool derailleur::Application::learning_switch ( short int switch_id,
