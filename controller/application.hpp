@@ -229,7 +229,7 @@ public:
       * @see Event
       */
      bool learning_switch ( short switch_id,
-                            fluid_msg::PacketInCommon* packet_in );
+                            const derailleur::Event* const event );
                             
                             
      /**

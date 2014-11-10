@@ -5,6 +5,7 @@
 
 #include "application.hpp"
 #include "util.hpp"
+#include "event.hpp"
 
 
 std::vector< int > derailleur::Application::get_switches_IDs()
@@ -44,36 +45,58 @@ uint8_t derailleur::Application::get_auxiliary_id ( short int switch_id )
 void derailleur::Application::get_switch_copy ( short int switch_id,
           derailleur::Switch& other )
 {
-    this->mutex_->lock();
-    
-    derailleur::Switch* source = this->stack_ptr_->at ( switch_id );
-    
-    other.connection_ = nullptr;
-    other.switch_id_ = source->switch_id_;
-    other.name_ = source->name_;
-    other.mac_address_ = source->mac_address_;
-    other.of_version_ = source->of_version_;
-    other.datapath_id_ = source->datapath_id_;
-    other.n_buffers_ = source->n_buffers_;
-    other.n_tables_ = source->n_tables_;
-    other.manufacturer_ = source->manufacturer_;
-    other.hardware_ = source->hardware_;
-    other.software_ = source->software_;
-    other.serial_number_ = source->serial_number_;
-    other.datapath_ = source->datapath_;
-    other.arp_table_v4_ = source->arp_table_v4_;
-    other.arp_table_v6_ = source->arp_table_v6_;
-    
-    this->mutex_->unlock();
+     this->mutex_->lock();
+
+     derailleur::Switch* source = this->stack_ptr_->at ( switch_id );
+
+     other.connection_ = nullptr;
+     other.switch_id_ = source->switch_id_;
+     other.name_ = source->name_;
+     other.mac_address_ = source->mac_address_;
+     other.of_version_ = source->of_version_;
+     other.datapath_id_ = source->datapath_id_;
+     other.n_buffers_ = source->n_buffers_;
+     other.n_tables_ = source->n_tables_;
+     other.manufacturer_ = source->manufacturer_;
+     other.hardware_ = source->hardware_;
+     other.software_ = source->software_;
+     other.serial_number_ = source->serial_number_;
+     other.datapath_ = source->datapath_;
+     other.arp_table_v4_ = source->arp_table_v4_;
+     other.arp_table_v6_ = source->arp_table_v6_;
+
+     this->mutex_->unlock();
 }
 
 
 
 bool derailleur::Application::learning_switch ( short int switch_id,
-          fluid_msg::PacketInCommon* packet_in )
+          const derailleur::Event* const event )
 {
+
+     fluid_msg::PacketInCommon* packet_in = nullptr;
+     uint16_t port;
+
+     /* First: Stores the input port; how it is done differs depending of
+      * OpenFlow version. */
+     if ( packet_in->version() ==  fluid_msg::of13::OFP_VERSION ) {
+          fluid_msg::of13::PacketIn* p_in13 = new fluid_msg::of13::PacketIn();
+          p_in13->unpack ( event->get_data() );
+          packet_in = p_in13;
+          port = p_in13->match().in_port()->value();
+
+     } else {
+          fluid_msg::of10::PacketIn* p_in10 = new fluid_msg::of10::PacketIn();
+          p_in10->unpack ( event->get_data() );
+          packet_in = p_in10;
+          port = p_in10->in_port();
+     }
+     
+     /* Check the link layer protocol (ARP or IPv6) */
      uint16_t link_layer = derailleur::util::get_link_layer_protocol (
-                                ( uint8_t* ) packet_in->data() );
+          ( uint8_t* ) packet_in->data() );
+
+     /* Second: Extracts MAC and IP address; it differs depending of IP version */
 
      /* Check if the link layer protocol is IPv6 (NDP/ICMPv6) */
      if ( link_layer == derailleur::util::Protocols.link_layer.ipv6 ) {
@@ -87,9 +110,13 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
           memcpy ( arp_entry.mac, ( uint8_t* ) packet_in->data() + 6, 6 );
           memcpy ( arp_entry.ip, ( uint8_t* ) packet_in->data() + 90, 4 );
+          arp_entry.port = port;
 
-          stack_ptr_->at ( switch_id )->set_IPv4_neighbor ( &arp_entry );
+          if ( stack_ptr_->at ( switch_id )->set_IPv4_neighbor (
+                         &arp_entry ) ) {
 
+          } else
+               return false;
      }
      /* If neither ARP of ICMPv6 are used return false because it is not
       * a neighborhood discovering operation. */

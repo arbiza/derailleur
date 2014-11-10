@@ -72,17 +72,19 @@ public:
                 * layers information from packet data, updates switches'
                 * ARP-like tables (IPv4 and IPv6) and installs the proper
                 * flow in the switch. */
-//                if ( this->learning_switch (
-//                               event->get_switch_id(), packet_in ) ) {
-//
-//                     std::list<derailleur::Arp4> arp =
-//                          get_IPv4_neighborhood ( event->get_switch_id() );
-//
-//                     for ( derailleur::Arp4 each : arp )
-//                          std::cout << "MAC: "
-//                                    << derailleur::util::MAC_converter ( each.mac )
-//                                    <<  std::endl;
-//                }
+               if ( this->learning_switch (
+                              event->get_switch_id(), event ) ) {
+
+                    std::list<derailleur::Arp4> arp =
+                         get_IPv4_neighborhood ( event->get_switch_id() );
+                         
+                    std::cout << "\nn MACs: " << arp.size();
+
+                    for ( derailleur::Arp4 each : arp )
+                         std::cout << "\nMAC: "
+                                   << derailleur::util::MAC_converter ( each.mac )
+                                   <<  std::endl;
+               }
 
           } else {
                derailleur::Log::Instance()->log ( "Learning Switch app",
