@@ -233,14 +233,14 @@ public:
       * Returns a copy of the ARP-like table for IPv4 connections of switch 
       * identified by parameter switch_id.
       */
-     std::list<derailleur::Arp4> get_IPv4_neighborhood ( short switch_id );
+     std::vector<derailleur::Arp4> get_IPv4_neighborhood ( short switch_id );
      
 
      /**
       * Returns a copy of the ARP-like table for IPv6 connections of switch 
       * identified by parameter switch_id.
       */
-     std::list<derailleur::Arp6> get_IPv6_neighborhood ( short switch_id );
+     std::vector<derailleur::Arp6> get_IPv6_neighborhood ( short switch_id );
 
 
 private:

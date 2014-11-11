@@ -75,7 +75,7 @@ public:
                if ( this->learning_switch (
                               event->get_switch_id(), event ) ) {
 
-                    std::list<derailleur::Arp4> arp =
+                    std::vector<derailleur::Arp4> arp =
                          get_IPv4_neighborhood ( event->get_switch_id() );
                          
                     std::cout << "\nn MACs: " << arp.size();

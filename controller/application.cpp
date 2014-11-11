@@ -219,22 +219,22 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
 
 
-std::list< derailleur::Arp4 > derailleur::Application::get_IPv4_neighborhood (
+std::vector< derailleur::Arp4 > derailleur::Application::get_IPv4_neighborhood (
      short int switch_id )
 {
      this->mutex_->lock();
-     std::list<Arp4> arp =
+     std::vector<Arp4> arp =
           this->stack_ptr_->at ( switch_id )->get_IPv4_neighborhood ();
      this->mutex_->unlock();
      return arp;
 }
 
 
-std::list< derailleur::Arp6 > derailleur::Application::get_IPv6_neighborhood (
+std::vector< derailleur::Arp6 > derailleur::Application::get_IPv6_neighborhood (
      short int switch_id )
 {
      this->mutex_->lock();
-     std::list<Arp6> arp =
+     std::vector<Arp6> arp =
           this->stack_ptr_->at ( switch_id )->get_IPv6_neighborhood ();
      this->mutex_->unlock();
      return arp;

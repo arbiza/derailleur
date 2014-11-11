@@ -18,7 +18,6 @@
 
 #include <string>
 #include <vector>
-#include <list>
 #include <mutex>
 
 #include <fluid/of10msg.hh>
@@ -222,9 +221,9 @@ public:
      /**
       * Returns a copy of the ARP-like table for IPv4 connections.
       */
-     std::list<Arp4> get_IPv4_neighborhood () {
+     std::vector<Arp4> get_IPv4_neighborhood () {
           this->mutex_.lock();
-          std::list<Arp4> arp = this->arp_table_v4_;
+          std::vector<Arp4> arp = this->arp_table_v4_;
           this->mutex_.unlock();
           return arp;
      }
@@ -232,9 +231,9 @@ public:
      /**
       * Returns a copy of the ARP-like table for IPv6 connections.
       */
-     std::list<Arp6> get_IPv6_neighborhood () {
+     std::vector<Arp6> get_IPv6_neighborhood () {
           this->mutex_.lock();
-          std::list<Arp6> arp = this->arp_table_v6_;
+          std::vector<Arp6> arp = this->arp_table_v6_;
           this->mutex_.unlock();
           return arp;
      }
@@ -341,8 +340,8 @@ protected:
          serial_number_,
          datapath_;
 
-     std::list<Arp6> arp_table_v6_;
-     std::list<Arp4> arp_table_v4_;
+     std::vector<Arp6> arp_table_v6_;
+     std::vector<Arp4> arp_table_v4_;
 
 
      /**
