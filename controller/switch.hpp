@@ -112,7 +112,7 @@ typedef struct capabilities_13 {
 typedef struct arp6 {
      uint16_t ip[8];
      uint8_t mac[6];
-     uint16_t port;
+     uint32_t port;
 } Arp6;
 
 /**
@@ -123,7 +123,7 @@ typedef struct arp6 {
 typedef struct arp4 {
      uint8_t ip[4];
      uint8_t mac[6];
-     uint16_t port;
+     uint32_t port;
 } Arp4;
 
 

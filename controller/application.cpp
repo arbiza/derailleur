@@ -77,9 +77,11 @@ void derailleur::Application::get_switch_copy ( short int switch_id,
 bool derailleur::Application::learning_switch ( short int switch_id,
           const derailleur::Event* const event )
 {
+     bool is_the_source_a_new_device = false;
 
      fluid_msg::PacketInCommon* packet_in = nullptr;
      uint16_t port;
+
 
      /* First: Stores the input port; how it is done differs depending of
       * OpenFlow version. */
@@ -96,9 +98,11 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           port = p_in10->in_port();
      }
 
+
      /* Check the link layer protocol (ARP or IPv6) */
      uint16_t link_layer = derailleur::util::get_link_layer_protocol (
                                 ( uint8_t* ) packet_in->data() );
+
 
      /* Second: Extracts MAC and IP address; it differs depending of IP version */
 
@@ -116,13 +120,83 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           memcpy ( arp_entry.ip, ( uint8_t* ) packet_in->data() + 28, 4 );
           arp_entry.port = port;
 
+
+          // Lock to access the stack.
+          this->mutex_->lock();
+
+          /* If set_IPv4_neighbor returns true the switch does not know the
+           * source; a new device was added to the ARP-like table. */
           if ( stack_ptr_->at ( switch_id )->set_IPv4_neighbor (
-                         &arp_entry ) ) {
+                         &arp_entry ) )
+               is_the_source_a_new_device = true;
 
-               derailleur::Log::Instance()->log ( "Application", "true" );
 
-          } else
-               return false;
+          /* Check if the destination is known; if it is known two way flows
+           * will be installed; if it is not known a packet-out will be sent
+           * trying to find destination device. When found destination device
+           * will send and ARP packet and so two way flows will be installed. */
+
+          uint8_t* dst_mac =
+               derailleur::util::get_destination_MAC ( packet_in->data() );
+
+          // Lock to access the switch ARP-like table.
+          stack_ptr_->at ( switch_id )->mutex_.lock();
+
+          for ( derailleur::Arp4 each :
+                    stack_ptr_->at ( switch_id )->arp_table_v4_ ) {
+               if ( derailleur::util::compare_byte_arrays ( dst_mac, each.mac, 6 ) ) {
+
+                    // TODO: stopped here!
+               
+               }
+          }
+
+          stack_ptr_->at ( switch_id )->mutex_.unlock();
+
+          this->mutex_->unlock();
+
+          if ( event->get_version() ==  fluid_msg::of13::OFP_VERSION ) {
+
+               fluid_msg::of13::FlowMod fm;
+               fm.xid ( packet_in->xid() );
+               fm.cookie ( 123 );
+               fm.cookie_mask ( 0xffffffffffffffff );
+               fm.table_id ( 0 );
+               fm.command ( fluid_msg::of13::OFPFC_ADD );
+               fm.idle_timeout ( 5 );
+               fm.hard_timeout ( 10 );
+               fm.priority ( 100 );
+               fm.buffer_id ( pi.buffer_id() );
+               fm.out_port ( 0 );
+               fm.out_group ( 0 );
+               fm.flags ( 0 );
+               fluid_msg::of13::EthSrc fsrc (
+                    ( ( uint8_t* ) &arp_entry.mac ) + 2 );
+               fluid_msg::of13::EthDst fdst (
+                    ( ( uint8_t* ) &dst ) + 2 );
+               fm.add_oxm_field ( fsrc );
+               fm.add_oxm_field ( fdst );
+               fluid_msg::of13::OutputAction act ( arp_entry.port, 1024 );
+               fluid_msg::of13::ApplyActions inst;
+               inst.add_action ( act );
+               fm.add_instruction ( inst );
+
+//                     buffer = fm.pack();
+//                     ofconn->send(buffer, fm.length());
+//                     OFMsg::free_buffer(buffer);
+//                     of13::Match m;
+//                     of13::MultipartRequestFlow rf(2, 0x0, 0, of13::OFPP_ANY, of13::OFPG_ANY,
+//                          0x0, 0x0, m);
+//                     buffer = rf.pack();
+//                     ofconn->send(buffer, rf.length());
+//                     OFMsg::free_buffer(buffer);
+
+          } else {
+
+          }
+
+
+
      }
      /* If neither ARP of ICMPv6 are used return false because it is not
       * a neighborhood discovering operation. */
@@ -130,7 +204,7 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           return false;
      }
 
-     return true;
+     return is_the_source_a_new_device;
 }
 
 
