@@ -28,7 +28,8 @@
 
 
 namespace fluid_msg {
-fluid_msg::PacketInCommon;
+// Forward declarations
+class PacketInCommon;
 }
 
 
@@ -202,9 +203,14 @@ public:
       * Returns a copy of the switch without connection pointer. This method
       * copies all values of the switch object, but not the connection pointer
       * to avoid trying attempts to use a connection pointer that may not exist
-      * anymore due to a disconnection.
+      * anymore due to a disconnection. Values copied are that common for all
+      * OpenFlow versions, the ones included in Switch class.
       */
+<<<<<<< HEAD
      derailleur::Switch* get_switch_copy ( short switch_id );
+=======
+     void get_switch_copy ( short switch_id, derailleur::Switch& other );
+>>>>>>> e975fd0c961f21c1bdeaf94c274a59dbd0919858
 
 
      ////// L2/L3 Switching related methods
@@ -218,13 +224,37 @@ public:
       *TODO: comment and implement about installing flow.
       *
       * @param switch_id switch identifier
+<<<<<<< HEAD
       * @param packet_in packet-in packet
+=======
+      * @param data data from an OpenFlow packet; Packet_in class from libfluid
+      * provides the data() method that may be used as parameter when calling this
+      * method.
+>>>>>>> e975fd0c961f21c1bdeaf94c274a59dbd0919858
       * @return returns true if a new connected device was added to any of the
       * ARP-like tables; otherwise return false.
       * @see Event
       */
      bool learning_switch ( short switch_id,
+<<<<<<< HEAD
                             fluid_msg::PacketInCommon* packet_in );
+=======
+                            const derailleur::Event* const event );
+                            
+                            
+     /**
+      * Returns a copy of the ARP-like table for IPv4 connections of switch 
+      * identified by parameter switch_id.
+      */
+     std::list<derailleur::Arp4> get_IPv4_neighborhood ( short switch_id );
+     
+
+     /**
+      * Returns a copy of the ARP-like table for IPv6 connections of switch 
+      * identified by parameter switch_id.
+      */
+     std::list<derailleur::Arp6> get_IPv6_neighborhood ( short switch_id );
+>>>>>>> e975fd0c961f21c1bdeaf94c274a59dbd0919858
 
 
 private:

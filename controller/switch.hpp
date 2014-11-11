@@ -213,7 +213,7 @@ public:
      std::string get_datapath () const {
           return this->datapath_;
      }
-     
+
      uint8_t get_of_version () const {
           return this->of_version_;
      }
@@ -237,7 +237,7 @@ public:
       * @return true on success
       */
      virtual short install_flow_table ( ) = 0;
-     
+
 
 
      /**
@@ -245,8 +245,9 @@ public:
       */
      std::list<Arp4> get_IPv4_neighborhood () {
           this->mutex_.lock();
-          return arp_table_v4_;
+          std::list<Arp4> arp = this->arp_table_v4_;
           this->mutex_.unlock();
+          return arp;
      }
 
      /**
@@ -254,8 +255,9 @@ public:
       */
      std::list<Arp6> get_IPv6_neighborhood () {
           this->mutex_.lock();
-          return arp_table_v6_;
+          std::list<Arp6> arp = this->arp_table_v6_;
           this->mutex_.unlock();
+          return arp;
      }
 
 
@@ -276,6 +278,8 @@ protected:
      Switch ( fluid_base::OFConnection* connection )
           : connection_ ( connection ),
             switch_id_ ( connection->get_id() ) {}
+
+     Switch () : connection_ ( nullptr ) {}
 
      /**
       * Parse response received from switches to features request message.
@@ -366,9 +370,28 @@ private:
       */
      //Switch ();
 
-     void set_null_connection_ptr () {
-          this->connection_ = nullptr;
-     }
+//      void set_null_connection_ptr () {
+//           this->connection_ = nullptr;
+//      }
+
+
+     /**
+      * Checks if there is an entry in the IPv4 ARP-like table for a new device.
+      * It is private and is primarily used by Application class.
+      * @param entry Arp4 struct containing MAC, IPv4 and port.
+      * @return true if a new entry was added; false if not.
+      */
+     bool set_IPv4_neighbor ( Arp4* entry );
+
+
+     /**
+      * Checks if there is an entry in the IPv6 ARP-like table for a new device.
+      * It is private and is primarily used by Application class.
+      * @param entry Arp4 struct containing MAC, IPv6 and port.
+      * @return true if a new entry was added; false if not.
+      */
+     bool set_IPv6_neighbor ( Arp6 entry );
+
 
      /**
       * Controller is a friend class because they creates switch objects and
@@ -391,6 +414,7 @@ private:
 class Switch10 : public Switch {
 
 public:
+     Switch10 () : Switch() {}
 
      /**
       * Cosntructor calls Switch constructor and sets the version attribute.
@@ -443,6 +467,8 @@ private:
 class Switch13 : public Switch {
 
 public:
+
+     Switch13 () : Switch() {}
 
      /**
       * Cosntructor calls Switch construcstor and sets the version attribute.

@@ -14,8 +14,8 @@
 
 
 #include <iostream>
-#include <vector>
 #include <sstream>
+#include <list>
 
 
 #include "../../derailleur.hpp"
@@ -32,10 +32,11 @@ public:
 
 
      void on_switch_up ( const derailleur::Event* const event ) override {
-          derailleur::Switch* s = get_switch_copy ( event->get_switch_id() );
+          derailleur::Switch13 s;
+          get_switch_copy ( event->get_switch_id(), s );
 
           std::stringstream      log;
-          log << "on switch up - MAC " << s->get_mac_address();
+          log << "on switch up - MAC " << s.get_mac_address();
           log << " - connection ID: " << event->get_switch_id();
 
           derailleur::Log::Instance()->log ( "LearningSwitch",
@@ -66,20 +67,28 @@ public:
                     packet_in->unpack ( event->get_data() );
                }
 
-               uint16_t l1_protocol = derailleur::util::get_link_layer_protocol (
-                                           ( uint8_t* ) packet_in->data()
-                                      );
 
-               /* Check if neighborhood discovery protocols are used in this
-                * packet: IPv6 (NDP/ICMPv6) or ARP for IPv4. */
-               if ( l1_protocol == derailleur::util::Protocols.link_layer.ipv6 ||
-                         l1_protocol == derailleur::util::Protocols.link_layer.arp ) {
+               /* learning_switch inherited method extracts link and internet
+                * layers information from packet data, updates switches'
+                * ARP-like tables (IPv4 and IPv6) and installs the proper
+                * flow in the switch. */
+               if ( this->learning_switch (
+                              event->get_switch_id(), event ) ) {
 
-                    /* learning_switch inherited method extract link and internet
-                     * layers information from packet data, updates switches'
-                     * ARP-like tables (IPv4 and IPv6) and installs the proper
-                     * flow in the switch. */
-                    this->learning_switch ( event->get_switch_id(), packet_in );
+                    std::list<derailleur::Arp4> arp =
+                         get_IPv4_neighborhood ( event->get_switch_id() );
+                         
+                    std::cout << "\nn MACs: " << arp.size();
+
+                    
+                    for ( derailleur::Arp4 each : arp )
+                         std::cout << "\nMAC: "
+                                   << derailleur::util::MAC_converter ( each.mac )
+                                   << " IP: "
+                                   << derailleur::util::ipv4_converter( each.ip )
+                                   << " porta: "
+                                   << (int) each.port
+                                   <<  std::endl;
                }
 
           } else {
