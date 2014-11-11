@@ -80,9 +80,14 @@ public:
                          
                     std::cout << "\nn MACs: " << arp.size();
 
+                    
                     for ( derailleur::Arp4 each : arp )
                          std::cout << "\nMAC: "
                                    << derailleur::util::MAC_converter ( each.mac )
+                                   << " IP: "
+                                   << derailleur::util::ipv4_converter( each.ip )
+                                   << " porta: "
+                                   << (int) each.port
                                    <<  std::endl;
                }
 

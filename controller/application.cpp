@@ -1,4 +1,7 @@
 
+// TODO: remove
+#include <sstream>
+
 #include <fluid/OFServer.hh>
 #include <fluid/of10msg.hh>
 #include <fluid/of13msg.hh>
@@ -6,6 +9,7 @@
 #include "application.hpp"
 #include "util.hpp"
 #include "event.hpp"
+#include "log.hpp"
 
 
 std::vector< int > derailleur::Application::get_switches_IDs()
@@ -79,7 +83,7 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
      /* First: Stores the input port; how it is done differs depending of
       * OpenFlow version. */
-     if ( packet_in->version() ==  fluid_msg::of13::OFP_VERSION ) {
+     if ( event->get_version() ==  fluid_msg::of13::OFP_VERSION ) {
           fluid_msg::of13::PacketIn* p_in13 = new fluid_msg::of13::PacketIn();
           p_in13->unpack ( event->get_data() );
           packet_in = p_in13;
@@ -91,10 +95,10 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           packet_in = p_in10;
           port = p_in10->in_port();
      }
-     
+
      /* Check the link layer protocol (ARP or IPv6) */
      uint16_t link_layer = derailleur::util::get_link_layer_protocol (
-          ( uint8_t* ) packet_in->data() );
+                                ( uint8_t* ) packet_in->data() );
 
      /* Second: Extracts MAC and IP address; it differs depending of IP version */
 
@@ -109,11 +113,13 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           derailleur::Arp4 arp_entry;
 
           memcpy ( arp_entry.mac, ( uint8_t* ) packet_in->data() + 6, 6 );
-          memcpy ( arp_entry.ip, ( uint8_t* ) packet_in->data() + 90, 4 );
+          memcpy ( arp_entry.ip, ( uint8_t* ) packet_in->data() + 28, 4 );
           arp_entry.port = port;
 
           if ( stack_ptr_->at ( switch_id )->set_IPv4_neighbor (
                          &arp_entry ) ) {
+
+               derailleur::Log::Instance()->log ( "Application", "true" );
 
           } else
                return false;
@@ -124,34 +130,10 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           return false;
      }
 
-
-//      // OpenFlow 1.3
-//      if ( packet_in->version() ==  fluid_msg::of13::OFP_VERSION ) {
-//
-//           /* TODO:
-//            *   - check ip version - OK
-//            *   - get switch arp
-//            *   - check if source in known (does IP and MAC match?):
-//            *     - no: store de source in ARP table
-//            *     - yes: check destination (if unknown, store)
-//            *   - set flow
-//            */
-//
-//
-//           /* At first, it checks if the source is unknown; */
-//
-//           /* Second, checks if the destination is unknown. If the switch knows
-//            * the destination, it does not need to flood to discover the
-//            * destination. */
-//
-//      }
-//      // OpenFlow 1.0
-//      else if ( packet_in->version() ==  fluid_msg::of10::OFP_VERSION ) {
-//
-//      }
-
      return true;
 }
+
+
 
 
 std::list< derailleur::Arp4 > derailleur::Application::get_IPv4_neighborhood (

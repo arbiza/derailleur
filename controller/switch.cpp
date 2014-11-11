@@ -87,6 +87,7 @@ bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4* entry )
           if ( derailleur::util::compare_byte_arrays ( it->mac, entry->mac, 6 )
                     &&
                     derailleur::util::compare_byte_arrays ( it->ip, entry->ip, 6 ) ) {
+                    
                matched = true;
           } else {
 
@@ -98,6 +99,7 @@ bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4* entry )
                     if ( !matched ) {
                          memcpy ( it->ip, entry->ip, 4 );
                          memcpy ( it->mac, entry->mac, 6 );
+                         it->port = entry->port;
                          matched = true;
                          new_device = true;
                     } else {

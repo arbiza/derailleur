@@ -139,8 +139,18 @@ uint8_t* derailleur::util::ipv4_converter ( const std::string ipv4 )
 
 std::string derailleur::util::ipv4_converter ( const uint8_t* ipv4_array )
 {
-     std::string ip;
-     return ip;
+     std::stringstream ip;
+     
+     uint8_t address[4];
+     memcpy( address, ipv4_array, 4);
+     
+     for (short i = 0; i < 4; i++) {
+          ip << (int) address[i];
+          if (i < 3)
+               ip << ".";
+     }
+     
+     return ip.str();
 }
 
 
