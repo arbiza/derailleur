@@ -121,23 +121,16 @@ bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4* entry )
 }
 
 
+void derailleur::Switch::install_flow ( fluid_msg::FlowModCommon* flow )
+{
+     uint8_t* buffer = flow->pack();
+     this->connection_->send ( buffer, flow->length() );
+     fluid_msg::OFMsg::free_buffer ( buffer );
+}
+
 
 
 // OpenFlow 1.0 Switch
-
-short derailleur::Switch10::install_flow ( fluid_msg::FlowModCommon* flow,
-          fluid_msg::Action* action )
-{
-
-     return EXIT_SUCCESS;
-}
-
-
-short int derailleur::Switch10::install_flow_table ( )
-{
-
-     return EXIT_SUCCESS;
-}
 
 void derailleur::Switch10::set_features_reply ( uint8_t* data )
 {
@@ -225,32 +218,25 @@ void derailleur::Switch10::multipart_description_reply (
 
 // OpenFlow 1.3 Switch
 
-short derailleur::Switch13::install_flow ( fluid_msg::FlowModCommon* flow,
-          fluid_msg::Action* action )
-{
-     fluid_msg::of13::FlowMod* flow_mod =
-          static_cast<fluid_msg::of13::FlowMod*> ( flow );
-
-     fluid_msg::of13::OutputAction* output_action =
-          static_cast<fluid_msg::of13::OutputAction*> ( action );
-
-
-     fluid_msg::of13::ApplyActions *inst = new fluid_msg::of13::ApplyActions();
-     inst->add_action ( output_action );
-     flow_mod->add_instruction ( inst );
-     uint8_t* buffer = flow_mod->pack();
-     this->connection_->send ( buffer, flow_mod->length() );
-     fluid_msg::OFMsg::free_buffer ( buffer );
-
-     return EXIT_SUCCESS;
-}
-
-
-short int derailleur::Switch13::install_flow_table ( )
-{
-
-     return EXIT_SUCCESS;
-}
+// short derailleur::Switch13::install_flow ( fluid_msg::FlowModCommon* flow,
+//           fluid_msg::Action* action )
+// {
+//      fluid_msg::of13::FlowMod* flow_mod =
+//           static_cast<fluid_msg::of13::FlowMod*> ( flow );
+// 
+//      fluid_msg::of13::OutputAction* output_action =
+//           static_cast<fluid_msg::of13::OutputAction*> ( action );
+// 
+// 
+//      fluid_msg::of13::ApplyActions *inst = new fluid_msg::of13::ApplyActions();
+//      inst->add_action ( output_action );
+//      flow_mod->add_instruction ( inst );
+//      uint8_t* buffer = flow_mod->pack();
+//      this->connection_->send ( buffer, flow_mod->length() );
+//      fluid_msg::OFMsg::free_buffer ( buffer );
+// 
+//      return EXIT_SUCCESS;
+// }
 
 
 

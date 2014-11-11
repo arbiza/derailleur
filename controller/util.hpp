@@ -128,7 +128,7 @@ bool compare_byte_arrays ( const Type* a, const Type* b, size_t length )
      memcpy ( first,  a, length );
      memcpy ( second,  b, length );
 
-     for ( short i = 0; i < length; i++ )
+     for ( size_t i = 0; i < length; i++ )
           if ( first[i] != second[i] )
                return false;
 

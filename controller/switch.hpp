@@ -220,27 +220,6 @@ public:
 
 
      /**
-      * Install the flow received by parameter in the switch.
-      * Children of this class must convert parameters to the proper version.
-      * @param flow FlowModCommon pointer
-      * @param action action settings pointer
-      * @return true on success
-      */
-     virtual short install_flow ( fluid_msg::FlowModCommon* flow,
-                                  fluid_msg::Action* action ) = 0;
-
-
-     /**
-      * Install the flow table received by parameter in the switch.
-      * @param table table containing flows to be installed (children must
-      *                 convert flows to the prover Flow Mod version)
-      * @return true on success
-      */
-     virtual short install_flow_table ( ) = 0;
-
-
-
-     /**
       * Returns a copy of the ARP-like table for IPv4 connections.
       */
      std::list<Arp4> get_IPv4_neighborhood () {
@@ -292,6 +271,16 @@ protected:
       * This method MUST be implemented by children.
       */
      virtual void install_flow_default() = 0;
+
+
+     /**
+      * Install the flow received by parameter in the switch.
+      * Children of this class must convert parameters to the proper version.
+      * @param flow FlowModCommon pointer
+      * @param action action settings pointer
+      */
+     virtual void install_flow ( fluid_msg::FlowModCommon* flow ) final;
+     
 
      /**
       * Send Multipart description request message to switch.
@@ -425,30 +414,13 @@ public:
           this->of_version_ = fluid_msg::of10::OFP_VERSION;
      }
 
-     /**
-      * Overrides install_flow method from Switch class.
-      * Install the flow received by parameter in the switch.
-      * @param flow FlowModCommon pointer
-      * @param action actions to be performade
-      * @return true on success
-      */
-     virtual short install_flow ( fluid_msg::FlowModCommon* flow,
-                                  fluid_msg::Action* action ) override;
-
-
-     /**
-      * Install the flow table received by parameter in the switch.
-      * @param table table containing flows to be installed (children must
-      *                 convert flows to the prover Flow Mod version)
-      * @return true on success
-      */
-     virtual short install_flow_table ( ) override;
 
 private:
 
      virtual void set_features_reply ( uint8_t* data ) override;
 
      virtual void install_flow_default() override;
+
 
      // Multipart description
      virtual void multipart_description_request () override;
@@ -483,26 +455,6 @@ public:
      uint8_t get_auxiliary_id () {
           return this->auxiliary_id_;
      }
-
-
-     /**
-      * Overrides install_flow method from Switch class.
-      * Install the flow received by parameter in the switch.
-      * @param flow FlowModCommon pointer
-      * @param action actions to be performade
-      * @return true on success
-      */
-     virtual short install_flow ( fluid_msg::FlowModCommon* flow,
-                                  fluid_msg::Action* action ) override;
-
-
-     /**
-      * Install the flow table received by parameter in the switch.
-      * @param table table containing flows to be installed (children must
-      *                 convert flows to the prover Flow Mod version)
-      * @return true on success
-      */
-     virtual short install_flow_table ( ) override;
 
 
 private:
