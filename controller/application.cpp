@@ -89,3 +89,9 @@ derailleur::Switch* derailleur::Application::get_switch_copy ( short int switch_
 
      return s;
 }
+
+
+bool derailleur::Application::learning_switch ( short int switch_id, fluid_msg::PacketInCommon* packet_in )
+{
+
+}
