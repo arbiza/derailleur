@@ -221,8 +221,9 @@ public:
       *
       * @param switch_id switch identifier
       * @param event Event pointer.
-      * @return returns true if a new connected device was added to any of the
-      * ARP-like tables; otherwise return false.
+      * @return true if the packet-in is ARP or ICMPv6 and was handled; false
+      * if it is not a discovery packet and nothing was handled or if something
+      * gone wrong.
       * @see Event
       */
      bool learning_switch ( short switch_id,

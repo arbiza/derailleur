@@ -77,65 +77,92 @@ void derailleur::Application::get_switch_copy ( short int switch_id,
 bool derailleur::Application::learning_switch ( short int switch_id,
           const derailleur::Event* const event )
 {
-     bool is_the_source_a_new_device = false;
 
      fluid_msg::PacketInCommon* packet_in = nullptr;
-     uint16_t port;
+     uint32_t port;
 
 
-     /* First: Stores the input port; how it is done differs depending of
-      * OpenFlow version. */
+     /* First: Stores the input port; it differs from one OpenFlow version from
+      * other. */
      if ( event->get_version() ==  fluid_msg::of13::OFP_VERSION ) {
           fluid_msg::of13::PacketIn* p_in13 = new fluid_msg::of13::PacketIn();
           p_in13->unpack ( event->get_data() );
+
+          if ( p_in13->match().in_port() ==  NULL )
+               return false;
+          else
+               port = p_in13->match().in_port()->value();
+
           packet_in = p_in13;
-          port = p_in13->match().in_port()->value();
 
      } else {
           fluid_msg::of10::PacketIn* p_in10 = new fluid_msg::of10::PacketIn();
           p_in10->unpack ( event->get_data() );
-          packet_in = p_in10;
+
           port = p_in10->in_port();
+
+          packet_in = p_in10;
      }
 
 
-     /* Check the link layer protocol (ARP or IPv6) */
+     /* Check the link layer protocol. If ARP it is an IPv4 packet; if IPv6
+      * it is an ICMPv6 packet (Neighbor Discovery Protocol). */
      uint16_t link_layer = derailleur::util::get_link_layer_protocol (
                                 ( uint8_t* ) packet_in->data() );
 
 
-     /* Second: Extracts MAC and IP address; it differs depending of IP version */
+     /* ************* IPv6 (ICMPv6) ************* */
 
-     /* Check if the link layer protocol is IPv6 (NDP/ICMPv6) */
      if ( link_layer == derailleur::util::Protocols.link_layer.ipv6 ) {
-          
-          
-          /* ************* IPv6 ************* */
 
+
+
+        return true; // yes, the packet-in was handled.
      }
-     /* Check if the link layer protocol is ARP (used for neighborhood
-      * discovering in IPv4). */
+     /* ************* IPv4 (ARP) ************* */
      else if ( link_layer == derailleur::util::Protocols.link_layer.arp ) {
 
-          
-          /* ************* IPv4 ************* */
-          
           derailleur::Arp4 arp_entry;
 
-          memcpy ( (uint8_t*) &arp_entry.mac, ( uint8_t* ) packet_in->data() + 6, 6 );
-          memcpy ( (uint8_t*) &arp_entry.ip, ( uint8_t* ) packet_in->data() + 28, 4 );
+          memcpy ( ( uint8_t* ) &arp_entry.mac, ( uint8_t* ) packet_in->data() + 6, 6 );
+          memcpy ( ( uint8_t* ) &arp_entry.ip, ( uint8_t* ) packet_in->data() + 28, 4 );
           arp_entry.port = port;
+
 
 
           // Lock to access the stack.
           this->mutex_->lock();
-          
+          // Lock to access the switch ARP-like table.
+          //stack_ptr_->at ( switch_id )->mutex_.lock();
+
+          std::vector<derailleur::Arp4> table =
+               stack_ptr_->at ( switch_id )->arp_table_v4_;
+
+          /* Check if the source is already stored in the ARP-like table. */
+          std::vector<derailleur::Arp4>::iterator it;
+          for ( it = table.begin(); it != table.end(); ++it )
+               if ( derailleur::util::compare_byte_arrays ( arp_entry.mac,
+                         it->mac, 6 ) )
+                    break;
+
+          /* if loop reached the end of the container source is not known;
+           * source is stored and controller floods to find the destination. */
+          if ( it == table.end() ) {
+
+               stack_ptr_->at ( switch_id )->arp_table_v4_.push_back ( arp_entry );
+
+               derailleur::Log::Instance()->log ( "Application", "new device." );
+
+               // flood
+          }
+
+
 
           /* If set_IPv4_neighbor returns true the switch does not know the
            * source; a new device was added to the ARP-like table. */
-          if ( stack_ptr_->at ( switch_id )->set_IPv4_neighbor (
-                         &arp_entry ) )
-               is_the_source_a_new_device = true;
+//           if ( stack_ptr_->at ( switch_id )->set_IPv4_neighbor (
+//                          &arp_entry ) )
+//                is_the_source_a_new_device = true;
 
 
           /* Check if the destination is known; if it is known two way flows
@@ -143,12 +170,10 @@ bool derailleur::Application::learning_switch ( short int switch_id,
            * trying to find destination device. When found destination device
            * will send and ARP packet and so two way flows will be installed. */
 
-          uint8_t dst_ip[4];
-          memcpy ( dst_ip, (uint8_t*) packet_in->data() + 38, 4 );
 
-          // Lock to access the switch ARP-like table.
-          stack_ptr_->at ( switch_id )->mutex_.lock();
 
+
+/*
           for ( derailleur::Arp4 each :
                     stack_ptr_->at ( switch_id )->arp_table_v4_ ) {
 
@@ -157,15 +182,15 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
 
                if ( derailleur::util::compare_byte_arrays ( dst_ip, each.ip, 4 ) ) {
-                    
+
 //                     ss << "MACs: "
 //                     << derailleur::util::MAC_converter ( arp_entry.mac )
 //                     << ", "
 //                     << derailleur::util::MAC_converter ( each.mac );
-// 
+//
 //                     derailleur::Log::Instance()->log ( "Application", ss.str().c_str() );
 
-                    if ( event->get_version() ==  fluid_msg::of13::OFP_VERSION ) { 
+                    if ( event->get_version() ==  fluid_msg::of13::OFP_VERSION ) {
 
                          fluid_msg::of13::FlowMod fm;
                          fm.xid ( packet_in->xid() );
@@ -200,20 +225,17 @@ bool derailleur::Application::learning_switch ( short int switch_id,
                     }
 
                }
-          }
+          }*/
 
-          stack_ptr_->at ( switch_id )->mutex_.unlock();
-
+          //stack_ptr_->at ( switch_id )->mutex_.unlock();
           this->mutex_->unlock();
+          
+          return true;  // yes, the packet-in was handled.
 
-     }
-     /* If neither ARP of ICMPv6 are used return false because it is not
-      * a neighborhood discovering operation. */
-     else {
-          return false;
-     }
+     }  // ends IPv4
 
-     return is_the_source_a_new_device;
+     
+    return false;  // nothing handled
 }
 
 
