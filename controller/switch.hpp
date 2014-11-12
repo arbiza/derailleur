@@ -279,7 +279,16 @@ protected:
       * @param action action settings pointer
       */
      virtual void install_flow ( fluid_msg::FlowModCommon* flow ) final;
-     
+
+
+     /**
+      * Send a packet-out to all ports in the switch with data of packet-in.
+      * @param packet_in it is the packet-in being handled
+      * @param port switch port where packet-in was received
+      */
+     virtual void flood ( fluid_msg::PacketInCommon* packet_in,
+                          uint32_t port ) = 0;
+
 
      /**
       * Send Multipart description request message to switch.
@@ -420,6 +429,8 @@ private:
 
      virtual void install_flow_default() override;
 
+     virtual void flood ( fluid_msg::PacketInCommon* packet_in,
+                          uint32_t port ) override;
 
      // Multipart description
      virtual void multipart_description_request () override;
@@ -461,6 +472,9 @@ private:
      virtual void set_features_reply ( uint8_t* data ) override;
 
      virtual void install_flow_default() override;
+
+     virtual void flood ( fluid_msg::PacketInCommon* packet_in,
+                          uint32_t port ) override;
 
      // Multipart description
      virtual void multipart_description_request () override;

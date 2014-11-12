@@ -79,18 +79,18 @@ bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4* entry )
      bool new_device = false;
 
 //      this->mutex_.lock();
-// 
+//
 //      for ( std::vector<Arp4>::iterator it = arp_table_v4_.begin();
 //                it != arp_table_v4_.end(); ++it ) {
-// 
+//
 //           /* If entry already exists. */
 //           if ( derailleur::util::compare_byte_arrays ( it->mac, entry->mac, 6 )
 //                     &&
 //                     derailleur::util::compare_byte_arrays ( it->ip, entry->ip, 6 ) ) {
-//                     
+//
 //                matched = true;
 //           } else {
-// 
+//
 //                /* Check if MAC, IP or port are already in the table; if yes table
 //                 * entry will be updated. */
 //                if ( derailleur::util::compare_byte_arrays ( it->mac, entry->mac, 6 )
@@ -108,13 +108,13 @@ bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4* entry )
 //                }
 //           }
 //      }
-// 
+//
 //      /* If entry did not match, it is a new device. */
 //      if ( !matched ) {
 //           arp_table_v4_.push_back ( *entry );
 //           new_device = true;
 //      }
-// 
+//
 //      this->mutex_.unlock();
 
      return new_device;
@@ -200,6 +200,11 @@ void derailleur::Switch10::install_flow_default()
 }
 
 
+void derailleur::Switch10::flood ( fluid_msg::PacketInCommon* packet_in, uint32_t port )
+{
+
+}
+
 
 void derailleur::Switch10::multipart_description_request()
 {
@@ -223,18 +228,18 @@ void derailleur::Switch10::multipart_description_reply (
 // {
 //      fluid_msg::of13::FlowMod* flow_mod =
 //           static_cast<fluid_msg::of13::FlowMod*> ( flow );
-// 
+//
 //      fluid_msg::of13::OutputAction* output_action =
 //           static_cast<fluid_msg::of13::OutputAction*> ( action );
-// 
-// 
+//
+//
 //      fluid_msg::of13::ApplyActions *inst = new fluid_msg::of13::ApplyActions();
 //      inst->add_action ( output_action );
 //      flow_mod->add_instruction ( inst );
 //      uint8_t* buffer = flow_mod->pack();
 //      this->connection_->send ( buffer, flow_mod->length() );
 //      fluid_msg::OFMsg::free_buffer ( buffer );
-// 
+//
 //      return EXIT_SUCCESS;
 // }
 
@@ -307,6 +312,29 @@ void derailleur::Switch13::install_flow_default()
      buffer = fm.pack();
      this->connection_->send ( buffer, fm.length() );
      fluid_msg::OFMsg::free_buffer ( buffer );
+}
+
+
+void derailleur::Switch13::flood ( fluid_msg::PacketInCommon* packet_in,
+                                   uint32_t port )
+{
+     uint8_t* buffer;
+
+     fluid_msg::of13::PacketOut packet_out ( packet_in->xid(),
+                                             packet_in->buffer_id(), port );
+                                             
+     /* if packet-in data was not buffered its data is added to the packet-out */
+     if (packet_in->buffer_id() == -1 )
+          packet_out.data( packet_in->data(), packet_in->data_len() );
+          
+     fluid_msg::of13::OutputAction action ( fluid_msg::of13::OFPP_FLOOD,  1024);
+     packet_out.add_action( action );
+     
+     buffer = packet_out.pack();
+     
+     this->connection_->send( buffer, packet_out.length() );
+     
+     fluid_msg::OFMsg::free_buffer( buffer );
 }
 
 
