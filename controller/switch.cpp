@@ -324,7 +324,7 @@ void derailleur::Switch13::flood ( fluid_msg::PacketInCommon* packet_in,
                                              packet_in->buffer_id(), port );
                                              
      /* if packet-in data was not buffered its data is added to the packet-out */
-     if (packet_in->buffer_id() == -1 )
+     if (packet_in->buffer_id() == (uint32_t) -1 )
           packet_out.data( packet_in->data(), packet_in->data_len() );
           
      fluid_msg::of13::OutputAction action ( fluid_msg::of13::OFPP_FLOOD,  1024);

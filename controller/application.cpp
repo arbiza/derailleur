@@ -79,8 +79,12 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
      bool learned = false;
      fluid_msg::PacketInCommon* packet_in = nullptr;
-     uint8_t* dst_mac;
      uint32_t port;
+
+     uint8_t dst_mac[6];
+     uint8_t broadcast[6];
+     for ( short i = 0; i < 6; i++ )
+          broadcast[0] = 255; /* ff */
 
 
      /* First: Stores the input port; it differs from one OpenFlow version from
@@ -151,45 +155,32 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
           /* Check if the source is already stored in the ARP-like table; if not
            * stores the source. */
-          derailleur::Log::Instance()->log ( "Application", "4.0" );
-          if ( searche_MAC_in_table ( arp_entry.mac, table ) == -1 ) {
+          if ( search_MAC_in_table ( arp_entry.mac, table ) == -1 ) {
                stack_ptr_->at ( switch_id )->arp_table_v4_.push_back ( arp_entry );
                learned = true;
           }
-          derailleur::Log::Instance()->log ( "Application", "4.1" );
 
 
           /* DESTINATION */
 
           /* If destination is broadcast (ff:ff:ff:ff:ff:ff) the message is
            * flooded through all switch ports. */
-          uint8_t* broadcast = new uint8_t[6];
-          for ( short i = 0; i < 6; i++ )
-               broadcast[0] = 255;                           // ff
+          derailleur::Log::Instance()->log ( "Application", "6.0" );
+          if ( derailleur::util::compare_byte_arrays ( &dst_mac,
+                    &broadcast, 6 ) ) {
 
-          if ( derailleur::util::compare_byte_arrays (
-                         ( uint8_t* ) &dst_mac,
-                         ( uint8_t* ) broadcast,
-                         6 ) ) {
-
-               // TODO remover
-               derailleur::Log::Instance()->log ( "Application", "1.0" );
+               derailleur::Log::Instance()->log ( "Application", "broadcast... flood" );
                stack_ptr_->at ( switch_id )->flood ( packet_in, port );
-               derailleur::Log::Instance()->log ( "Application", "1.1" );
 
           }
           /* Search for destination in ARP-like table. If destination is known
            * a flow is installed; if not the message is flooded. */
           else {
-               derailleur::Log::Instance()->log ( "Application", "5.0" );
-               //  TODO problem aqui! talvez dst_mac esteja vazio
-               int index = searche_MAC_in_table ( dst_mac, table );
-               derailleur::Log::Instance()->log ( "Application", "5.1" );
+               
+               int index = search_MAC_in_table ( (uint8_t*) &dst_mac, table );
 
+               /* Installs flow if destination is known */
                if ( index != -1 ) {
-
-                    // TODO remover
-                    derailleur::Log::Instance()->log ( "Application", "2.0" );
 
                     /* OpenFlow 1.3 */
                     if ( event->get_version() ==  fluid_msg::of13::OFP_VERSION ) {
@@ -207,12 +198,14 @@ bool derailleur::Application::learning_switch ( short int switch_id,
                          fm.out_port ( 0 );
                          fm.out_group ( 0 );
                          fm.flags ( 0 );
-                         fluid_msg::of13::EthSrc fsrc (
-                              ( ( uint8_t* ) &arp_entry.mac ) );
-                         fluid_msg::of13::EthDst fdst (
+                         /* Set the source MAC as destination */
+                         fluid_msg::of13::EthSrc source_mac (
                               ( ( uint8_t* ) &table[index].mac ) );
-                         fm.add_oxm_field ( fsrc );
-                         fm.add_oxm_field ( fdst );
+                         /* Set the destination MAC as source */
+                         fluid_msg::of13::EthDst destination_mac (
+                              ( ( uint8_t* ) &arp_entry.mac ) );
+                         fm.add_oxm_field ( source_mac );
+                         fm.add_oxm_field ( destination_mac );
                          fluid_msg::of13::OutputAction act ( port, 1024 );
                          fluid_msg::of13::ApplyActions inst;
                          inst.add_action ( act );
@@ -220,7 +213,7 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
                          // install flow
                          stack_ptr_->at ( switch_id )->install_flow ( &fm );
-                         derailleur::Log::Instance()->log ( "Application", "2.1" );
+                         derailleur::Log::Instance()->log ( "Application", "instalou" );
 
                     }
                     /* OpenFlow 1.0 */
@@ -228,12 +221,12 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
                     }
 
-               } else {
-                    // TODO remover
-                    derailleur::Log::Instance()->log ( "Application", "3.0" );
+               } 
+               /* if destination is unknown the message is flooded. */
+               else {
+                    derailleur::Log::Instance()->log ( "Application", "unknown... flood" );
                     // floods discovery message (ARP) to discover the destination
                     stack_ptr_->at ( switch_id )->flood ( packet_in, port );
-                    derailleur::Log::Instance()->log ( "Application", "3.1" );
                }
           } /* ends else */
      } /* ends IPv4 (ARP) */
@@ -241,6 +234,8 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
      //stack_ptr_->at ( switch_id )->mutex_.unlock();
      this->mutex_->unlock();
+
+     delete packet_in;
 
      /* If program reached this point any device was learned. */
      return learned;

@@ -272,10 +272,10 @@ private:
       * @see Switch
       */
      template <class TypeArp>
-     int searche_MAC_in_table ( const uint8_t* mac,
+     int search_MAC_in_table ( const uint8_t* mac,
                                 const std::vector<TypeArp>& table ) {
 
-          for ( int i = 0; i < table.size(); i++ ) {
+          for ( int i = 0; i < (int) table.size(); i++ ) {
                if ( derailleur::util::compare_byte_arrays ( mac,
                          table[i].mac, 6 ) )
                          return i;
