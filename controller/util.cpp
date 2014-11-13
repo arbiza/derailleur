@@ -77,7 +77,7 @@ uint8_t* derailleur::util::MAC_converter ( const std::string* mac )
           position += 3;
      }
 
-     return array;
+     return ( uint8_t* ) array;
 }
 
 

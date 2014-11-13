@@ -75,7 +75,7 @@ std::string derailleur::Switch::convert_bits_to_mac_address (
 bool derailleur::Switch::set_IPv4_neighbor ( derailleur::Arp4* entry )
 {
 
-     bool matched = false;
+     
      bool new_device = false;
 
 //      this->mutex_.lock();

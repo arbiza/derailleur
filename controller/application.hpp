@@ -25,6 +25,7 @@
 
 
 #include "switch.hpp"
+#include "util.hpp"
 
 
 namespace fluid_msg {
@@ -221,24 +222,24 @@ public:
       *
       * @param switch_id switch identifier
       * @param event Event pointer.
-      * @return true if the packet-in is ARP or ICMPv6 and was handled; false
-      * if it is not a discovery packet and nothing was handled or if something
+      * @return true if the packet-in is ARP or ICMPv6 and if the switch learned
+      * a new device;; false if it is not a discovery packet or if something
       * gone wrong.
       * @see Event
       */
      bool learning_switch ( short switch_id,
                             const derailleur::Event* const event );
-                            
-                            
+
+
      /**
-      * Returns a copy of the ARP-like table for IPv4 connections of switch 
+      * Returns a copy of the ARP-like table for IPv4 connections of switch
       * identified by parameter switch_id.
       */
      std::vector<derailleur::Arp4> get_IPv4_neighborhood ( short switch_id );
-     
+
 
      /**
-      * Returns a copy of the ARP-like table for IPv6 connections of switch 
+      * Returns a copy of the ARP-like table for IPv6 connections of switch
       * identified by parameter switch_id.
       */
      std::vector<derailleur::Arp6> get_IPv6_neighborhood ( short switch_id );
@@ -260,6 +261,27 @@ private:
       */
      void set_mutex_ptr ( std::mutex* mutex ) {
           this->mutex_ = mutex;
+     }
+
+
+     /**
+      * Searches for a MAC address in an ARP-like table.
+      * @param mac uint8_t pointer to the MAC to be searched
+      * @param table reference to the ARP-like table to be inspected
+      * @return index of the found element; if not found returns -1
+      * @see Switch
+      */
+     template <class TypeArp>
+     int searche_MAC_in_table ( const uint8_t* mac,
+                                const std::vector<TypeArp>& table ) {
+
+          for ( int i = 0; i < table.size(); i++ ) {
+               if ( derailleur::util::compare_byte_arrays ( mac,
+                         table[i].mac, 6 ) )
+                         return i;
+               }
+
+          return -1;
      }
 
 

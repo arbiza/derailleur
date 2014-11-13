@@ -7,7 +7,6 @@
 #include <fluid/of13msg.hh>
 
 #include "application.hpp"
-#include "util.hpp"
 #include "event.hpp"
 #include "log.hpp"
 
@@ -78,6 +77,7 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           const derailleur::Event* const event )
 {
 
+     bool learned = false;
      fluid_msg::PacketInCommon* packet_in = nullptr;
      uint8_t* dst_mac;
      uint32_t port;
@@ -118,7 +118,7 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
 
 
-          return true; // yes, the packet-in was handled.
+
      }
      /* ************* IPv4 (ARP) ************* */
      else if ( link_layer == derailleur::util::Protocols.link_layer.arp ) {
@@ -141,6 +141,8 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           // Lock to access the switch ARP-like table.
           //stack_ptr_->at ( switch_id )->mutex_.lock();
 
+
+
           std::vector<derailleur::Arp4> table =
                stack_ptr_->at ( switch_id )->arp_table_v4_;
 
@@ -149,50 +151,45 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
           /* Check if the source is already stored in the ARP-like table; if not
            * stores the source. */
-          std::vector<derailleur::Arp4>::iterator it;
-          for ( it = table.begin(); it != table.end(); ++it )
-               if ( derailleur::util::compare_byte_arrays ( arp_entry.mac,
-                         it->mac, 6 ) )
-                    break;
-
-          /* if loop reached the end of the container source is not known; so
-           * the source is stored. */
-          if ( it == table.end() )
+          derailleur::Log::Instance()->log ( "Application", "4.0" );
+          if ( searche_MAC_in_table ( arp_entry.mac, table ) == -1 ) {
                stack_ptr_->at ( switch_id )->arp_table_v4_.push_back ( arp_entry );
+               learned = true;
+          }
+          derailleur::Log::Instance()->log ( "Application", "4.1" );
 
 
           /* DESTINATION */
 
           /* If destination is broadcast (ff:ff:ff:ff:ff:ff) the message is
-           * flooded. */
-          if ( derailleur::util::compare_byte_arrays ( dst_mac,
-                    derailleur::util::MAC_converter ( "ff:ff:ff:ff:ff:ff" ), 6 ) ) {
+           * flooded through all switch ports. */
+          uint8_t* broadcast = new uint8_t[6];
+          for ( short i = 0; i < 6; i++ )
+               broadcast[0] = 255;                           // ff
 
+          if ( derailleur::util::compare_byte_arrays (
+                         ( uint8_t* ) &dst_mac,
+                         ( uint8_t* ) broadcast,
+                         6 ) ) {
+
+               // TODO remover
+               derailleur::Log::Instance()->log ( "Application", "1.0" );
                stack_ptr_->at ( switch_id )->flood ( packet_in, port );
+               derailleur::Log::Instance()->log ( "Application", "1.1" );
 
-          } else {
-               
-               // TODO: stopped here
+          }
+          /* Search for destination in ARP-like table. If destination is known
+           * a flow is installed; if not the message is flooded. */
+          else {
+               derailleur::Log::Instance()->log ( "Application", "5.0" );
+               //  TODO problem aqui! talvez dst_mac esteja vazio
+               int index = searche_MAC_in_table ( dst_mac, table );
+               derailleur::Log::Instance()->log ( "Application", "5.1" );
 
-               /* Search for destination in ARP-like table. */
-               for ( it = table.begin(); it != table.end(); ++it )
-                    if ( derailleur::util::compare_byte_arrays ( dst_mac,
-                              it->mac, 6 ) )
-                         break;
+               if ( index != -1 ) {
 
-
-               /* if loop reached the end of the container source is not known;
-                * source is stored and controller floods to find the destination;
-                * else a flow is installed. */
-               if ( it == table.end() ) {
-
-                    stack_ptr_->at ( switch_id )->arp_table_v4_.push_back ( arp_entry );
-
-                    // floods discovery message (ARP) to discover the destination
-                    stack_ptr_->at ( switch_id )->flood ( packet_in, port );
-               }
-               /* INSTALL FLOW */
-               else {
+                    // TODO remover
+                    derailleur::Log::Instance()->log ( "Application", "2.0" );
 
                     /* OpenFlow 1.3 */
                     if ( event->get_version() ==  fluid_msg::of13::OFP_VERSION ) {
@@ -213,7 +210,7 @@ bool derailleur::Application::learning_switch ( short int switch_id,
                          fluid_msg::of13::EthSrc fsrc (
                               ( ( uint8_t* ) &arp_entry.mac ) );
                          fluid_msg::of13::EthDst fdst (
-                              ( ( uint8_t* ) &dst_mac ) );
+                              ( ( uint8_t* ) &table[index].mac ) );
                          fm.add_oxm_field ( fsrc );
                          fm.add_oxm_field ( fdst );
                          fluid_msg::of13::OutputAction act ( port, 1024 );
@@ -223,97 +220,31 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
                          // install flow
                          stack_ptr_->at ( switch_id )->install_flow ( &fm );
-                         derailleur::Log::Instance()->log ( "Application", "instalou!" );
+                         derailleur::Log::Instance()->log ( "Application", "2.1" );
 
                     }
                     /* OpenFlow 1.0 */
                     else {
 
                     }
+
+               } else {
+                    // TODO remover
+                    derailleur::Log::Instance()->log ( "Application", "3.0" );
+                    // floods discovery message (ARP) to discover the destination
+                    stack_ptr_->at ( switch_id )->flood ( packet_in, port );
+                    derailleur::Log::Instance()->log ( "Application", "3.1" );
                }
-
-          }
-
-          /* If set_IPv4_neighbor returns true the switch does not know the
-           * source; a new device was added to the ARP-like table. */
-//           if ( stack_ptr_->at ( switch_id )->set_IPv4_neighbor (
-//                          &arp_entry ) )
-//                is_the_source_a_new_device = true;
+          } /* ends else */
+     } /* ends IPv4 (ARP) */
 
 
-          /* Check if the destination is known; if it is known two way flows
-           * will be installed; if it is not known a packet-out will be sent
-           * trying to find destination device. When found destination device
-           * will send and ARP packet and so two way flows will be installed. */
+     //stack_ptr_->at ( switch_id )->mutex_.unlock();
+     this->mutex_->unlock();
 
-
-
-
-          /*
-                    for ( derailleur::Arp4 each :
-                              stack_ptr_->at ( switch_id )->arp_table_v4_ ) {
-
-
-                         std::stringstream ss;
-
-
-                         if ( derailleur::util::compare_byte_arrays ( dst_ip, each.ip, 4 ) ) {
-
-          //                     ss << "MACs: "
-          //                     << derailleur::util::MAC_converter ( arp_entry.mac )
-          //                     << ", "
-          //                     << derailleur::util::MAC_converter ( each.mac );
-          //
-          //                     derailleur::Log::Instance()->log ( "Application", ss.str().c_str() );
-
-                              if ( event->get_version() ==  fluid_msg::of13::OFP_VERSION ) {
-
-                                   fluid_msg::of13::FlowMod fm;
-                                   fm.xid ( packet_in->xid() );
-                                   fm.cookie ( 123 );
-                                   fm.cookie_mask ( 0xffffffffffffffff );
-                                   fm.table_id ( 0 );
-                                   fm.command ( fluid_msg::of13::OFPFC_ADD );
-                                   fm.idle_timeout ( 5 );
-                                   fm.hard_timeout ( 10 );
-                                   fm.priority ( 100 );
-                                   fm.buffer_id ( packet_in->buffer_id() );
-                                   fm.out_port ( 0 );
-                                   fm.out_group ( 0 );
-                                   fm.flags ( 0 );
-                                   fluid_msg::of13::EthSrc fsrc (
-                                        ( ( uint8_t* ) &arp_entry.mac ) );
-                                   fluid_msg::of13::EthDst fdst (
-                                        ( ( uint8_t* ) &each.mac ) );
-                                   fm.add_oxm_field ( fsrc );
-                                   fm.add_oxm_field ( fdst );
-                                   fluid_msg::of13::OutputAction act ( each.port, 1024 );
-                                   fluid_msg::of13::ApplyActions inst;
-                                   inst.add_action ( act );
-                                   fm.add_instruction ( inst );
-
-                                   // install flow
-                                   stack_ptr_->at ( switch_id )->install_flow ( &fm );
-                                   derailleur::Log::Instance()->log ( "Application", "instalou!" );
-
-                              } else {
-
-                              }
-
-                         }
-                    }*/
-
-          //stack_ptr_->at ( switch_id )->mutex_.unlock();
-          this->mutex_->unlock();
-
-          return true;  // yes, the packet-in was handled.
-
-     }  // ends IPv4
-
-
-     return false;  // nothing handled
+     /* If program reached this point any device was learned. */
+     return learned;
 }
-
 
 
 
