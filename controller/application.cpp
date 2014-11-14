@@ -79,12 +79,14 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
      bool learned = false;
      fluid_msg::PacketInCommon* packet_in = nullptr;
-     uint32_t port;
+     uint32_t in_port;
 
      uint8_t dst_mac[6];
      uint8_t broadcast[6];
      for ( short i = 0; i < 6; i++ )
           broadcast[0] = 255; /* ff */
+
+     int index;
 
 
      /* First: Stores the input port; it differs from one OpenFlow version from
@@ -96,7 +98,7 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           if ( p_in13->match().in_port() ==  NULL )
                return false;
           else
-               port = p_in13->match().in_port()->value();
+               in_port = p_in13->match().in_port()->value();
 
           packet_in = p_in13;
 
@@ -104,7 +106,7 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           fluid_msg::of10::PacketIn* p_in10 = new fluid_msg::of10::PacketIn();
           p_in10->unpack ( event->get_data() );
 
-          port = p_in10->in_port();
+          in_port = p_in10->in_port();
 
           packet_in = p_in10;
      }
@@ -112,124 +114,102 @@ bool derailleur::Application::learning_switch ( short int switch_id,
 
      /* Check the link layer protocol. If ARP it is an IPv4 packet; if IPv6
       * it is an ICMPv6 packet (Neighbor Discovery Protocol). */
-     uint16_t link_layer = derailleur::util::get_link_layer_protocol (
-                                ( uint8_t* ) packet_in->data() );
+//      uint16_t link_layer = derailleur::util::get_link_layer_protocol (
+//                                 ( uint8_t* ) packet_in->data() );
 
 
      /* ************* IPv6 (ICMPv6) ************* */
 
-     if ( link_layer == derailleur::util::Protocols.link_layer.ipv6 ) {
-
-
-
-
-     }
+//      if ( link_layer == derailleur::util::Protocols.link_layer.ipv6 ) {
+//
+//
+//
+//
+//      }
      /* ************* IPv4 (ARP) ************* */
-     else if ( link_layer == derailleur::util::Protocols.link_layer.arp ) {
+//      else if ( link_layer == derailleur::util::Protocols.link_layer.arp ) {
 
-          derailleur::Arp4 arp_entry;
+     derailleur::Arp4 source;
 
-          // Set fields
-          memcpy ( ( uint8_t* ) &dst_mac,
-                   ( uint8_t* ) packet_in->data(), 6 );
-          memcpy ( ( uint8_t* ) &arp_entry.mac,
-                   ( uint8_t* ) packet_in->data() + 6, 6 );
-          memcpy ( ( uint8_t* ) &arp_entry.ip,
-                   ( uint8_t* ) packet_in->data() + 28, 4 );
-          arp_entry.port = port;
-
-
-
-          // Lock to access the stack.
-          this->mutex_->lock();
-          // Lock to access the switch ARP-like table.
-          //stack_ptr_->at ( switch_id )->mutex_.lock();
+     // Set fields
+     memcpy ( ( uint8_t* ) &dst_mac,
+              ( uint8_t* ) packet_in->data(), 6 );
+     memcpy ( ( uint8_t* ) &source.mac,
+              ( uint8_t* ) packet_in->data() + 6, 6 );
+     memcpy ( ( uint8_t* ) &source.ip,
+              ( uint8_t* ) packet_in->data() + 28, 4 );
+     source.port = in_port;
 
 
+     // Lock to access the stack.
+     this->mutex_->lock();
+     // Lock to access the switch ARP-like table.
+     //stack_ptr_->at ( switch_id )->mutex_.lock();
 
-          std::vector<derailleur::Arp4> table =
-               stack_ptr_->at ( switch_id )->arp_table_v4_;
+
+     std::vector<derailleur::Arp4>* table =
+          &stack_ptr_->at ( switch_id )->arp_table_v4_;
 
 
-          /* SOURCE */
+     /* SOURCE */
 
-          /* Check if the source is already stored in the ARP-like table; if not
-           * stores the source. */
-          if ( search_MAC_in_table ( arp_entry.mac, table ) == -1 ) {
-               stack_ptr_->at ( switch_id )->arp_table_v4_.push_back ( arp_entry );
-               learned = true;
+     /* Check if the source is already stored in the ARP-like table; if not
+      * stores the source. */
+     if ( ( index = search_MAC_in_table ( source.mac, table ) ) < 0 ) {
+          stack_ptr_->at ( switch_id )->arp_table_v4_.push_back ( source );
+          learned = true;
+     } else {
+          /* update entry (IP or port may had change) */
+          memcpy ( ( uint8_t* ) table->at ( index ).ip,
+                   ( uint8_t* ) &source.ip,  6 );
+
+          table->at ( index ).port = in_port;
+     }
+
+
+     /* DESTINATION */
+
+     if ( ( index = search_MAC_in_table ( ( uint8_t* ) &dst_mac, table ) ) >=  0 ) {
+
+          /* OpenFlow 1.3 */
+          if ( event->get_version() ==  fluid_msg::of13::OFP_VERSION ) {
+
+               fluid_msg::of13::FlowMod fm;
+               fm.xid ( packet_in->xid() );
+               fm.cookie ( 123 );
+               fm.cookie_mask ( 0xffffffffffffffff );
+               fm.table_id ( 0 );
+               fm.command ( fluid_msg::of13::OFPFC_ADD );
+               fm.idle_timeout ( 5 );
+               fm.hard_timeout ( 10 );
+               fm.priority ( 10 );
+               fm.buffer_id ( packet_in->buffer_id() );
+               fm.out_port ( 0 );
+               fm.out_group ( 0 );
+               fm.flags ( 0 );
+               fluid_msg::of13::EthSrc source_mac (
+                    ( ( uint8_t* ) &source.mac ) );
+               fluid_msg::of13::EthDst destination_mac (
+                    ( ( uint8_t* ) &dst_mac ) );
+               fm.add_oxm_field ( source_mac );
+               fm.add_oxm_field ( destination_mac );
+               fluid_msg::of13::OutputAction act ( table->at ( index ).port,
+                                                   1024 );
+               fluid_msg::of13::ApplyActions inst;
+               inst.add_action ( act );
+               fm.add_instruction ( inst );
+
+               // install flow
+               stack_ptr_->at ( switch_id )->install_flow ( &fm );
           }
-
-
-          /* DESTINATION */
-
-          /* If destination is broadcast (ff:ff:ff:ff:ff:ff) the message is
-           * flooded through all switch ports. */
-          derailleur::Log::Instance()->log ( "Application", "6.0" );
-          if ( derailleur::util::compare_byte_arrays ( &dst_mac,
-                    &broadcast, 6 ) ) {
-
-               derailleur::Log::Instance()->log ( "Application", "broadcast... flood" );
-               stack_ptr_->at ( switch_id )->flood ( packet_in, port );
-
-          }
-          /* Search for destination in ARP-like table. If destination is known
-           * a flow is installed; if not the message is flooded. */
+          /* OpenFlow 1.0 */
           else {
-               
-               int index = search_MAC_in_table ( (uint8_t*) &dst_mac, table );
 
-               /* Installs flow if destination is known */
-               if ( index != -1 ) {
+          }
 
-                    /* OpenFlow 1.3 */
-                    if ( event->get_version() ==  fluid_msg::of13::OFP_VERSION ) {
-
-                         fluid_msg::of13::FlowMod fm;
-                         fm.xid ( packet_in->xid() );
-                         fm.cookie ( 123 );
-                         fm.cookie_mask ( 0xffffffffffffffff );
-                         fm.table_id ( 0 );
-                         fm.command ( fluid_msg::of13::OFPFC_ADD );
-                         fm.idle_timeout ( 5 );
-                         fm.hard_timeout ( 10 );
-                         fm.priority ( 10 );
-                         fm.buffer_id ( packet_in->buffer_id() );
-                         fm.out_port ( 0 );
-                         fm.out_group ( 0 );
-                         fm.flags ( 0 );
-                         /* Set the source MAC as destination */
-                         fluid_msg::of13::EthSrc source_mac (
-                              ( ( uint8_t* ) &table[index].mac ) );
-                         /* Set the destination MAC as source */
-                         fluid_msg::of13::EthDst destination_mac (
-                              ( ( uint8_t* ) &arp_entry.mac ) );
-                         fm.add_oxm_field ( source_mac );
-                         fm.add_oxm_field ( destination_mac );
-                         fluid_msg::of13::OutputAction act ( port, 1024 );
-                         fluid_msg::of13::ApplyActions inst;
-                         inst.add_action ( act );
-                         fm.add_instruction ( inst );
-
-                         // install flow
-                         stack_ptr_->at ( switch_id )->install_flow ( &fm );
-                         derailleur::Log::Instance()->log ( "Application", "instalou" );
-
-                    }
-                    /* OpenFlow 1.0 */
-                    else {
-
-                    }
-
-               } 
-               /* if destination is unknown the message is flooded. */
-               else {
-                    derailleur::Log::Instance()->log ( "Application", "unknown... flood" );
-                    // floods discovery message (ARP) to discover the destination
-                    stack_ptr_->at ( switch_id )->flood ( packet_in, port );
-               }
-          } /* ends else */
-     } /* ends IPv4 (ARP) */
+     } else {
+          stack_ptr_->at ( switch_id )->flood ( packet_in, in_port );
+     }
 
 
      //stack_ptr_->at ( switch_id )->mutex_.unlock();
@@ -263,3 +243,6 @@ std::vector< derailleur::Arp6 > derailleur::Application::get_IPv6_neighborhood (
      this->mutex_->unlock();
      return arp;
 }
+
+
+
