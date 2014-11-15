@@ -57,12 +57,7 @@ enum LENGTH {
  */
 struct l1 {
      const uint16_t arp = 0x0806;
-
-     /**
-      * IPv6 also appear here in link layer protocols because in IPv6 networks
-      * neighborhood discovery is made by NDP (Neighbor Discovery Protocol) that
-      * uses ICMPv6 packets; OpenFlow identifies IPv6 in the first layer.
-      */
+     const uint16_t ipv4 = 0x0800;
      const uint16_t ipv6 = 0x08dd;
 };
 
