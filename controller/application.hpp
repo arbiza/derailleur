@@ -76,11 +76,17 @@ public:
       * @param switch_id Controller sends the switch identifier.
       */
      virtual void on_switch_down ( const int switch_id ) = 0;
+     
+     /**
+      * Pure virtual method triggered by Controller when a packet-in is received.
+      * This method MUST be implemented by Application children.
+      * @param switch_id Controller sends the switch identifier.
+      */
+     virtual void on_packet_in ( const derailleur::Event* const event ) = 0;
 
      /**
-      * * Pure virtual method triggered by Controller when a switch send any
-      * message but some messages handled by controller to create switch objects
-      * with information retrieved from each connected switch.
+      * * Pure virtual method triggered by Controller when a switch sends any
+      * message not handled by the tree previous methods.
       * This method MUST be implemented by Application children.
       * @param event Event object containing data to be used in message handling.
       * @see Event

@@ -47,7 +47,7 @@ derailleur::Controller::Controller ( const char* address,
 void derailleur::Controller::message_callback (
      fluid_base::OFConnection *ofconn,
      uint8_t type,
-     void *data,
+     void* data,
      size_t length )
 {
      switch ( type ) {
@@ -71,6 +71,14 @@ void derailleur::Controller::message_callback (
           this->mutex_.unlock();
 
           break;
+     
+     case 10: // packet-in
+          
+          this->application_->on_packet_in(
+               new Event ( this, ofconn->get_id(), ofconn->get_version(),
+                    type, data, length ) );
+          
+          break;
 
      case 19: // Switch sending description: OFTP_MULTIPART_REPLAY
 
@@ -92,10 +100,11 @@ void derailleur::Controller::message_callback (
 
      default:
 
+          /* If packet was not handled in the previous conditions it triggers
+           * the default method (Application child handles the packet). */
           this->application_->message_handler (
                new Event ( this, ofconn->get_id(), ofconn->get_version(),
-                           type, data, length )
-          );
+                           type, data, length ) );
           break;
      }
 }
