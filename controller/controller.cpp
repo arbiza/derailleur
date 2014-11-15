@@ -12,6 +12,7 @@
  **/
 
 #include <string>
+#include <utility>
 
 #include "controller.hpp"
 #include "application.hpp"
@@ -71,13 +72,13 @@ void derailleur::Controller::message_callback (
           this->mutex_.unlock();
 
           break;
-     
+
      case 10: // packet-in
-          
-          this->application_->on_packet_in(
+
+          this->application_->on_packet_in (
                new Event ( this, ofconn->get_id(), ofconn->get_version(),
-                    type, data, length ) );
-          
+                           type, data, length ) );
+
           break;
 
      case 19: // Switch sending description: OFTP_MULTIPART_REPLAY
@@ -136,25 +137,49 @@ void derailleur::Controller::connection_callback (
 
      } else if ( type == fluid_base::OFConnection::EVENT_CLOSED ) {
 
-          derailleur::Log::Instance()->log (
-               "Controller",
-               "Switch disconnected: EVENT_CLOSED" );
+          if ( ofconn->get_version() == fluid_msg::of13::OFP_VERSION ) {
+               derailleur::Switch13 s;
+               this->application_->get_switch_copy ( ofconn->get_id(), s );
+               this->application_->on_switch_down ( &s );
+
+          } else {
+               derailleur::Switch10 s;
+               this->application_->get_switch_copy ( ofconn->get_id(), s );
+               this->application_->on_switch_down ( &s );
+          }
+
           // Delete the switch object corresponding to the connection from the
           // stack.
           this->mutex_.lock();
           stack_.erase ( ofconn->get_id() );
           this->mutex_.unlock();
 
+          derailleur::Log::Instance()->log (
+               "Controller",
+               "Switch disconnected: EVENT_CLOSED" );
+
      } else if ( type == fluid_base::OFConnection::EVENT_DEAD ) {
+
+          if ( ofconn->get_version() == fluid_msg::of13::OFP_VERSION ) {
+               derailleur::Switch13 s;
+               this->application_->get_switch_copy ( ofconn->get_id(), s );
+               this->application_->on_switch_down ( &s );
+
+          } else {
+               derailleur::Switch10 s;
+               this->application_->get_switch_copy ( ofconn->get_id(), s );
+               this->application_->on_switch_down ( &s );
+          }
+
+          // Delete the switch object corresponding to the connection from the
+          // stack.
+          this->mutex_.lock();
+          stack_.erase ( ofconn->get_id() );
+          this->mutex_.unlock();
 
           derailleur::Log::Instance()->log (
                "Controller",
                "Switch disconnected: EVENT_DEAD" );
-          // Delete the switch object corresponding to the connection from the
-          // stack.
-          this->mutex_.lock();
-          stack_.erase ( ofconn->get_id() );
-          this->mutex_.unlock();
      }
 }
 

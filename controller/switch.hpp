@@ -156,7 +156,7 @@ public:
       * with switches must be through switches objects in the controller stack;
       * switches copies may represent a switch that is not connected anymore.
       */
-     Switch ( const Switch& source );
+//      Switch ( const Switch& source );
 
 
      /**

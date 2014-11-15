@@ -35,7 +35,7 @@ public:
           derailleur::Switch13 s;
           get_switch_copy ( event->get_switch_id(), s );
 
-          std::stringstream      log;
+          std::stringstream log;
           log << "on switch up - MAC " << s.get_mac_address();
           log << " - connection ID: " << event->get_switch_id();
 
@@ -45,9 +45,17 @@ public:
 
 
 
-     void on_switch_down ( const int switch_id ) override {
+     void on_switch_down ( derailleur::Switch* switch_down ) override {
+
+          std::stringstream log;
+          log << "switch ";
+          log << switch_down->get_mac_address();
+          log << ", ID ";
+          log << switch_down->get_switch_id();
+          log << " is disconnected.";
+
           derailleur::Log::Instance()->log ( this->get_name().c_str(),
-               "A switch gone down." );
+                                             log.str().c_str() );
      }
 
 

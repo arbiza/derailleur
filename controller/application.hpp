@@ -75,7 +75,7 @@ public:
       * This method MUST be implemented by Application children.
       * @param switch_id Controller sends the switch identifier.
       */
-     virtual void on_switch_down ( const int switch_id ) = 0;
+     virtual void on_switch_down ( derailleur::Switch* switch_down ) = 0;
      
      /**
       * Pure virtual method triggered by Controller when a packet-in is received.
