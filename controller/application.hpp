@@ -220,15 +220,13 @@ public:
       *
       *TODO: comment and implement about installing flow.
       *
-      * @param switch_id switch identifier
       * @param event Event pointer.
       * @return true if the packet-in is ARP or ICMPv6 and if the switch learned
       * a new device;; false if it is not a discovery packet or if something
       * gone wrong.
       * @see Event
       */
-     bool learning_switch ( short switch_id,
-                            const derailleur::Event* const event );
+     bool learning_switch ( const derailleur::Event* const event );
 
 
      /**

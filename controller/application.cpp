@@ -73,8 +73,8 @@ void derailleur::Application::get_switch_copy ( short int switch_id,
 
 
 
-bool derailleur::Application::learning_switch ( short int switch_id,
-          const derailleur::Event* const event )
+bool derailleur::Application::learning_switch (
+     const derailleur::Event* const event )
 {
 
      bool learned = false;
@@ -144,11 +144,11 @@ bool derailleur::Application::learning_switch ( short int switch_id,
      // Lock to access the stack.
      this->mutex_->lock();
      // Lock to access the switch ARP-like table.
-     //stack_ptr_->at ( switch_id )->mutex_.lock();
+     //stack_ptr_->at ( event->get_switch_id() )->mutex_.lock();
 
 
      std::vector<derailleur::Arp4>* table =
-          &stack_ptr_->at ( switch_id )->arp_table_v4_;
+          &stack_ptr_->at ( event->get_switch_id() )->arp_table_v4_;
 
 
      /* SOURCE */
@@ -156,7 +156,8 @@ bool derailleur::Application::learning_switch ( short int switch_id,
      /* Check if the source is already stored in the ARP-like table; if not
       * stores the source. */
      if ( ( index = search_MAC_in_table ( source.mac, table ) ) < 0 ) {
-          stack_ptr_->at ( switch_id )->arp_table_v4_.push_back ( source );
+          stack_ptr_->at (
+               event->get_switch_id() )->arp_table_v4_.push_back ( source );
           learned = true;
      } else {
           /* update entry (IP or port may had change) */
@@ -200,7 +201,7 @@ bool derailleur::Application::learning_switch ( short int switch_id,
                fm.add_instruction ( inst );
 
                // install flow
-               stack_ptr_->at ( switch_id )->install_flow ( &fm );
+               stack_ptr_->at ( event->get_switch_id() )->install_flow ( &fm );
           }
           /* OpenFlow 1.0 */
           else {
@@ -208,11 +209,11 @@ bool derailleur::Application::learning_switch ( short int switch_id,
           }
 
      } else {
-          stack_ptr_->at ( switch_id )->flood ( packet_in, in_port );
+          stack_ptr_->at ( event->get_switch_id() )->flood ( packet_in, in_port );
      }
 
 
-     //stack_ptr_->at ( switch_id )->mutex_.unlock();
+     //stack_ptr_->at ( event->get_switch_id() )->mutex_.unlock();
      this->mutex_->unlock();
 
      delete packet_in;

@@ -72,8 +72,7 @@ public:
                 * layers information from packet data, updates switches'
                 * ARP-like tables (IPv4 and IPv6) and installs the proper
                 * flow in the switch. */
-               if ( this->learning_switch (
-                              event->get_switch_id(), event ) ) {
+               if ( this->learning_switch ( event ) ) {
 
                     std::vector<derailleur::Arp4> arp =
                          get_IPv4_neighborhood ( event->get_switch_id() );
