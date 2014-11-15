@@ -22,10 +22,7 @@
 
 
 #include <string>
-#include <sstream>
-#include <cstring>
 
-#include "event.hpp"
 
 
 namespace derailleur {

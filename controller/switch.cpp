@@ -214,7 +214,7 @@ void derailleur::Switch10::multipart_description_request()
 
 
 void derailleur::Switch10::multipart_description_reply (
-     const derailleur::InternalEvent* event )
+     const derailleur::Event* event )
 {
 
 }
@@ -350,7 +350,7 @@ void derailleur::Switch13::multipart_description_request()
 
 
 void derailleur::Switch13::multipart_description_reply (
-     const derailleur::InternalEvent* event )
+     const derailleur::Event* event )
 {
      fluid_msg::of13::MultipartReplyDesc reply;
      reply.unpack ( event->get_data() );

@@ -37,7 +37,7 @@ derailleur::Controller::Controller ( const char* address,
 {
      this->application_ = application;
      this->application_->set_stack_ptr ( &this->stack_ );
-     this->application_->set_mutex_ptr( &this->mutex_ );
+     this->application_->set_mutex_ptr ( &this->mutex_ );
 
      derailleur::Log::Instance()->open_log_file ( log_path );
 }
@@ -73,18 +73,19 @@ void derailleur::Controller::message_callback (
           break;
 
      case 19: // Switch sending description: OFTP_MULTIPART_REPLAY
-          
+
           Log::Instance()->log ( "Controller",
                                  "Message type 19 - OFTP_MULTIPART_REPLAY" );
           this->mutex_.lock();
 
           stack_.at ( ofconn->get_id() )->multipart_description_reply (
-               new InternalEvent ( this, type, data, length ) );
-          
+               new Event ( this, ofconn->get_id(), ofconn->get_version(),
+                           type, data, length ) );
+
           this->mutex_.unlock();
 
           this->application_->on_switch_up (
-               new Event ( ofconn->get_id(), ofconn->get_version(), this,
+               new Event ( this, ofconn->get_id(), ofconn->get_version(),
                            type, data, length ) );
           break;
 
@@ -92,7 +93,7 @@ void derailleur::Controller::message_callback (
      default:
 
           this->application_->message_handler (
-               new Event ( ofconn->get_id(), ofconn->get_version(), this,
+               new Event ( this, ofconn->get_id(), ofconn->get_version(),
                            type, data, length )
           );
           break;
@@ -107,23 +108,23 @@ void derailleur::Controller::connection_callback (
 {
 
      if ( type == fluid_base::OFConnection::EVENT_STARTED ) {
-          
+
           derailleur::Log::Instance()->log (
                "Controller",
                "Switch attempting to connect: EVENT_STARTED" );
-          
+
      } else if ( type == fluid_base::OFConnection::EVENT_ESTABLISHED ) {
-          
+
           derailleur::Log::Instance()->log (
                "Controller",
                "Switch's connection established: EVENT_ESTABLISHED" );
-               
+
      } else if ( type == fluid_base::OFConnection::EVENT_FAILED_NEGOTIATION ) {
-          
+
           derailleur::Log::Instance()->log (
                "Controller",
                "Switch's connection attempt failed: EVENT_FAILED_NEGOTIATION" );
-               
+
      } else if ( type == fluid_base::OFConnection::EVENT_CLOSED ) {
 
           derailleur::Log::Instance()->log (

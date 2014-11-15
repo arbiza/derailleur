@@ -302,7 +302,7 @@ protected:
       * This method MUST be implemented by children.
       */
      virtual void multipart_description_reply (
-          const derailleur::InternalEvent* event ) = 0;
+          const derailleur::Event* event ) = 0;
 
      /**
       * Extracts switch MAC from datapath_id.
@@ -435,7 +435,7 @@ private:
      // Multipart description
      virtual void multipart_description_request () override;
      virtual void multipart_description_reply (
-          const derailleur::InternalEvent* event ) override;
+          const derailleur::Event* event ) override;
 
      // Features reply attributes:
      Capabilities_10_ capabilities_;
@@ -479,7 +479,7 @@ private:
      // Multipart description
      virtual void multipart_description_request () override;
      virtual void multipart_description_reply (
-          const derailleur::InternalEvent* event ) override;
+          const derailleur::Event* event ) override;
 
 
      // Features reply attributes:
