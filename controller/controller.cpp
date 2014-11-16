@@ -13,6 +13,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "controller.hpp"
 #include "application.hpp"
@@ -51,6 +52,17 @@ void derailleur::Controller::message_callback (
      void* data,
      size_t length )
 {
+
+     // packet-in
+     if ( type == 10 ) {
+
+          derailleur::Event event ( this, ofconn->get_id(),
+                                    ofconn->get_version(),
+                                    type, data, length );
+
+          this->application_->on_packet_in ( std::move ( event ) );
+     }
+
      switch ( type ) {
 
      case 6: // Switch UP: OFTP_FEATURES_REPLAY
@@ -73,13 +85,6 @@ void derailleur::Controller::message_callback (
 
           break;
 
-     case 10: // packet-in
-
-          this->application_->on_packet_in (
-               new Event ( this, ofconn->get_id(), ofconn->get_version(),
-                           type, data, length ) );
-
-          break;
 
      case 19: // Switch sending description: OFTP_MULTIPART_REPLAY
 
@@ -183,3 +188,128 @@ void derailleur::Controller::connection_callback (
      }
 }
 
+
+
+void derailleur::Controller::knows_source_device ( derailleur::Event* event )
+{
+     /* Check if the source is already stored in the ARP-like table; if not
+      * stores the source. */
+
+     fluid_msg::PacketInCommon* packet_in;
+
+     uint32_t in_port;
+
+
+     /* Extract device information (MAC, IP, port) */
+
+
+     /* Port is the first because it depends of the proper version of packet-in */
+     if ( event->get_version() ==  fluid_msg::of13::OFP_VERSION ) {
+
+          fluid_msg::of13::PacketIn* p_in13 = new fluid_msg::of13::PacketIn();
+          p_in13->unpack ( event->get_data() );
+
+          if ( p_in13->match().in_port() !=  NULL ) {
+               in_port = p_in13->match().in_port()->value();
+               packet_in = p_in13;
+          } else
+               return;
+
+     } else {
+          fluid_msg::of10::PacketIn* p_in10 = new fluid_msg::of10::PacketIn();
+          p_in10->unpack ( event->get_data() );
+
+          in_port = p_in10->in_port();
+
+          packet_in = p_in10;
+     }
+
+
+     /* IPv6 */
+     if ( event->get_ip_version() == derailleur::util::IP::v6 ) {
+
+          derailleur::Arp6 source;
+
+          // IP
+          memcpy ( ( uint16_t* ) source.ip,
+                   ( uint16_t* ) packet_in->data() + 23, 16 );
+
+          // MAC
+          memcpy ( ( uint8_t* ) source.mac,
+                   ( uint8_t* ) packet_in->data() + 6, 6 );
+
+          // Port
+          source.port = in_port;
+
+
+          /* Get the ARP table pointer to search for device. */
+          this->mutex_.lock();
+
+          std::vector<derailleur::Arp6>* arp_table =
+               &stack_.at ( event->get_switch_id() )->arp_table_v6_;
+
+
+          /* If device is unknown the new device will be stored in the ARP table. */
+          if ( int index = derailleur::Application::search_MAC_in_table (
+                                ( uint8_t* ) source.mac, arp_table ) < 0 ) {
+
+               arp_table->push_back ( source );
+          }
+          /* If device is known its entry is updated because it IP or port may
+           * changed. */
+          else {
+               // update IP
+               memcpy ( ( uint16_t* ) arp_table->at ( index ).ip,
+                        ( uint16_t* ) source.ip, 16 );
+
+               // update port
+               arp_table->at ( index ).port = source.port;
+          }
+
+          this->mutex_.unlock();
+     }
+     /* IPv4 */
+     else {
+          derailleur::Arp4 source;
+
+          // IP
+          memcpy ( ( uint16_t* ) source.ip,
+                   ( uint16_t* ) packet_in->data() + 28, 4 );
+
+          // MAC
+          memcpy ( ( uint8_t* ) source.mac,
+                   ( uint8_t* ) packet_in->data() + 6, 6 );
+
+          // Port
+          source.port = in_port;
+
+
+          /* Get the ARP table pointer to search for device. */
+          this->mutex_.lock();
+
+          std::vector<derailleur::Arp4>* arp_table =
+               &stack_.at ( event->get_switch_id() )->arp_table_v4_;
+
+
+          /* If device is unknown the new device will be stored in the ARP table. */
+          if ( int index = derailleur::Application::search_MAC_in_table (
+                                ( uint8_t* ) source.mac, arp_table ) < 0 ) {
+
+               arp_table->push_back ( source );
+          }
+          /* If device is known its entry is updated because it IP or port may
+           * changed. */
+          else {
+               // update IP
+               memcpy ( ( uint8_t* ) arp_table->at ( index ).ip,
+                        ( uint8_t* ) source.ip, 4 );
+
+               // update port
+               arp_table->at ( index ).port = source.port;
+          }
+
+          this->mutex_.unlock();
+     }
+
+     delete packet_in;
+}

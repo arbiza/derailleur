@@ -60,17 +60,17 @@ public:
 
 
 
-     void on_packet_in ( const derailleur::Event* const event ) override {
+     void on_packet_in ( derailleur::Event event ) override {
 
 
           fluid_msg::PacketInCommon* packet_in = nullptr;
 
-          if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
+          if ( event.get_version() == fluid_msg::of13::OFP_VERSION ) {
                packet_in = new fluid_msg::of13::PacketIn();
-               packet_in->unpack ( event->get_data() );
+               packet_in->unpack ( event.get_data() );
           } else {
                packet_in = new fluid_msg::of10::PacketIn();
-               packet_in->unpack ( event->get_data() );
+               packet_in->unpack ( event.get_data() );
           }
 
 
@@ -78,10 +78,10 @@ public:
            * layers information from packet data, updates switches'
            * ARP-like tables (IPv4 and IPv6) and installs the proper
            * flow in the switch. */
-          if ( this->learning_switch ( event ) ) {
+          if ( this->learning_switch ( &event ) ) {
 
                std::vector<derailleur::Arp4> arp =
-                    get_IPv4_neighborhood ( event->get_switch_id() );
+                    get_IPv4_neighborhood ( event.get_switch_id() );
 
                std::cout << "\nn MACs: " << arp.size();
 

@@ -151,23 +151,6 @@ bool derailleur::Application::learning_switch (
           &stack_ptr_->at ( event->get_switch_id() )->arp_table_v4_;
 
 
-//      /* SOURCE */
-// 
-//      /* Check if the source is already stored in the ARP-like table; if not
-//       * stores the source. */
-//      if ( ( index = search_MAC_in_table ( source.mac, table ) ) < 0 ) {
-//           stack_ptr_->at (
-//                event->get_switch_id() )->arp_table_v4_.push_back ( source );
-//           learned = true;
-//      } else {
-//           /* update entry (IP or port may had change) */
-//           memcpy ( ( uint8_t* ) table->at ( index ).ip,
-//                    ( uint8_t* ) &source.ip,  6 );
-// 
-//           table->at ( index ).port = in_port;
-//      }
-
-
      /* DESTINATION */
 
      if ( ( index = search_MAC_in_table ( ( uint8_t* ) &dst_mac, table ) ) >=  0 ) {

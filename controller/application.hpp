@@ -82,7 +82,7 @@ public:
       * This method MUST be implemented by Application children.
       * @param switch_id Controller sends the switch identifier.
       */
-     virtual void on_packet_in ( const derailleur::Event* const event ) = 0;
+     virtual void on_packet_in ( derailleur::Event event ) = 0;
 
      /**
       * * Pure virtual method triggered by Controller when a switch sends any
@@ -276,7 +276,7 @@ private:
       * @see Switch
       */
      template <class TypeArp>
-     int search_MAC_in_table ( const uint8_t* mac,
+     static int search_MAC_in_table ( const uint8_t* mac,
                                const std::vector<TypeArp>* table ) {
 
           for ( int i = 0; i < ( int ) table->size(); i++ ) {

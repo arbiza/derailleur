@@ -86,6 +86,13 @@ public:
 
 
 private:
+     
+     /**
+      * This method stores MAC, IP and the port of the source device in the 
+      * ARP-like table according to the packet-in IP version. With this method
+      * controller knows every device connected to each switch.
+      */
+     void knows_source_device ( derailleur::Event* event );
 
      std::map<int, derailleur::Switch*> stack_;
 

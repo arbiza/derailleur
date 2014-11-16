@@ -104,14 +104,22 @@ typedef struct capabilities_13 {
 
 
 /**
+ * This is the base ARP-like table. Children override mac according IP version.
+ * It is used in cases where inheritance or pointer are needed.
+ */
+typedef struct arp {
+     uint8_t mac[6]; 
+     int ip[1];
+     uint32_t port;
+  } Arp;
+
+/**
  * Arp6 is an Arp-like structure for IPv6 neiborhood.
  * It is used to provide L2 leaning switching features and may be used to
  * provide an overview of the entire network connected to the switch.
  */
-typedef struct arp6 {
+typedef struct arp6 : arp {
      uint16_t ip[8];
-     uint8_t mac[6];
-     uint32_t port;
 } Arp6;
 
 /**
@@ -119,10 +127,8 @@ typedef struct arp6 {
  * It is used to provide L2 leaning switching features and may be used to
  * provide an overview of the entire network connected to the switch.
  */
-typedef struct arp4 {
+typedef struct arp4 : arp {
      uint8_t ip[4];
-     uint8_t mac[6];
-     uint32_t port;
 } Arp4;
 
 
