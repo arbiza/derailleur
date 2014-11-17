@@ -254,8 +254,9 @@ void derailleur::Controller::learn_source_device (
 
 
           /* If device is unknown the new device will be stored in the ARP table. */
-          if ( int index = derailleur::Application::search_MAC_in_table (
-                                ( uint8_t* ) source.mac, arp_table ) < 0 ) {
+          int index;
+          if ( ( index = derailleur::Application::search_MAC_in_table (
+                              ( uint8_t* ) source.mac, arp_table ) ) < 0 ) {
 
                arp_table->push_back ( source );
           }
@@ -296,8 +297,9 @@ void derailleur::Controller::learn_source_device (
 
 
           /* If device is unknown the new device will be stored in the ARP table. */
-          if ( int index = derailleur::Application::search_MAC_in_table (
-                                ( uint8_t* ) source.mac, arp_table ) < 0 ) {
+          int index;
+          if ( ( index = derailleur::Application::search_MAC_in_table (
+                              ( uint8_t* ) source.mac, arp_table ) ) < 0 ) {
 
                arp_table->push_back ( source );
           }
@@ -316,8 +318,8 @@ void derailleur::Controller::learn_source_device (
      }
 
      delete packet_in;
-     
+
      /* Event can not be deleted here because it is a pointer and is used after
       * here in on_packet_in method. */
-     // delete event; 
+     // delete event;
 }
