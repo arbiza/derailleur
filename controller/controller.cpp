@@ -56,10 +56,10 @@ void derailleur::Controller::message_callback (
      switch ( type ) {
 
      case 10: // packet-in
-          //           learn_source_device ( new Event (
-          //                                      this, ofconn->get_id(),
-          //                                      ofconn->get_version(),
-          //                                      type, data, length ) );
+          learn_source_device ( new Event (
+                                     this, ofconn->get_id(),
+                                     ofconn->get_version(),
+                                     type, data, length ) );
 
           this->application_->on_packet_in ( new Event (
                                                   this, ofconn->get_id(),
@@ -235,11 +235,11 @@ void derailleur::Controller::learn_source_device (
           derailleur::Arp6 source;
 
           // IP
-          memcpy ( ( uint16_t* ) source.ip,
-                   ( uint16_t* ) packet_in->data() + 23, 16 );
+          memcpy ( ( uint16_t* ) &source.ip,
+                   ( uint16_t* ) packet_in->data() + 23, 8 );
 
           // MAC
-          memcpy ( ( uint8_t* ) source.mac,
+          memcpy ( ( uint8_t* ) &source.mac,
                    ( uint8_t* ) packet_in->data() + 6, 6 );
 
           // Port
@@ -264,7 +264,7 @@ void derailleur::Controller::learn_source_device (
           else {
                // update IP
                memcpy ( ( uint16_t* ) arp_table->at ( index ).ip,
-                        ( uint16_t* ) source.ip, 16 );
+                        ( uint16_t* ) source.ip, 8 );
 
                // update port
                arp_table->at ( index ).port = source.port;
@@ -277,11 +277,11 @@ void derailleur::Controller::learn_source_device (
           derailleur::Arp4 source;
 
           // IP
-          memcpy ( ( uint16_t* ) source.ip,
-                   ( uint16_t* ) packet_in->data() + 28, 4 );
+          memcpy ( ( uint8_t* ) &source.ip,
+                   ( uint8_t* ) packet_in->data() + 28, 4 );
 
           // MAC
-          memcpy ( ( uint8_t* ) source.mac,
+          memcpy ( ( uint8_t* ) &source.mac,
                    ( uint8_t* ) packet_in->data() + 6, 6 );
 
           // Port
@@ -316,5 +316,8 @@ void derailleur::Controller::learn_source_device (
      }
 
      delete packet_in;
-     delete event;
+     
+     /* Event can not be deleted here because it is a pointer and is used after
+      * here in on_packet_in method. */
+     // delete event; 
 }

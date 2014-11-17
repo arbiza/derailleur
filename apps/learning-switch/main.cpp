@@ -80,36 +80,37 @@ public:
            * flow in the switch. */
 //           if ( this->learning_switch ( &event ) ) {
 
-//                std::vector<derailleur::Arp4> arp =
-//                     get_IPv4_neighborhood ( event->get_switch_id() );
-//
-//                std::cout << "\nn MACs: " << arp.size();
-//
-//
-//                for ( derailleur::Arp4 each : arp )
-//                     std::cout << "\nMAC: "
-//                               << derailleur::util::MAC_converter ( each.mac )
-//                               << " IP: "
-//                               << derailleur::util::ipv4_converter ( each.ip )
-//                               << " porta: "
-//                               << ( int ) each.port
-//                               <<  std::endl;
-//           }
+          std::vector<derailleur::Arp4> arp =
+               get_IPv4_neighborhood ( event->get_switch_id() );
 
-          derailleur::Log::Instance()->log ( this->get_name().c_str(),
-               "packet-in" );
-
-        delete event;
-     } // on_packet_in
+          std::cout << "\nn MACs: " << arp.size();
 
 
-     void message_handler ( const derailleur::Event* const event ) override {
+          for ( derailleur::Arp4 each : arp )
+               std::cout << "\nMAC: "
+                         << derailleur::util::MAC_converter ( each.mac )
+                         << " IP: "
+                         << derailleur::util::ipv4_converter ( each.ip )
+                         << " porta: "
+                         << ( int ) each.port
+                         <<  std::endl;
+//      }
 
-          derailleur::Log::Instance()->log ( this->get_name().c_str(),
-                                             "unknown/unhandled message" );
-                                             
-          delete event;
-     }
+     derailleur::Log::Instance()->log ( this->get_name().c_str(),
+                                        "packet-in" );
+
+     delete event;
+} // on_packet_in
+
+
+void message_handler ( const derailleur::Event* const event ) override
+{
+
+     derailleur::Log::Instance()->log ( this->get_name().c_str(),
+                                        "unknown/unhandled message" );
+
+     delete event;
+}
 
 };
 
