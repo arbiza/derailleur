@@ -53,17 +53,20 @@ void derailleur::Controller::message_callback (
      size_t length )
 {
 
-     // packet-in
-     if ( type == 10 ) {
-
-          derailleur::Event event ( this, ofconn->get_id(),
-                                    ofconn->get_version(),
-                                    type, data, length );
-
-          this->application_->on_packet_in ( std::move ( event ) );
-     }
-
      switch ( type ) {
+
+     case 10: // packet-in
+          //           learn_source_device ( new Event (
+          //                                      this, ofconn->get_id(),
+          //                                      ofconn->get_version(),
+          //                                      type, data, length ) );
+
+          this->application_->on_packet_in ( new Event (
+                                                  this, ofconn->get_id(),
+                                                  ofconn->get_version(),
+                                                  type, data, length ) );
+
+          break;
 
      case 6: // Switch UP: OFTP_FEATURES_REPLAY
           Log::Instance()->log ( "Controller",
@@ -190,7 +193,8 @@ void derailleur::Controller::connection_callback (
 
 
 
-void derailleur::Controller::knows_source_device ( derailleur::Event* event )
+void derailleur::Controller::learn_source_device (
+     const derailleur::Event* const event )
 {
      /* Check if the source is already stored in the ARP-like table; if not
       * stores the source. */
@@ -312,4 +316,5 @@ void derailleur::Controller::knows_source_device ( derailleur::Event* event )
      }
 
      delete packet_in;
+     delete event;
 }

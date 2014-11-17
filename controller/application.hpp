@@ -82,7 +82,7 @@ public:
       * This method MUST be implemented by Application children.
       * @param switch_id Controller sends the switch identifier.
       */
-     virtual void on_packet_in ( derailleur::Event event ) = 0;
+     virtual void on_packet_in ( const derailleur::Event* const event ) = 0;
 
      /**
       * * Pure virtual method triggered by Controller when a switch sends any

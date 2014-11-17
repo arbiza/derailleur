@@ -22,6 +22,7 @@
 
 #include <cstdlib>
 #include <cstdint>
+#include <cstring>
 
 #include <fluid/OFServer.hh>
 #include <fluid/of10msg.hh>
@@ -42,14 +43,17 @@ public:
              const uint8_t of_version,
              const int type,
              const void* data,
-             const size_t length ) {
+             const size_t length )
+          : handler_ ( ofhandler ), switch_id_ ( switch_id ),
+            of_version_ ( of_version ), type_ ( type ),
+            data_ ( ( uint8_t* ) data ), length_ ( length ) {
 
-          this->handler_ = ofhandler;
-          this->type_ = type;
-          this->data_ = ( uint8_t* ) data;
-          this->length_ = length;
-          this->of_version_ = of_version;
-          this->switch_id_ = switch_id;
+//           this->handler_ = ofhandler;
+//           this->type_ = type;
+//           this->data_ = &data;
+//           this->length_ = length;
+//           this->of_version_ = of_version;
+//           this->switch_id_ = switch_id;
 
           /* If the packet is a packet-in (10) ip_version_ is set; if not it
            * will not be. It may change in the future, but for now I do not see
@@ -69,7 +73,7 @@ public:
      }
 
      uint8_t* get_data () const {
-          return this->data_;
+          return ( uint8_t* ) this->data_;
      }
 
      size_t get_length () const {
@@ -83,7 +87,7 @@ public:
      uint8_t get_version () const {
           return this->of_version_;
      }
-     
+
      uint8_t get_ip_version () const {
           return this->ip_version_;
      }
@@ -91,7 +95,7 @@ public:
 private:
 
      /**
-      * Set ip_version_ attribute with 4 or 6 corresponding to the version of 
+      * Set ip_version_ attribute with 4 or 6 corresponding to the version of
       * IP of the packet. It is called only when the received packet is a packet-
       * in (type 10).
       */
@@ -101,16 +105,15 @@ private:
 
           if ( this->of_version_ == fluid_msg::of13::OFP_VERSION ) {
                packet_in = new fluid_msg::of13::PacketIn();
-               packet_in->unpack ( this->data_ );
+               packet_in->unpack ( ( uint8_t* ) this->data_ );
           } else {
                packet_in = new fluid_msg::of10::PacketIn();
-               packet_in->unpack ( this->data_ );
+               packet_in->unpack ( ( uint8_t* ) this->data_ );
           }
 
           uint16_t link_layer = derailleur::util::get_link_layer_protocol (
                                      ( uint8_t* ) packet_in->data() );
 
-          derailleur::Log::Instance()->log ( "Event", "4" );
 
           if ( link_layer == derailleur::util::Protocols.link_layer.ipv6 )
                this->ip_version_ = 6;
@@ -122,12 +125,12 @@ private:
      }
 
      fluid_base::OFHandler* handler_;
+     int switch_id_;
+     uint8_t of_version_;
      int type_;
      uint8_t* data_;
      size_t length_;
      uint8_t ip_version_;
-     int switch_id_;
-     uint8_t of_version_;
 };
 
 } //  namespace derailleur
