@@ -109,7 +109,7 @@ typedef struct capabilities_13 {
  */
 typedef struct arp {
      uint8_t mac[6]; 
-     int ip[1];
+     uint8_t* ip;
      uint32_t port;
   } Arp;
 
