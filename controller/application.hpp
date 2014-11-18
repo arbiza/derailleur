@@ -227,9 +227,8 @@ public:
       *TODO: comment and implement about installing flow.
       *
       * @param event Event pointer.
-      * @return true if the packet-in is ARP or ICMPv6 and if the switch learned
-      * a new device;; false if it is not a discovery packet or if something
-      * gone wrong.
+      * @return true if a flow was installed; false if not or if something gone
+      * wrong (e.g. packet corrupted).
       * @see Event
       */
      bool learning_switch ( const derailleur::Event* const event );

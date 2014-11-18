@@ -109,28 +109,35 @@ typedef struct capabilities_13 {
  */
 typedef struct arp {
      uint8_t mac[6]; 
-     uint8_t* ip;
+     void* ip;
      uint32_t port;
-  } Arp;
+} Arp;
+  
+typedef std::vector<Arp> ArpTable;
+
 
 /**
  * Arp6 is an Arp-like structure for IPv6 neiborhood.
  * It is used to provide L2 leaning switching features and may be used to
  * provide an overview of the entire network connected to the switch.
  */
-typedef struct arp6 : arp {
+typedef struct arp6 : public Arp {
      uint16_t ip[8];
 } Arp6;
+
+typedef std::vector<Arp6> Arp6Table;
+
 
 /**
  * Arp4 is an Arp-like structure for IPv4 neiborhood.
  * It is used to provide L2 leaning switching features and may be used to
  * provide an overview of the entire network connected to the switch.
  */
-typedef struct arp4 : arp {
+typedef struct arp4 : public Arp {
      uint8_t ip[4];
 } Arp4;
 
+typedef std::vector<Arp4> Arp4Table;
 
 
 /**
