@@ -81,6 +81,7 @@ bool derailleur::Application::learning_switch (
 
      fluid_msg::PacketInCommon* packet_in = nullptr;
      uint32_t in_port;
+     uint32_t out_port;
 
 
      /* Set the proper version of packet-in. */
@@ -113,28 +114,37 @@ bool derailleur::Application::learning_switch (
               ( uint8_t* ) packet_in->data(), 6 );
 
 
-     derailleur::ArpTable* arp_table;
-
      // Lock to access the stack.
      this->mutex_->lock();
      // Lock to access the switch ARP-like table.
      //stack_ptr_->at ( event->get_switch_id() )->mutex_.lock();
 
 
-     /* Get ARP table (v4 | v6) */
+     /* Get ARP table (v4 | v6) and search for destination MAC; when found
+      * the port is copied to out_port. */
+     int index;
      if ( event->get_ip_version() ==  derailleur::util::IP::v6 ) {
-          derailleur::Arp6Table* arp6 = new derailleur::Arp6Table;
-          arp6 = &stack_ptr_->at ( event->get_switch_id() )->arp_table_v6_;
-          arp_table = dynamic_cast<ArpTable>(arp6);
+
+          derailleur::Arp6Table* arp_table =
+               &stack_ptr_->at ( event->get_switch_id() )->arp_table_v6_;
+
+          if ( ( index = search_MAC_in_table (
+                              ( uint8_t* ) &dst_mac, arp_table ) ) >=  0 )
+               out_port = arp_table->at ( index ).port;
+
      } else {
-          arp_table =  &stack_ptr_->at ( event->get_switch_id() )->arp_table_v4_;
+
+          derailleur::Arp4Table* arp_table =
+               &stack_ptr_->at ( event->get_switch_id() )->arp_table_v4_;
+
+          if ( ( index = search_MAC_in_table (
+                              ( uint8_t* ) &dst_mac, arp_table ) ) >=  0 )
+               out_port = arp_table->at ( index ).port;
      }
 
 
-     /* Search for destination */
-     int index;
-     if ( ( index = search_MAC_in_table (
-                         ( uint8_t* ) &dst_mac, arp_table ) ) >=  0 ) {
+     /* If destination was found a flow is installed. */
+     if ( index >=  0 ) {
 
 
           /* get source MAC */
@@ -152,8 +162,8 @@ bool derailleur::Application::learning_switch (
                fm.cookie_mask ( 0xffffffffffffffff );
                fm.table_id ( 0 );
                fm.command ( fluid_msg::of13::OFPFC_ADD );
-               fm.idle_timeout ( 5 );
-               fm.hard_timeout ( 10 );
+               fm.idle_timeout ( 15 );
+               fm.hard_timeout ( 0 );
                fm.priority ( 10 );
                fm.buffer_id ( packet_in->buffer_id() );
                fm.out_port ( 0 );
@@ -163,8 +173,7 @@ bool derailleur::Application::learning_switch (
                fluid_msg::of13::EthDst destination ( ( ( uint8_t* ) &dst_mac ) );
                fm.add_oxm_field ( source );
                fm.add_oxm_field ( destination );
-               fluid_msg::of13::OutputAction act ( arp_table->at ( index ).port,
-                                                   1024 );
+               fluid_msg::of13::OutputAction act ( out_port, 1024 );
                fluid_msg::of13::ApplyActions inst;
                inst.add_action ( act );
                fm.add_instruction ( inst );
@@ -191,7 +200,6 @@ bool derailleur::Application::learning_switch (
      this->mutex_->unlock();
 
      delete packet_in;
-     delete arp_table;
 
      /* If program reached this point any device was learned. */
      return flow_installed;

@@ -63,54 +63,42 @@ public:
      void on_packet_in ( const derailleur::Event* const event ) override {
 
 
-//           fluid_msg::PacketInCommon* packet_in = nullptr;
-//
-//           if ( event->get_version() == fluid_msg::of13::OFP_VERSION ) {
-//                packet_in = new fluid_msg::of13::PacketIn();
-//                packet_in->unpack ( event->get_data() );
-//           } else {
-//                packet_in = new fluid_msg::of10::PacketIn();
-//                packet_in->unpack ( event->get_data() );
-//           }
-
-
           /* learning_switch inherited method extracts link and internet
            * layers information from packet data, updates switches'
            * ARP-like tables (IPv4 and IPv6) and installs the proper
            * flow in the switch. */
-//           if ( this->learning_switch ( &event ) ) {
+          if ( this->learning_switch ( event ) ) {
 
-          std::vector<derailleur::Arp4> arp =
-               get_IPv4_neighborhood ( event->get_switch_id() );
+               std::vector<derailleur::Arp4> arp =
+                    get_IPv4_neighborhood ( event->get_switch_id() );
 
-          std::cout << "\nn MACs: " << arp.size();
-
-
-          for ( derailleur::Arp4 each : arp )
-               std::cout << "\nMAC: "
-                         << derailleur::util::MAC_converter ( each.mac )
-                         << " IP: "
-                         << derailleur::util::ipv4_converter ( each.ip )
-                         << " porta: "
-                         << ( int ) each.port
-                         <<  std::endl;
-//      }
-
-     derailleur::Log::Instance()->log ( this->get_name().c_str(),
-                                        "packet-in" );
-
-     delete event;
-} // on_packet_in
+               std::cout << "\nn MACs: " << arp.size();
 
 
-void message_handler ( const derailleur::Event* const event ) override
-{
+               for ( derailleur::Arp4 each : arp )
+                    std::cout << "\nMAC: "
+                              << derailleur::util::MAC_converter ( each.mac )
+                              << " IP: "
+                              << derailleur::util::ipv4_converter ( each.ip )
+                              << " porta: "
+                              << ( int ) each.port
+                              <<  std::endl;
+          }
 
-     derailleur::Log::Instance()->log ( this->get_name().c_str(),
-                                        "unknown/unhandled message" );
+          derailleur::Log::Instance()->log ( this->get_name().c_str(),
+                                             "packet-in" );
 
-     delete event;
-}
+          delete event;
+     } // on_packet_in
+
+
+     void message_handler ( const derailleur::Event* const event ) override {
+
+          derailleur::Log::Instance()->log ( this->get_name().c_str(),
+                                             "unknown/unhandled message" );
+
+          delete event;
+     }
 
 };
 
