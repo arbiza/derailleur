@@ -22,3 +22,8 @@ lib/
 ## For now it is not tracked, only Doxygen configuration file was added
 doc/html/
 *swp
+
+
+# Its the application I'm developing for my thesis; it is here because
+# while I develop it probably some changes will be made on Derailleur.
+apps/thingsflow
