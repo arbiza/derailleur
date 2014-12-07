@@ -27,8 +27,8 @@ message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
 
 
 # Add derailleur library
-add_library(libderailleur SHARED IMPORTED)
-set_property(TARGET libderailleur PROPERTY IMPORTED_LOCATION /home/lucas/projetos/derailleur/controller/build/lib/libderailleur.so)
+#add_library(libderailleur SHARED IMPORTED)
+#set_property(TARGET libderailleur PROPERTY IMPORTED_LOCATION /home/lucas/projetos/derailleur/controller/build/lib/libderailleur.so)
 
 
 # Executable
@@ -36,4 +36,4 @@ add_executable(${EXECUTABLE} ${SOURCES})
 
 
 # Link libraries
-target_link_libraries(${EXECUTABLE} fluid_base fluid_msg pthread libderailleur)
+target_link_libraries(${EXECUTABLE} fluid_base fluid_msg pthread derailleur)

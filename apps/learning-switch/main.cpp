@@ -18,7 +18,7 @@
 #include <list>
 
 
-#include "../../derailleur.hpp"
+#include <derailleur.hpp>
 
 #include <unistd.h>
 
