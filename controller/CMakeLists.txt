@@ -13,6 +13,7 @@ set(CMAKE_BUILD_TYPE Release)
 message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
 
 
+
 # Set directories
 aux_source_directory(. SRC_LIST)
 set(HEADERS 
@@ -26,7 +27,13 @@ set(HEADERS
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(INCLUDE_DIR "/usr/include/")
 set(HEADERS_DIR "/usr/include/derailleur/")
-set(LIBS_DIR "/usr/lib/")
+
+# Set LIBS_DIR according system architecture
+if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+    	set( LIBS_DIR "/usr/lib64/" )
+else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+	set( LIBS_DIR "/usr/lib/" )
+endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 
 
 # Build library
