@@ -15,18 +15,18 @@
 #ifndef _DERAILLEUR_HPP_
 #define _DERAILLEUR_HPP_
 
-// This file is the only one anyone which will use derailleur controller
+// This file is the only one anyone which will use derailleur derailleur
 // should include. It includes the header files needed for applications.
 
 #include <fluid/of10msg.hh>
 #include <fluid/of13msg.hh>
 
-#include "controller/controller.hpp"
-#include "controller/application.hpp"
-#include "controller/event.hpp"
-#include "controller/switch.hpp"
-#include "controller/util.hpp"
-#include "controller/log.hpp"
+#include "derailleur/controller.hpp"
+#include "derailleur/application.hpp"
+#include "derailleur/event.hpp"
+#include "derailleur/switch.hpp"
+#include "derailleur/util.hpp"
+#include "derailleur/log.hpp"
 
 
 

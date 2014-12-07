@@ -15,8 +15,17 @@ message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
 
 # Set directories
 aux_source_directory(. SRC_LIST)
+set(HEADERS 
+	"application.hpp"
+	"log.hpp"
+	"switch.hpp"
+	"controller.hpp"
+	"event.hpp"
+	"util.hpp"
+	)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(INCLUDE_DIR "/usr/include/derailleur/")
+set(INCLUDE_DIR "/usr/include/")
+set(HEADERS_DIR "/usr/include/derailleur/")
 set(LIBS_DIR "/usr/lib/")
 
 
@@ -28,3 +37,5 @@ add_library(${PROJECT_NAME} SHARED  ${SRC_LIST})
 ### Install:
 install(TARGETS derailleur DESTINATION ${LIBS_DIR})
 install(FILES derailleur.hpp DESTINATION ${INCLUDE_DIR})
+install(FILES ${HEADERS} DESTINATION ${HEADERS_DIR})
+
