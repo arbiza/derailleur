@@ -15,6 +15,9 @@
 #include <utility>
 #include <vector>
 
+// TODO: remove
+#include <sstream>
+
 #include "controller.hpp"
 #include "application.hpp"
 #include "event.hpp"
@@ -279,7 +282,7 @@ void derailleur::Controller::learn_source_device (
 
           // IP
           memcpy ( ( uint8_t* ) &source.ip,
-                   ( uint8_t* ) packet_in->data() + 28, 4 );
+                   ( uint8_t* ) packet_in->data() + 26, 4 );
 
           // MAC
           memcpy ( ( uint8_t* ) &source.mac,
@@ -287,6 +290,17 @@ void derailleur::Controller::learn_source_device (
 
           // Port
           source.port = in_port;
+          
+          std::stringstream src;
+          src << "Source: mac ";
+          src << derailleur::util::MAC_converter( source.mac );
+          src << ", ip ";
+          src << derailleur::util::ipv4_converter( source.ip );
+          src << ", port ";
+          src << (int) source.port;
+          derailleur::Log::Instance()->log (
+               "Controller",
+               src.str().c_str() );
 
 
           /* Get the ARP table pointer to search for device. */
@@ -297,11 +311,14 @@ void derailleur::Controller::learn_source_device (
 
 
           /* If device is unknown the new device will be stored in the ARP table. */
-          int index;
-          if ( ( index = derailleur::Application::search_MAC_in_table (
-                              ( uint8_t* ) source.mac, arp_table ) ) < 0 ) {
+          int index = derailleur::Application::search_MAC_in_table (
+                           ( uint8_t* ) source.mac, arp_table );
 
+          if ( index < 0 ) {
                arp_table->push_back ( source );
+               derailleur::Log::Instance()->log (
+                    "Controller",
+                    "Novo dispositivo adicionado." );
           }
           /* If device is known its entry is updated because it IP or port may
            * changed. */
@@ -312,6 +329,14 @@ void derailleur::Controller::learn_source_device (
 
                // update port
                arp_table->at ( index ).port = source.port;
+               
+               std::stringstream ss;
+               ss << "Atualizado MAC ";
+               ss << derailleur::util::MAC_converter( arp_table->at( index ).mac );
+               
+               derailleur::Log::Instance()->log (
+                    "Controller",
+                    ss.str().c_str() );
           }
 
           this->mutex_.unlock();
