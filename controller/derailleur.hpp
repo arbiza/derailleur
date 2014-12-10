@@ -27,6 +27,7 @@
 #include "derailleur/switch.hpp"
 #include "derailleur/util.hpp"
 #include "derailleur/log.hpp"
+#include "derailleur/cli.hpp"
 
 
 
