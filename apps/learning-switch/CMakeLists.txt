@@ -3,7 +3,7 @@
 
 project(Learning_Switch)
 set(EXECUTABLE learning-switch)
-set(SOURCES main.cpp)
+set(SOURCES main.cpp learning_switch.cpp)
 
 
 # -----------------------------------------
@@ -24,11 +24,6 @@ set(CMAKE_BUILD_TYPE Release)
 # Messages output
 message("Building project ${project}")
 message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
-
-
-# Add derailleur library
-#add_library(libderailleur SHARED IMPORTED)
-#set_property(TARGET libderailleur PROPERTY IMPORTED_LOCATION /home/lucas/projetos/derailleur/controller/build/lib/libderailleur.so)
 
 
 # Executable

@@ -76,7 +76,7 @@ public:
       * @param switch_id Controller sends the switch identifier.
       */
      virtual void on_switch_down ( derailleur::Switch* switch_down ) = 0;
-     
+
      /**
       * Pure virtual method triggered by Controller when a packet-in is received.
       * This method MUST be implemented by Application children.
@@ -231,7 +231,8 @@ public:
       * wrong (e.g. packet corrupted).
       * @see Event
       */
-     bool learning_switch ( const derailleur::Event* const event );
+     bool learning_switch ( const derailleur::Event* const event,
+                            uint16_t hard_timeout, uint16_t idle_timeout );
 
 
      /**
@@ -276,7 +277,7 @@ private:
       */
      template <class TypeArp>
      static int search_MAC_in_table ( const uint8_t* mac,
-                               const std::vector<TypeArp>* table ) {
+                                      const std::vector<TypeArp>* table ) {
 
           for ( int i = 0; i < ( int ) table->size(); i++ ) {
                if ( derailleur::util::compare_byte_arrays ( mac,
