@@ -74,7 +74,8 @@ void derailleur::Application::get_switch_copy ( short int switch_id,
 
 
 bool derailleur::Application::learning_switch (
-     const derailleur::Event* const event )
+     const derailleur::Event* const event,
+     uint16_t hard_timeout, uint16_t idle_timeout )
 {
 
      bool flow_installed = false; /* value returned if no flow is installed.*/
@@ -162,8 +163,8 @@ bool derailleur::Application::learning_switch (
                fm.cookie_mask ( 0xffffffffffffffff );
                fm.table_id ( 0 );
                fm.command ( fluid_msg::of13::OFPFC_ADD );
-               fm.idle_timeout ( 15 );
-               fm.hard_timeout ( 0 );
+               fm.idle_timeout ( idle_timeout );
+               fm.hard_timeout ( hard_timeout );
                fm.priority ( 10 );
                fm.buffer_id ( packet_in->buffer_id() );
                fm.out_port ( 0 );
