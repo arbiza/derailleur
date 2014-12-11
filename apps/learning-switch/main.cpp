@@ -26,10 +26,8 @@ int main ( int argc, char *argv[] )
 
      controller.start();
 
-     while ( 1 ) {
-          sleep ( 1 );
-
-     }
+     derailleur::CLI cli ( &app );
+     cli.shell();
 
      return 0;
 }

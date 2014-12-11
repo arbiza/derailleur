@@ -20,17 +20,39 @@
 #ifndef CLI_H
 #define CLI_H
 
+#include <string>
+
 
 namespace derailleur {
+
+// forward declaration
+class Application;
 
 class CLI {
      
 public:
-     CLI();
-     ~CLI();
+     CLI( derailleur::Application* application ) {
+          this->application_ = application;
+     }
+     
+     /**
+      * shell method starts the command line interface and waits for commands.
+      */
+     void shell ();
 
 private:
      
+     /**
+      * show handles every show commands.
+      */
+     void show ();
+     
+     std::string input_;
+     
+     /**
+      * 
+      */
+     derailleur::Application* application_;
 };
 
 } // namespace derailleur

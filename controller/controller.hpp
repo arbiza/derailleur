@@ -43,13 +43,16 @@ class Controller : public fluid_base::OFServer {
 
 public:
 
-     // Contructor
+     // Constructor
      Controller ( const char* address,
                   const int port,
                   const int n_workers,
                   const bool secure,
                   derailleur::Application* application,
                   const char* log_path );
+                  
+     // Destructor
+     ~Controller();
 
 
 

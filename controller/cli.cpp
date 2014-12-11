@@ -17,14 +17,34 @@
  *
  */
 
-#include "../../controller/cli.hpp"
+#include <iostream>
 
-CLI::CLI()
+#include "application.hpp"
+#include "cli.hpp"
+
+void derailleur::CLI::shell()
 {
+     bool stay = true;
 
+     std::cout << "\n\nDerailleur OpenFlow Controller"
+               << "\nhttp://unexisting.page.com.br"
+               << "\n______________________________"
+               << "\n\nType your commands; help to see possibilities."
+               << "\nType 'quit' to exit.\n"
+               << std::endl;
+
+               
+     while ( stay ) {
+          
+          std::cout << this->application_->get_name() << " > ";
+          std::cin >> this->input_;
+          
+          if ( this->input_.find( "quit" ) != std::string::npos )
+               stay = false;
+     }
+
+     
+     std::cout << "\n\nBye!\n\n" << std::endl;
 }
 
-CLI::~CLI()
-{
 
-}

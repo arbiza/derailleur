@@ -20,15 +20,12 @@
 #include <vector>
 #include <mutex>
 
+#include <fluid/OFServer.hh>
 #include <fluid/of10msg.hh>
 #include <fluid/of13msg.hh>
 
 
 
-/** Forward declarations of classes from fluid_base namespace **/
-namespace fluid_base {
-class OFConnection;
-}
 
 /** Forward declarations of classes from fluid_msg namespace **/
 namespace fluid_msg {

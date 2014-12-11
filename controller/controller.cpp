@@ -45,6 +45,12 @@ derailleur::Controller::Controller ( const char* address,
 }
 
 
+derailleur::Controller::~Controller()
+{
+     Log::Instance()->log ( "Controller", "CONTROLLER EXECUTION FINISHED." );
+}
+
+
 
 void derailleur::Controller::message_callback (
      fluid_base::OFConnection *ofconn,

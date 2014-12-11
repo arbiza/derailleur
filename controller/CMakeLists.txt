@@ -23,6 +23,7 @@ set(HEADERS
 	"controller.hpp"
 	"event.hpp"
 	"util.hpp"
+	"cli.hpp"
 	)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(INCLUDE_DIR "/usr/include/")
