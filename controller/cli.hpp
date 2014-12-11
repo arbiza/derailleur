@@ -20,10 +20,10 @@
 #ifndef CLI_H
 #define CLI_H
 
-#include <string>
-
 
 namespace derailleur {
+
+#include <vector>
 
 // forward declaration
 class Application;
@@ -43,16 +43,20 @@ public:
 private:
      
      /**
+      * 
+      */
+     void help ();
+     
+     /**
       * show handles every show commands.
       */
-     void show ();
-     
-     std::string input_;
+     void show ( std::vector<std::string>& commands);
      
      /**
       * 
       */
      derailleur::Application* application_;
+     
 };
 
 } // namespace derailleur

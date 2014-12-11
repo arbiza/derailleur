@@ -18,6 +18,8 @@
  */
 
 #include <iostream>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 #include "application.hpp"
 #include "cli.hpp"
@@ -25,6 +27,15 @@
 void derailleur::CLI::shell()
 {
      bool stay = true;
+     std::string input;
+     std::vector<std::string> commands;
+     
+     /* allocate vector for at least 3 positions */
+     commands.reserve( 3 );
+
+     // get the name of the running app to show in the prompt
+     std::string app_name = this->application_->get_name();
+
 
      std::cout << "\n\nDerailleur OpenFlow Controller"
                << "\nhttp://unexisting.page.com.br"
@@ -33,18 +44,47 @@ void derailleur::CLI::shell()
                << "\nType 'quit' to exit.\n"
                << std::endl;
 
-               
+
      while ( stay ) {
-          
-          std::cout << this->application_->get_name() << " > ";
-          std::cin >> this->input_;
-          
-          if ( this->input_.find( "quit" ) != std::string::npos )
-               stay = false;
+
+          std::cout << app_name << " $> ";
+          std::getline ( std::cin, input );
+
+
+          if ( input.empty() ) {
+               // do nothing
+          } else {
+               boost::split ( commands, input, boost::is_any_of ( "," ) );
+
+
+               if ( commands[0] == "show" )
+                    show ( commands );
+               else if ( commands[0] == "help" )
+                    help();
+               else if ( commands[0] == "quit" )
+                    stay = false;
+               else
+                    std::cout << "Unknown command." << std::endl;
+               
+               /* clean vector up */
+               for ( std::string& s : commands )
+                    s.clear();
+          }
      }
 
-     
+
      std::cout << "\n\nBye!\n\n" << std::endl;
+}
+
+
+void derailleur::CLI::show ( std::vector< std::string >& commands )
+{
+     
+}
+
+void derailleur::CLI::help()
+{
+    
 }
 
 
