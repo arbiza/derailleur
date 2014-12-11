@@ -220,10 +220,10 @@ public:
      
      
      /**
-      * Return a map container with copies of all connected switches. Copies are
-      * pointer to a copy,  but not to the switch object.
+      * Return a pointer to map container with copies of all connected switches. 
+      * Switches copies are pointers to a copy,  but not to the switch object.
       */
-     std::map< int, derailleur::Switch* > get_switches_copies ();
+     std::map< int, derailleur::Switch* >* get_switches_copies ();
 
 
      ////// L2/L3 Switching related methods

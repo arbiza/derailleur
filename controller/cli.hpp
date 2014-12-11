@@ -26,14 +26,20 @@ namespace derailleur {
 #include <vector>
 #include <map>
 
+// TODO remove
+#include <string>
+
 // forward declaration
 class Application;
+class Switch;
 
 class CLI {
      
 public:
-     CLI( derailleur::Application* application ) {
-          this->application_ = application;
+     CLI( derailleur::Application* application );
+     
+     ~CLI() {
+          delete switches_copies_;
      }
      
      /**
@@ -63,8 +69,13 @@ private:
       * switches this container is populated/updated; when user asks for an 
       * specific switch only that switch is updated. It reduces the need of
       * copying switches objects, only some fields are updated.
+      * 
+      * Why is this a pointer instead of an object such as in Controller class?
+      * It is because CLI class is not instantiated in any other derailleur
+      * class, this way switches_copies is not initialized causing Segmentation
+      * Fault errors. This pointer is initialized in constructor. 
       */
-     std::map< int, derailleur::Switch* > switches_copies_;
+     std::map< int, derailleur::Switch* >* switches_copies_;
      
 };
 

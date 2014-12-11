@@ -25,8 +25,16 @@
 #include "application.hpp"
 #include "cli.hpp"
 
+derailleur::CLI::CLI ( derailleur::Application* application )
+{
+     this->application_ = application;
+     this->switches_copies_ = new std::map< int, derailleur::Switch* >;
+}
+
+
 void derailleur::CLI::shell()
 {
+
      bool stay = true;
      std::string input;
      std::vector<std::string> commands;
@@ -87,16 +95,29 @@ void derailleur::CLI::show ( std::vector< std::string >& commands )
                     << std::endl;
 
      else if ( commands[1] == "switches" ) {
-          
-          this->application_->get_switches_IDs();
-          
+
+          if ( this->switches_copies_->empty() )
+               this->switches_copies_ =
+                    this->application_->get_switches_copies();
+
           /* list switches */
-          std::cout << "\nSwitches connected:"
-                    << "==================="
+          std::cout << "\nSwitches connected: " << this->switches_copies_->size()
+                    << "\n==================================="
                     << std::endl;
+
+          std::map< int, derailleur::Switch* >::iterator it;
+
+          for ( it = this->switches_copies_->begin();
+                    it != this->switches_copies_->end();
+                    ++it ) {
+
+                    std::cout << it->first <<  std::endl;
+          }
           
-          
-                    
+          std::cout << "__________________________________\n" << std::endl;
+
+
+
      } else if ( commands[1] == "switch" ) {
           if ( commands.size() != 3 )
                std::cout << "Wrong usage of 'show switch'; use help to see options."

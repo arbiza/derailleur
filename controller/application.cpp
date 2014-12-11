@@ -117,10 +117,12 @@ bool derailleur::Application::get_switch_copy ( short int switch_id,
 }
 
 
-std::map< int, derailleur::Switch* > derailleur::Application::get_switches_copies()
+std::map< int, derailleur::Switch* >* derailleur::Application::get_switches_copies()
 {
      std::vector<int> ids = get_switches_IDs();
-     std::map< int, derailleur::Switch* > copies;
+
+     std::map< int, derailleur::Switch* >* copies =
+          new std::map< int, derailleur::Switch* >;
 
      for ( int& switch_id : ids ) {
           derailleur::Switch* s;
@@ -132,7 +134,7 @@ std::map< int, derailleur::Switch* > derailleur::Application::get_switches_copie
                s = new derailleur::Switch10;
 
           get_switch_copy ( switch_id, s );
-          copies.emplace ( std::make_pair ( switch_id, s ) );
+          copies->emplace ( std::make_pair ( switch_id, s ) );
      }
 
      return copies;
