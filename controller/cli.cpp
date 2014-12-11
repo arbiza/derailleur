@@ -54,7 +54,7 @@ void derailleur::CLI::shell()
           if ( input.empty() ) {
                // do nothing
           } else {
-               boost::split ( commands, input, boost::is_any_of ( "," ) );
+               boost::split ( commands, input, boost::is_any_of ( " " ) );
 
 
                if ( commands[0] == "show" )
@@ -64,7 +64,8 @@ void derailleur::CLI::shell()
                else if ( commands[0] == "quit" )
                     stay = false;
                else
-                    std::cout << "Unknown command." << std::endl;
+                    std::cout << "Unknown command; use help to see options."
+                              << std::endl;
 
                /* clean vector up */
                for ( std::string& s : commands )
@@ -80,7 +81,23 @@ void derailleur::CLI::shell()
 
 void derailleur::CLI::show ( std::vector< std::string >& commands )
 {
+     if ( commands.size() < 2 )
+          std::cout << "'show' requires arguments; use help to see options."
+                    << std::endl;
 
+     else if ( commands[1] == "switches" ) {
+          /* list switches */
+          std::cout << "list switches" << std::endl;
+     } else if ( commands[1] == "switch" ) {
+          if ( commands.size() != 3 )
+               std::cout << "Wrong usage of 'show switch'; use help to see options."
+                         << std::endl;
+          else {
+               std::cout << "show switch" << std::endl;
+          }
+     } else
+          std::cout << "Unknown option for 'show'; use help to see options."
+                    << std::endl;
 }
 
 
