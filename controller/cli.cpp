@@ -90,18 +90,16 @@ void derailleur::CLI::shell()
 void derailleur::CLI::show ( std::vector< std::string >& commands )
 {
      if ( commands.size() < 2 ) {
-          
+
           std::cout << "'show' requires arguments; use help to see options."
                     << std::endl;
 
-     } 
+     }
      /* list switches */
-     else if ( commands[1] == "switches" ) { 
+     else if ( commands[1] == "switches" ) {
 
-          if ( this->switches_copies_->empty() )
-               this->application_->get_switches_copies ( switches_copies_ );
+          this->application_->get_switches_copies ( switches_copies_ );
 
-          
           std::cout << "\nSwitches connected: "
                     << this->switches_copies_->size()
                     << "\n" << std::endl;
@@ -114,12 +112,12 @@ void derailleur::CLI::show ( std::vector< std::string >& commands )
 
                std::cout << it->first <<  std::endl;
           }
-          
+
           std::cout << std::endl;
 
-       } 
+     }
      /* Show one switch */
-       else if ( commands[1] == "switch" ) { 
+     else if ( commands[1] == "switch" ) {
           if ( commands.size() != 3 )
                std::cout << "Wrong usage of 'show switch'; use help to see options."
                          << std::endl;

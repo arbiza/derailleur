@@ -117,22 +117,46 @@ bool derailleur::Application::get_switch_copy ( short int switch_id,
 }
 
 
-void derailleur::Application::get_switches_copies(
+void derailleur::Application::get_switches_copies (
      std::map< int, derailleur::Switch* >* copies )
 {
      std::vector<int> ids = get_switches_IDs();
+     std::map< int, derailleur::Switch* >::iterator it;
 
+     /* Get ids of all connected switches; if switch is in copies container it
+      * will be updated; if not it will be added. */
      for ( int& switch_id : ids ) {
-          derailleur::Switch* s;
 
-          if ( this->stack_ptr_->at ( switch_id )->get_of_version() ==
-                    fluid_msg::of13::OFP_VERSION )
-               s = new derailleur::Switch13;
-          else
-               s = new derailleur::Switch10;
+          it = copies->find ( switch_id );
 
-          get_switch_copy ( switch_id, s );
-          copies->emplace ( std::make_pair ( switch_id, s ) );
+          /* if do not find the switch it will be added. */
+          if ( it == copies->end() ) {
+
+               derailleur::Switch* s;
+
+               if ( this->stack_ptr_->at ( switch_id )->get_of_version() ==
+                         fluid_msg::of13::OFP_VERSION )
+                    s = new derailleur::Switch13;
+               else
+                    s = new derailleur::Switch10;
+
+               get_switch_copy ( switch_id, s );
+               copies->emplace ( std::make_pair ( switch_id, s ) );
+          }
+          /* if the switch was found in copies container only ARP tables are
+           * updated.  */
+          else {
+
+               this->mutex_->lock();
+
+               it->second->arp_table_v6_ =
+                    this->stack_ptr_->at ( switch_id )->arp_table_v6_;
+               it->second->arp_table_v4_ =
+                    this->stack_ptr_->at ( switch_id )->arp_table_v4_;
+
+               this->mutex_->unlock();
+          }
+
      }
 }
 
