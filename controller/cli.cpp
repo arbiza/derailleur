@@ -29,9 +29,9 @@ void derailleur::CLI::shell()
      bool stay = true;
      std::string input;
      std::vector<std::string> commands;
-     
+
      /* allocate vector for at least 3 positions */
-     commands.reserve( 3 );
+     commands.reserve ( 3 );
 
      // get the name of the running app to show in the prompt
      std::string app_name = this->application_->get_name();
@@ -65,7 +65,7 @@ void derailleur::CLI::shell()
                     stay = false;
                else
                     std::cout << "Unknown command." << std::endl;
-               
+
                /* clean vector up */
                for ( std::string& s : commands )
                     s.clear();
@@ -77,14 +77,21 @@ void derailleur::CLI::shell()
 }
 
 
+
 void derailleur::CLI::show ( std::vector< std::string >& commands )
 {
-     
+
 }
+
+
 
 void derailleur::CLI::help()
 {
-    
+     std::cout << "\n\nHELP\n"
+               << "\nshow switches - list connected switches."
+               << "\nshow switch <number> - show switch's info and its LAN."
+               << "\n\nquit - stop controller and exit.\n"
+               << std::endl;
 }
 
 
