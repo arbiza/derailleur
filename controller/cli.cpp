@@ -82,7 +82,6 @@ void derailleur::CLI::shell()
           }
      }
 
-
      std::cout << "\n\nBye!\n\n" << std::endl;
 }
 
@@ -90,20 +89,22 @@ void derailleur::CLI::shell()
 
 void derailleur::CLI::show ( std::vector< std::string >& commands )
 {
-     if ( commands.size() < 2 )
+     if ( commands.size() < 2 ) {
+          
           std::cout << "'show' requires arguments; use help to see options."
                     << std::endl;
 
-     else if ( commands[1] == "switches" ) {
+     } 
+     /* list switches */
+     else if ( commands[1] == "switches" ) { 
 
           if ( this->switches_copies_->empty() )
-               this->switches_copies_ =
-                    this->application_->get_switches_copies();
+               this->application_->get_switches_copies ( switches_copies_ );
 
-          /* list switches */
-          std::cout << "\nSwitches connected: " << this->switches_copies_->size()
-                    << "\n==================================="
-                    << std::endl;
+          
+          std::cout << "\nSwitches connected: "
+                    << this->switches_copies_->size()
+                    << "\n" << std::endl;
 
           std::map< int, derailleur::Switch* >::iterator it;
 
@@ -111,14 +112,14 @@ void derailleur::CLI::show ( std::vector< std::string >& commands )
                     it != this->switches_copies_->end();
                     ++it ) {
 
-                    std::cout << it->first <<  std::endl;
+               std::cout << it->first <<  std::endl;
           }
           
-          std::cout << "__________________________________\n" << std::endl;
+          std::cout << std::endl;
 
-
-
-     } else if ( commands[1] == "switch" ) {
+       } 
+     /* Show one switch */
+       else if ( commands[1] == "switch" ) { 
           if ( commands.size() != 3 )
                std::cout << "Wrong usage of 'show switch'; use help to see options."
                          << std::endl;

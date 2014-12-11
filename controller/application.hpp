@@ -223,7 +223,7 @@ public:
       * Return a pointer to map container with copies of all connected switches. 
       * Switches copies are pointers to a copy,  but not to the switch object.
       */
-     std::map< int, derailleur::Switch* >* get_switches_copies ();
+     void get_switches_copies ( std::map< int, derailleur::Switch* >* copies );
 
 
      ////// L2/L3 Switching related methods
