@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <vector>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
 
@@ -86,8 +87,16 @@ void derailleur::CLI::show ( std::vector< std::string >& commands )
                     << std::endl;
 
      else if ( commands[1] == "switches" ) {
+          
+          this->application_->get_switches_IDs();
+          
           /* list switches */
-          std::cout << "list switches" << std::endl;
+          std::cout << "\nSwitches connected:"
+                    << "==================="
+                    << std::endl;
+          
+          
+                    
      } else if ( commands[1] == "switch" ) {
           if ( commands.size() != 3 )
                std::cout << "Wrong usage of 'show switch'; use help to see options."

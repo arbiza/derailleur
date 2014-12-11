@@ -216,6 +216,14 @@ public:
       * and copy was not made.
       */
      bool get_switch_copy ( short switch_id, derailleur::Switch& other );
+     bool get_switch_copy ( short switch_id, derailleur::Switch* other );
+     
+     
+     /**
+      * Return a map container with copies of all connected switches. Copies are
+      * pointer to a copy,  but not to the switch object.
+      */
+     std::map< int, derailleur::Switch* > get_switches_copies ();
 
 
      ////// L2/L3 Switching related methods

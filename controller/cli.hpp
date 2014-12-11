@@ -24,6 +24,7 @@
 namespace derailleur {
 
 #include <vector>
+#include <map>
 
 // forward declaration
 class Application;
@@ -56,6 +57,14 @@ private:
       * 
       */
      derailleur::Application* application_;
+     
+     /**
+      * Container where switches' copies are stored. Every time user asks for
+      * switches this container is populated/updated; when user asks for an 
+      * specific switch only that switch is updated. It reduces the need of
+      * copying switches objects, only some fields are updated.
+      */
+     std::map< int, derailleur::Switch* > switches_copies_;
      
 };
 
