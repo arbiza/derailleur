@@ -45,30 +45,39 @@ uint8_t derailleur::Application::get_auxiliary_id ( short int switch_id )
 }
 
 
-void derailleur::Application::get_switch_copy ( short int switch_id,
+bool derailleur::Application::get_switch_copy ( short int switch_id,
           derailleur::Switch& other )
 {
+     bool found = false;
+     
      this->mutex_->lock();
 
-     derailleur::Switch* source = this->stack_ptr_->at ( switch_id );
+     /* Ensure that element exists in the container,  otherwise returns false. */
+     if ( this->stack_ptr_->find ( switch_id ) != this->stack_ptr_->end() ) {
+          derailleur::Switch* source = this->stack_ptr_->at ( switch_id );
 
-     other.connection_ = nullptr;
-     other.switch_id_ = source->switch_id_;
-     other.name_ = source->name_;
-     other.mac_address_ = source->mac_address_;
-     other.of_version_ = source->of_version_;
-     other.datapath_id_ = source->datapath_id_;
-     other.n_buffers_ = source->n_buffers_;
-     other.n_tables_ = source->n_tables_;
-     other.manufacturer_ = source->manufacturer_;
-     other.hardware_ = source->hardware_;
-     other.software_ = source->software_;
-     other.serial_number_ = source->serial_number_;
-     other.datapath_ = source->datapath_;
-     other.arp_table_v4_ = source->arp_table_v4_;
-     other.arp_table_v6_ = source->arp_table_v6_;
+          other.connection_ = nullptr;
+          other.switch_id_ = source->switch_id_;
+          other.name_ = source->name_;
+          other.mac_address_ = source->mac_address_;
+          other.of_version_ = source->of_version_;
+          other.datapath_id_ = source->datapath_id_;
+          other.n_buffers_ = source->n_buffers_;
+          other.n_tables_ = source->n_tables_;
+          other.manufacturer_ = source->manufacturer_;
+          other.hardware_ = source->hardware_;
+          other.software_ = source->software_;
+          other.serial_number_ = source->serial_number_;
+          other.datapath_ = source->datapath_;
+          other.arp_table_v4_ = source->arp_table_v4_;
+          other.arp_table_v6_ = source->arp_table_v6_;
+          
+          found = true;
+     }
 
      this->mutex_->unlock();
+     
+     return found;
 }
 
 

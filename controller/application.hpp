@@ -207,13 +207,15 @@ public:
 
 
      /**
-      * Returns a copy of the switch without connection pointer. This method
-      * copies all values of the switch object, but not the connection pointer
-      * to avoid trying attempts to use a connection pointer that may not exist
-      * anymore due to a disconnection. Values copied are that common for all
-      * OpenFlow versions, the ones included in Switch class.
+      * Copy the switch identified by switch_id to other pointer. The copy has
+      * not a connection pointer. It is not possible to interact with the switch
+      * through the copied object.
+      * @param switch_id switch identifier.
+      * @param other object to where the switch is copied.
+      * @return true if a copy is made; false if switch is not yet connected
+      * and copy was not made.
       */
-     void get_switch_copy ( short switch_id, derailleur::Switch& other );
+     bool get_switch_copy ( short switch_id, derailleur::Switch& other );
 
 
      ////// L2/L3 Switching related methods
