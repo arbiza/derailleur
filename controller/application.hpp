@@ -224,6 +224,16 @@ public:
       * Switches copies are pointers to a copy,  but not to the switch object.
       */
      void get_switches_copies ( std::map< int, derailleur::Switch* >* copies );
+     
+     
+     /**
+      * Update ARP-like tables of an specific switch which ID is passed by
+      * parameter.
+      * @param copies pointer to the container with switches copies
+      * @param id identifier of the switch to be updated
+      */
+     void update_switch_ARP_tables ( 
+          std::map< int, derailleur::Switch* >* copies, int id);
 
 
      ////// L2/L3 Switching related methods

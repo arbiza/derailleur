@@ -202,16 +202,51 @@ void derailleur::CLI::show ( std::vector< std::string >& commands )
 void derailleur::CLI::print_switch_lan (
      std::map< int, derailleur::Switch* >::iterator& it )
 {
-     std::cout << "\nSwitch ID:" << std::setfill ( '.' ) << std::setw ( 64 ) << it->first
-               << "\nName:" << std::setfill ( '.' ) << std::setw ( 69 ) << it->second->get_name()
-               << "\nMAC:" << std::setfill ( '.' ) << std::setw ( 70 ) << it->second->get_mac_address()
-               << "\nManufacturer:" << std::setfill ( '.' ) << std::setw ( 61 ) << it->second->get_manufacturer()
-               << "\nOpenFlow version:" << std::setfill ( '.' ) << std::setw ( 57 ) << ( int ) it->second->get_version()
-               << "\nHardware:"  << std::setfill ( '.' ) << std::setw ( 65 ) << it->second->get_hardware()
-               << "\nSoftware:" << std::setfill ( '.' ) << std::setw ( 65 ) << it->second->get_software()
-               << "\nSerial number:" << std::setfill ( '.' ) << std::setw ( 60 ) << it->second->get_serial_number()
-               << "\n\nLAN"
+
+     /* update switch table */
+     this->application_->update_switch_ARP_tables ( switches_copies_, it->first );
+
+     std::cout << std::setfill ( '.' )
+               << "\nSwitch ID:"  << std::setw ( 69 ) << it->first
+               << "\nName:" << std::setw ( 74 ) << it->second->get_name()
+               << "\nMAC:" << std::setw ( 75 ) << it->second->get_mac_address()
+               << "\nManufacturer:" << std::setw ( 66 ) << it->second->get_manufacturer()
+               << "\nOpenFlow version:" << std::setw ( 62 ) << ( int ) it->second->get_version()
+               << "\nHardware:" << std::setw ( 70 ) << it->second->get_hardware()
+               << "\nSoftware:" << std::setw ( 70 ) << it->second->get_software()
+               << "\nSerial number:" << std::setw ( 65 ) << it->second->get_serial_number()
                << std::endl;
+
+
+     if ( it->second->get_IPv4_neighborhood().size() == 0 )
+          std::cout << "\nIPv4 LAN: None device connected.\n" << std::endl;
+     else {
+
+          std::cout << "\nIPv4 LAN\n\n"
+                    << std::setfill ( ' ' )
+                    << "Manufacturer"
+                    << std::setw ( 14 ) << "Port  MAC"
+                    << std::setw ( 54 ) << "IP address\n"
+                    << std::setfill ( '-' ) << std::setw ( 80 ) << "\n"
+                    << std::endl;
+
+          for ( derailleur::Arp4& entry :
+                    it->second->get_IPv4_neighborhood() ) {
+
+               // TODO: calculate width for manufacturers
+               std::cout << std::setfill ( ' ' )
+                         << std::setw ( 16 ) << "Missing"
+                         << std::setw ( 5 ) << entry.port
+                         << std::setw ( 19 )
+                         <<  derailleur::util::MAC_converter ( entry.mac )
+                         << std::setw ( 40 )
+                         << derailleur::util::ipv4_converter ( entry.ip )
+                         << std::endl;
+          }
+     }
+
+
+     std::cout << std::endl;
 }
 
 

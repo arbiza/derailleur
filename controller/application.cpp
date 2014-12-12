@@ -1,6 +1,6 @@
 
 // TODO: remove
-#include <sstream>
+#include <iostream>
 
 #include <fluid/OFServer.hh>
 #include <fluid/of10msg.hh>
@@ -142,6 +142,26 @@ void derailleur::Application::get_switches_copies (
           copies->emplace ( std::make_pair ( switch_id, s ) );
      }
 }
+
+
+
+void derailleur::Application::update_switch_ARP_tables (
+     std::map< int, derailleur::Switch* >* copies, int id )
+{
+     this->mutex_->lock();
+
+     /* Ensure that element exists in the container,  otherwise returns false. */
+     if ( this->stack_ptr_->find ( id ) != this->stack_ptr_->end() ) {
+
+          copies->at ( id )->arp_table_v4_ =
+               this->stack_ptr_->at ( id )->arp_table_v4_;
+          copies->at ( id )->arp_table_v6_ =
+               this->stack_ptr_->at ( id )->arp_table_v6_;
+     }
+
+     this->mutex_->unlock();
+}
+
 
 
 

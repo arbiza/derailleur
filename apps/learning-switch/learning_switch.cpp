@@ -36,32 +36,11 @@ void LearningSwitch::on_switch_down ( derailleur::Switch* switch_down )
 
 void LearningSwitch::on_packet_in ( const derailleur::Event* const event )
 {
-
-
      /* learning_switch inherited method extracts link and internet
       * layers information from packet data, updates switches'
       * ARP-like tables (IPv4 and IPv6) and installs the proper
       * flow in the switch. */
-     if ( this->learning_switch ( event, 15, 5 ) ) {
-
-          std::vector<derailleur::Arp4> arp =
-               get_IPv4_neighborhood ( event->get_switch_id() );
-
-          std::cout << "\nn MACs: " << arp.size();
-
-
-          for ( derailleur::Arp4 each : arp )
-               std::cout << "\nMAC: "
-                         << derailleur::util::MAC_converter ( each.mac )
-                         << " IP: "
-                         << derailleur::util::ipv4_converter ( each.ip )
-                         << " porta: "
-                         << ( int ) each.port
-                         <<  std::endl;
-     }
-
-     derailleur::Log::Instance()->log ( this->get_name().c_str(),
-                                        "packet-in" );
+     this->learning_switch ( event, 15, 5 );
 
      delete event;
 }
