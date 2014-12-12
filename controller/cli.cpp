@@ -104,16 +104,29 @@ void derailleur::CLI::show ( std::vector< std::string >& commands )
                     << this->switches_copies_->size()
                     << "\n" << std::endl;
 
-          std::map< int, derailleur::Switch* >::iterator it;
+          if ( this->switches_copies_->size() > 0 ) {
 
-          for ( it = this->switches_copies_->begin();
-                    it != this->switches_copies_->end();
-                    ++it ) {
+               std::cout << std::setw ( 6 ) << "ID"
+                         << std::setw ( 24 ) << "MAC"
+                         << std::setw ( 20 ) << "OF Version"
+                         << std::setw ( 24 ) << "Name"
+                         << std::endl;
 
-               std::cout << it->first <<  std::endl;
+               std::map< int, derailleur::Switch* >::iterator it;
+
+               for ( it = this->switches_copies_->begin();
+                         it != this->switches_copies_->end();
+                         ++it ) {
+
+                    std::cout << std::setw ( 6 ) << it->first
+                              << std::setw ( 24 ) << it->second->get_mac_address()
+                              << std::setw ( 20 ) << ( int ) it->second->get_version()
+                              << std::setw ( 24 ) << it->second->get_name()
+                              << std::endl;
+               }
+
+               std::cout << std::endl;
           }
-
-          std::cout << std::endl;
 
      }
      /* Show one switch */
