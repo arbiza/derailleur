@@ -18,7 +18,9 @@
  */
 
 #include <iostream>
+#include <cstdlib>
 #include <vector>
+#include <algorithm>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
 
@@ -87,6 +89,18 @@ void derailleur::CLI::shell()
 
 
 
+void derailleur::CLI::help()
+{
+     std::cout << "\n\nHELP\n"
+               << "\nshow switches - list connected switches."
+               << "\nshow switch <ID> network - show switch info and its LAN."
+               << "\nshow switch <ID> flows - show running flows."
+               << "\n\nquit - stop controller and exit.\n"
+               << std::endl;
+}
+
+
+
 void derailleur::CLI::show ( std::vector< std::string >& commands )
 {
      if ( commands.size() < 2 ) {
@@ -131,11 +145,52 @@ void derailleur::CLI::show ( std::vector< std::string >& commands )
      }
      /* Show one switch */
      else if ( commands[1] == "switch" ) {
-          if ( commands.size() != 3 )
+
+          /* check if there is the number of required arguments */
+          if ( commands.size() < 4 ) {
+
                std::cout << "Wrong usage of 'show switch'; use help to see options."
                          << std::endl;
+          }
+          /* access selected switch if user informed correctly */
           else {
-               std::cout << "show switch" << std::endl;
+               /* check if argument is a number */
+               if ( std::all_of (
+                              commands[2].begin(), commands[2].end(), ::isdigit ) ) {
+
+                    /* check if switches_copies is populated */
+                    if ( this->switches_copies_->empty() )
+                         this->application_->get_switches_copies ( switches_copies_ );
+
+
+                    int id = std::atoi ( commands[2].c_str() );
+
+                    std::map< int, derailleur::Switch* >::iterator it;
+
+                    /* search for the switch in switches container */
+                    it = this->switches_copies_->find ( id );
+                    if ( it != this->switches_copies_->end() ) {
+
+
+                         if ( commands[3] == "lan" )
+                              print_switch_lan ( it );
+                         else
+                              print_switch_flows ( it );
+
+
+                    }
+                    /* if switch was not found a helping message is printed */
+                    else {
+                         std::cout << "There is no switch with ID "
+                                   << id <<  std::endl;
+                    }
+
+               }
+               /* if is not a number print helping information */
+               else {
+                    std::cout << "'show switch' requires a valid switch ID."
+                              << std::endl;
+               }
           }
      } else
           std::cout << "Unknown option for 'show'; use help to see options."
@@ -144,13 +199,28 @@ void derailleur::CLI::show ( std::vector< std::string >& commands )
 
 
 
-void derailleur::CLI::help()
+void derailleur::CLI::print_switch_lan (
+     std::map< int, derailleur::Switch* >::iterator& it )
 {
-     std::cout << "\n\nHELP\n"
-               << "\nshow switches - list connected switches."
-               << "\nshow switch <number> - show switch's info and its LAN."
-               << "\n\nquit - stop controller and exit.\n"
+     std::cout << "\nSwitch ID:" << std::setfill ( '.' ) << std::setw ( 64 ) << it->first
+               << "\nName:" << std::setfill ( '.' ) << std::setw ( 69 ) << it->second->get_name()
+               << "\nMAC:" << std::setfill ( '.' ) << std::setw ( 70 ) << it->second->get_mac_address()
+               << "\nManufacturer:" << std::setfill ( '.' ) << std::setw ( 61 ) << it->second->get_manufacturer()
+               << "\nOpenFlow version:" << std::setfill ( '.' ) << std::setw ( 57 ) << ( int ) it->second->get_version()
+               << "\nHardware:"  << std::setfill ( '.' ) << std::setw ( 65 ) << it->second->get_hardware()
+               << "\nSoftware:" << std::setfill ( '.' ) << std::setw ( 65 ) << it->second->get_software()
+               << "\nSerial number:" << std::setfill ( '.' ) << std::setw ( 60 ) << it->second->get_serial_number()
+               << "\n\nLAN"
                << std::endl;
 }
+
+
+
+void derailleur::CLI::print_switch_flows (
+     std::map< int, derailleur::Switch* >::iterator& it )
+{
+
+}
+
 
 

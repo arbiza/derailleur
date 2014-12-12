@@ -34,49 +34,65 @@ class Application;
 class Switch;
 
 class CLI {
-     
+
 public:
-     CLI( derailleur::Application* application );
-     
+     CLI ( derailleur::Application* application );
+
      ~CLI() {
           delete switches_copies_;
      }
-     
+
      /**
       * shell method starts the command line interface and waits for commands.
       */
      void shell ();
 
 private:
-     
+
      /**
-      * 
+      *
       */
      void help ();
-     
+
      /**
       * show handles every show commands.
       */
-     void show ( std::vector<std::string>& commands);
-     
+     void show ( std::vector<std::string>& commands );
+
      /**
-      * 
+      * Print switch details and its LAN.
+      * @param it Iterator at the position corresponding to the switch to be
+      * printed.
+      */
+     void print_switch_lan (
+          std::map< int, derailleur::Switch* >::iterator& it );
+          
+     /**
+      * Print flows running on switch.
+      * @param it Iterator at the position corresponding to the switch to be
+      * printed.
+      */
+     void print_switch_flows (
+          std::map< int, derailleur::Switch* >::iterator& it );
+
+     /**
+      *
       */
      derailleur::Application* application_;
-     
+
      /**
       * Container where switches' copies are stored. Every time user asks for
-      * switches this container is populated/updated; when user asks for an 
+      * switches this container is populated/updated; when user asks for an
       * specific switch only that switch is updated. It reduces the need of
       * copying switches objects, only some fields are updated.
-      * 
+      *
       * Why is this a pointer instead of an object such as in Controller class?
       * It is because CLI class is not instantiated in any other derailleur
       * class, this way switches_copies is not initialized causing Segmentation
-      * Fault errors. This pointer is initialized in constructor. 
+      * Fault errors. This pointer is initialized in constructor.
       */
      std::map< int, derailleur::Switch* >* switches_copies_;
-     
+
 };
 
 } // namespace derailleur
