@@ -19,9 +19,10 @@ Derailleur requires some packages for building. The versions indicated bellow we
 
 Building Derailleur is quite simple. Procedures bellow illustrate steps for out of source building using Cmake executed at derailleur root directory:
 
- ...derailleur$ mkdir controller/build
- ...derailleur$ cd controller/build
- ...derailleur$ cmake ../
- ...derailleur$ make
- ...derailleur$ sudo make install
-
+```
+...derailleur$ mkdir controller/build
+...derailleur$ cd controller/build
+...derailleur$ cmake ../
+...derailleur$ make
+...derailleur$ sudo make install
+```
