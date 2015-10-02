@@ -26,3 +26,9 @@ Building Derailleur is quite simple. Procedures bellow illustrate steps for out 
 ...derailleur$ make
 ...derailleur$ sudo make install
 ```
+
+## Development
+
+* Versioning is done using [Semantic Versioning 2.0.0](http://semver.org)
+* Coding style guide are base in [Google C++ guidelines](https://google-styleguide.googlecode.com/svn/trunk/cppguide.html)
+* Documentations is built using Doxygen
