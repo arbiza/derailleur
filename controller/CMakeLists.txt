@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 project(derailleur)
 
 # Compiler flags
-add_definitions(-Wall -std=c++11 -Wno-unused-function)
+add_definitions(-Wall -std=c++14 -Wno-unused-function)
 
 set(CMAKE_BUILD_TYPE Release)
 
