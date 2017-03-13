@@ -1,6 +1,6 @@
 # Notice
 
-It is not a production-ready software. Derailleur development aimed to validate my Master's Degree proposal. 
+_It is not a production-ready software._ Derailleur development aimed to validate my Master's Degree proposal. 
 I didn't continue to develop this controller because it is based on Libfluid and its development stopped.
 
 
